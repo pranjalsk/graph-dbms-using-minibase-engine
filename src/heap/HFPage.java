@@ -5,10 +5,10 @@ package heap;
 import java.io.*;
 import java.lang.*;
 
+import heap.ConstSlot;
+
 import global.*;
 import diskmgr.*;
-
-
 
  /**
   * Define constant values for INVALID_SLOT and EMPTY_SLOT

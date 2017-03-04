@@ -1,10 +1,12 @@
-package heap;
+package nodeheap;
 
 
 /** File DataPageInfo.java */
 
 
 import global.*;
+import heap.InvalidTupleSizeException;
+
 import java.io.*;
 
 /** DataPageInfo class : the type of records stored on a directory page.
@@ -114,6 +116,24 @@ class DataPageInfo implements GlobalConst{
     return atuple;
 
   }
+  
+  public Node convertToNode()
+	       throws IOException
+	  {
+
+	    // 1) write availspace, recct, pageId into data []
+	    Convert.setIntValue(availspace, offset, data);
+	    Convert.setIntValue(recct, offset+4, data);
+	    Convert.setIntValue(pageId.pid, offset+8, data);
+
+
+	    // 2) creat a Tuple object using this array
+	    Node anode = new Node(data, offset); 
+	 
+	    // 3) return tuple object
+	    return anode;
+
+	  }
     
   /** write this object's useful fields(availspace, recct, pageId) 
    *  to the data[](may be in buffer pool)
