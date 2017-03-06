@@ -2,9 +2,9 @@ package edgeheap;
 
 import java.io.IOException;
 
-import nodeheap.FieldNumberOutOfBoundException;
+import heap.FieldNumberOutOfBoundException;
 import nodeheap.Node;
-import nodeheap.Tuple;
+import heap.Tuple;
 
 import global.AttrType;
 import global.Convert;

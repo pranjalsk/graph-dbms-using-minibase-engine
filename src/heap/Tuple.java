@@ -16,7 +16,7 @@ public class Tuple implements GlobalConst {
 	/**
 	 * a byte array to hold data
 	 */
-	private byte[] data;
+	protected byte[] data;
 
 	/**
 	 * start position of this tuple in data[]
@@ -31,16 +31,16 @@ public class Tuple implements GlobalConst {
 	/**
 	 * private field Number of fields in this tuple
 	 */
-	private short fldCnt;
+	protected short fldCnt;
 
 	/**
 	 * private field Array of offsets of the fields
 	 */
 
-	private short[] fldOffset;
+	protected short[] fldOffset;
 
 	/**
-	 * Class constructor Creat a new tuple with length = max_size,tuple offset =
+	 * Class constructor Create a new tuple with length = max_size,tuple offset =
 	 * 0.
 	 */
 
