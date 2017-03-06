@@ -4,8 +4,10 @@ import java.io.IOException;
 
 import global.AttrType;
 import global.Descriptor;
+import heap.Tuple;
 import heap.InvalidTupleSizeException;
 import heap.InvalidTypeException;
+import heap.FieldNumberOutOfBoundException;
 
 public class Node extends Tuple {
 		

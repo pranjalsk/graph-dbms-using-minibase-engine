@@ -6,7 +6,6 @@ import java.io.*;
 import diskmgr.*;
 import bufmgr.*;
 import global.*;
-import nodeheap.DataPageInfo;
 import heap.FileAlreadyDeletedException;
 import heap.HFBufMgrException;
 import heap.HFDiskMgrException;
@@ -14,7 +13,6 @@ import heap.HFException;
 import heap.InvalidSlotNumberException;
 import heap.InvalidTupleSizeException;
 import heap.InvalidUpdateException;
-import nodeheap.Node;
 import heap.SpaceNotAvailableException;
 
 /**  This heapfile implementation is directory-based. We maintain a
