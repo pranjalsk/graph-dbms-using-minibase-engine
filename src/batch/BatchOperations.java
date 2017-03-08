@@ -32,51 +32,53 @@ public class BatchOperations {
 			graphDBName=args[2];
 			//fr = new FileReader(nodeHeapFileName);
 			//br = new BufferedReader(fr);
-            switch(taskName){
+			int taskNumber = 0;
+			if(taskName.equalsIgnoreCase("batchnodeinsert"))
+				taskNumber = 10;
+			else if(taskName.equalsIgnoreCase("batchedgeinsert"))
+				taskNumber = 11;
+			else if(taskName.equalsIgnoreCase("batchnodedelete"))
+				taskNumber = 12;
+			else if(taskName.equalsIgnoreCase("batchedgedelete"))
+				taskNumber = 13;
+			
+            switch(taskNumber){
             //batch node insert case
-            case "batchnodeinsert":
-            try {
-
-            
-            	
+            case 10:
+            try {                        	
             	String sCurrentLine;
-
-				br = new BufferedReader(new FileReader(nodeHeapFileName));
-          
-
+				br = new BufferedReader(new FileReader(nodeHeapFileName));       
 				while ((sCurrentLine = br.readLine()) != null) {
 					System.out.println(sCurrentLine);
-					StringTokenizer st=new StringTokenizer(sCurrentLine," ");
-					
-					
+					StringTokenizer st=new StringTokenizer(sCurrentLine," ");										
 				}
               }
 				catch (IOException e) {
-
 					e.printStackTrace();
-
 				} finally {
-
 					try {
-
 						if (br != null)
 							br.close();
-
-						if (fr != null)
-							fr.close();
-
+						//if (fr != null)
+						//	fr.close();
 					} catch (IOException ex) {
-
 						ex.printStackTrace();
-
 					}
-
 				}
-
-
             	break;
-            case "batchedgedelete":
-            	//TODO tast12
+            	
+            case 11:
+            	//TODO task 11
+            	break;
+            	
+            case 12:
+            	//TODO task 12
+            	break;
+            	
+            case 13:
+            	//TODO task 13
+            	break;
+            	
             default:
             	System.out.println( "Error: unrecognized task number " + taskName);
                 break;
