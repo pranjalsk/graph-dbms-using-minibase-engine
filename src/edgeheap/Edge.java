@@ -110,7 +110,7 @@ public class Edge extends Tuple {
 	
 	public void setHdr() throws InvalidTypeException, InvalidTupleSizeException, IOException{
 		AttrType[] types = {new AttrType(0),new AttrType(5)};
-		super.setHdr((short)2, types, new short[]{34});
+		super.setHdr((short)2, types, new short[]{54}); //check about 54
 	}
 	
 }
