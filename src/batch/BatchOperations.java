@@ -24,7 +24,7 @@ public class BatchOperations {
 	 
 	private static String taskName ="";
 
-	private static String nodeHeapFileName ="";
+	private static String heapFileName ="";
 	
 	private static String graphDBName ="";
  
@@ -40,9 +40,9 @@ public class BatchOperations {
 		
 			
 			taskName=args[0];
-			nodeHeapFileName=args[1];
+			heapFileName=args[1];
 			graphDBName=args[2];
-			//fr = new FileReader(nodeHeapFileName);
+			//fr = new FileReader(heapFileName);
 			//br = new BufferedReader(fr);
 			int taskNumber = 0;
 			if(taskName.equalsIgnoreCase("batchnodeinsert"))
@@ -60,7 +60,7 @@ public class BatchOperations {
             try {                        	
             	String sCurrentLine;
             	BatchNodeInsert bi=new BatchNodeInsert();
-				br = new BufferedReader(new FileReader(nodeHeapFileName));       
+				br = new BufferedReader(new FileReader(heapFileName));       
 				while ((sCurrentLine = br.readLine()) != null) {
 					System.out.println(sCurrentLine);
 					String[] tokens = sCurrentLine.split(" ");
@@ -79,10 +79,10 @@ public class BatchOperations {
 		            boolean exists = varTmpDir.exists();
 		            if(exists){
 			            dbObject.openDB(graphDBName);
-			            NodeHeapfile nhf=dbObject.createHeapFile(nodeHeapFileName);
+			            NodeHeapfile nhf=dbObject.createNodeHeapFile(heapFileName);
 			            bi.insertNode(nhf.get_fileName(), label, desc);
  		              }
-		            else
+		            else//we need to create a new GraphDB and one NHF and one EHF
 		            	System.out.println("File do not exists");
 				     }  
               }
