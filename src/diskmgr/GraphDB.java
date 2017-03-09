@@ -57,7 +57,7 @@ public class GraphDB extends DB {
 		return ehf.insertEdge(ed.getEdgeByteArray());
 	}
 
-	public boolean deleteRecord(String Label) throws InvalidSlotNumberException,
+	public boolean deleteNodeRecord(String Label) throws InvalidSlotNumberException,
 			HFException, HFBufMgrException, HFDiskMgrException, Exception {
 		boolean status = OK;
 		NScan scan = null;
