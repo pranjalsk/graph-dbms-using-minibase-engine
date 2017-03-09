@@ -2,7 +2,6 @@ package diskmgr;
 
 import global.Convert;
 import global.Descriptor;
-import heap.Tuple;
 import nodeheap.*;
 
 class DummyNodeRecord {
@@ -12,7 +11,7 @@ class DummyNodeRecord {
 	public Descriptor iDesc;
 	
 	// length under control
-	private int reclen;
+	//private int reclen;
 
 	private byte[] data;
 
@@ -26,7 +25,7 @@ class DummyNodeRecord {
 	 * another constructor
 	 */
 	public DummyNodeRecord(int _reclen) {
-		setRecLen(_reclen);
+		//setRecLen(_reclen);
 		data = new byte[_reclen];
 	}
 
@@ -41,7 +40,7 @@ class DummyNodeRecord {
 		setStrRec(arecord);
 		setDescRec(arecord);
 		data = arecord;
-		setRecLen(iLabel.length());
+		//setRecLen(iLabel.length());
 	}
 
 	/**
@@ -54,7 +53,7 @@ class DummyNodeRecord {
 	public DummyNodeRecord(Node _aNode) throws java.io.IOException {
 		data = new byte[_aNode.getLength()];
 		data = _aNode.getNodeByteArray();
-		setRecLen(_aNode.getLength());
+		//setRecLen(_aNode.getLength());
 
 		setStrRec(data);
 		setDescRec(data);
@@ -68,7 +67,7 @@ class DummyNodeRecord {
 	public byte[] toByteArray() throws java.io.IOException {
 		// data = new byte[reclen];
 		Convert.setStrValue(iLabel, 0, data);
-		Convert.setDescValue(iDesc, reclen - 20, data);
+		Convert.setDescValue(iDesc, 54-20, data);
 		return data;
 	}
 
@@ -81,22 +80,22 @@ class DummyNodeRecord {
 	public void setStrRec(byte[] _data) throws java.io.IOException {
 		// System.out.println("reclne= "+reclen);
 		// System.out.println("data size "+_data.size());
-		iLabel = Convert.getStrValue(0, _data, reclen - 20);
+		iLabel = Convert.getStrValue(0, _data, 54 - 20);
 	}
 	public void setDescRec(byte[] _data) throws java.io.IOException {
 		// System.out.println("reclne= "+reclen);
 		// System.out.println("data size "+_data.size());
-		iDesc = Convert.getDescValue(reclen - 20, _data);
+		iDesc = Convert.getDescValue(54 - 20, _data);
 	}
 
 	// Other access methods to the size of the String field and
 	// the size of the record
-	public void setRecLen(int size) {
-		reclen = size;
-	}
+//	public void setRecLen(int size) {
+//		reclen = size;
+//	}
 
-	public int getRecLength() {
-		return reclen;
-	}
+//	public int getRecLength() {
+//		return reclen;
+//	}
 }
 
