@@ -8,7 +8,247 @@ import global.*;
 
 public class DB implements GlobalConst {
 
+<<<<<<< HEAD
 	private static final int bits_per_page = MAX_SPACE * 8;
+=======
+  
+  private static final int bits_per_page = MAX_SPACE * 8;
+  
+  
+  /** Open the database with the given name.
+   *
+   * @param name DB_name
+   *
+   * @exception IOException I/O errors
+   * @exception FileIOException file I/O error
+   * @exception InvalidPageNumberException invalid page number
+   * @exception DiskMgrException error caused by other layers
+   */
+  public void openDB( String fname)
+    throws IOException, 
+	   InvalidPageNumberException, 
+	   FileIOException,
+	   DiskMgrException {
+    
+    name = fname;
+    
+    // Creaat a random access file
+    fp = new RandomAccessFile(fname, "rw");
+    
+    PageId pageId = new PageId();
+    Page apage = new Page();
+    pageId.pid = 0;
+    
+    num_pages = 1;	//temporary num_page value for pinpage to work
+    
+    pinPage(pageId, apage, false /*read disk*/);
+    
+    
+    DBFirstPage firstpg = new DBFirstPage();
+    firstpg.openPage(apage);
+    num_pages = firstpg.getNumDBPages();
+    
+    unpinPage(pageId, false /* undirty*/);
+  }
+  
+  /** default constructor.
+   */
+  public DB() { }
+  
+  
+  /** DB Constructors.
+   * Create a database with the specified number of pages where the page
+   * size is the default page size.
+   *
+   * @param name DB name
+   * @param num_pages number of pages in DB
+   *
+   * @exception IOException I/O errors
+   * @exception InvalidPageNumberException invalid page number
+   * @exception FileIOException file I/O error
+   * @exception DiskMgrException error caused by other layers
+   */
+  public void openDB( String fname, int num_pgs)
+    throws IOException, 
+	   InvalidPageNumberException,
+	   FileIOException,
+	   DiskMgrException {
+    
+    name = new String(fname);
+    num_pages = (num_pgs > 2) ? num_pgs : 2;
+    
+    File DBfile = new File(name);
+    
+    DBfile.delete();
+    
+    // Creaat a random access file
+    fp = new RandomAccessFile(fname, "rw");
+    
+    // Make the file num_pages pages long, filled with zeroes.
+    fp.seek((long)(num_pages*MINIBASE_PAGESIZE-1));
+    fp.writeByte(0);
+    
+    // Initialize space map and directory pages.
+    
+    // Initialize the first DB page
+    Page apage = new Page();
+    PageId pageId = new PageId();
+    pageId.pid = 0;
+    pinPage(pageId, apage, true /*no diskIO*/);
+    
+    DBFirstPage firstpg = new DBFirstPage(apage);
+    
+    firstpg.setNumDBPages(num_pages);
+    unpinPage(pageId, true /*dirty*/);
+    
+    // Calculate how many pages are needed for the space map.  Reserve pages
+    // 0 and 1 and as many additional pages for the space map as are needed.
+    int num_map_pages = (num_pages + bits_per_page -1)/bits_per_page;
+    
+    set_bits(pageId, 1+num_map_pages, 1);
+    
+  }
+  
+  /** Close DB file.
+   * @exception IOException I/O errors.
+   */
+  public void closeDB() throws IOException {
+    fp.close();
+  }
+  
+  
+  /** Destroy the database, removing the file that stores it. 
+   * @exception IOException I/O errors.
+   */
+  public void DBDestroy() 
+    throws IOException {
+    
+    fp.close();
+    File DBfile = new File(name);
+    DBfile.delete();
+  }
+  
+  /** Read the contents of the specified page into a Page object
+   *
+   * @param pageno pageId which will be read
+   * @param apage page object which holds the contents of page
+   *
+   * @exception InvalidPageNumberException invalid page number
+   * @exception FileIOException file I/O error
+   * @exception IOException I/O errors
+   */
+  public  void read_page(PageId pageno, Page apage)
+    throws InvalidPageNumberException, 
+	   FileIOException, 
+	   IOException {
+
+    if((pageno.pid < 0)||(pageno.pid >= num_pages))
+      throw new InvalidPageNumberException(null, "BAD_PAGE_NUMBER");
+    
+    // Seek to the correct page
+    fp.seek((long)(pageno.pid *MINIBASE_PAGESIZE));
+    
+    // Read the appropriate number of bytes.
+    byte [] buffer = apage.getpage();  //new byte[MINIBASE_PAGESIZE];
+    try{
+      fp.read(buffer);
+      PCounter.readIncrement();
+    }
+    catch (IOException e) {
+      throw new FileIOException(e, "DB file I/O error");
+    }
+    
+  }
+  
+  /** Write the contents in a page object to the specified page.
+   *
+   * @param pageno pageId will be wrote to disk
+   * @param apage the page object will be wrote to disk
+   *
+   * @exception InvalidPageNumberException invalid page number
+   * @exception FileIOException file I/O error
+   * @exception IOException I/O errors
+   */
+  public void write_page(PageId pageno, Page apage)
+    throws InvalidPageNumberException, 
+	   FileIOException, 
+	   IOException {
+
+    if((pageno.pid < 0)||(pageno.pid >= num_pages))
+      throw new InvalidPageNumberException(null, "INVALID_PAGE_NUMBER");
+    
+    // Seek to the correct page
+    fp.seek((long)(pageno.pid *MINIBASE_PAGESIZE));
+    
+    // Write the appropriate number of bytes.
+    try{
+      fp.write(apage.getpage());
+      PCounter.writeIncrement();
+    }
+    catch (IOException e) {
+      throw new FileIOException(e, "DB file I/O error");
+    }
+    
+  }
+  
+  /** Allocate a set of pages where the run size is taken to be 1 by default.
+   *  Gives back the page number of the first page of the allocated run.
+   *  with default run_size =1
+   *
+   * @param start_page_num page number to start with 
+   *
+   * @exception OutOfSpaceException database is full
+   * @exception InvalidRunSizeException invalid run size 
+   * @exception InvalidPageNumberException invalid page number
+   * @exception FileIOException DB file I/O errors
+   * @exception IOException I/O errors
+   * @exception DiskMgrException error caused by other layers
+   */
+  public void allocate_page(PageId start_page_num)
+    throws OutOfSpaceException, 
+	   InvalidRunSizeException, 
+	   InvalidPageNumberException, 
+	   FileIOException, 
+	   DiskMgrException,
+           IOException {
+    allocate_page(start_page_num, 1);
+  }
+  
+  /** user specified run_size
+   *
+   * @param start_page_num the starting page id of the run of pages
+   * @param run_size the number of page need allocated
+   *
+   * @exception OutOfSpaceException No space left
+   * @exception InvalidRunSizeException invalid run size 
+   * @exception InvalidPageNumberException invalid page number
+   * @exception FileIOException file I/O error
+   * @exception IOException I/O errors
+   * @exception DiskMgrException error caused by other layers
+   */
+  public void allocate_page(PageId start_page_num, int runsize)
+    throws OutOfSpaceException, 
+	   InvalidRunSizeException, 
+	   InvalidPageNumberException, 
+	   FileIOException, 
+	   DiskMgrException,
+           IOException {
+
+    if(runsize < 0) throw new InvalidRunSizeException(null, "Negative run_size");
+    
+    int run_size = runsize;
+    int num_map_pages = (num_pages + bits_per_page -1)/bits_per_page;
+    int current_run_start = 0; 
+    int current_run_length = 0;
+    
+    
+    // This loop goes over each page in the space map.
+    PageId pgid = new PageId();
+    byte [] pagebuf;
+    int byteptr;
+    
+    for(int i=0; i< num_map_pages; ++i) {// start forloop01
+>>>>>>> e8339c6fec377ffe2be45ad0a0f4bed0487e72e5
 	
 	private RandomAccessFile fp;
 	private int num_pages;

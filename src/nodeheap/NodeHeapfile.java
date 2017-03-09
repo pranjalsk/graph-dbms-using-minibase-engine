@@ -53,8 +53,17 @@ public class NodeHeapfile implements Filetypes, GlobalConst {
 	PageId _firstDirPageId; // page number of header page
 	int _ftype;
 	private boolean _file_deleted;
+
 	private String _fileName;
 	private static int tempfilecount = 0;
+
+	public String get_fileName() {
+		return _fileName;
+	}
+
+	public void set_fileName(String _fileName) {
+		this._fileName = _fileName;
+	}
 
 	/*
 	 * get a new datapage from the buffer manager and initialize dpinfo
@@ -334,7 +343,7 @@ public class NodeHeapfile implements Filetypes, GlobalConst {
 	} // end of getRecCnt
 
 	/**
-	 * Insert record into file, return its Rid.
+	 * Insert record into file, return its NID.
 	 * 
 	 * @param recPtr
 	 *            pointer of the record
@@ -784,8 +793,7 @@ public class NodeHeapfile implements Filetypes, GlobalConst {
 	/**
 	 * Read record from file, returning pointer and length.
 	 * 
-	 * @param rid
-	 *            Record ID
+	 * @param NID
 	 * 
 	 * @exception InvalidSlotNumberException
 	 *                invalid slot number

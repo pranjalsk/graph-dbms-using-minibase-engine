@@ -64,7 +64,25 @@ public class Node extends Tuple {
 	public void nodeSet(byte[] fromnode, int offset){
 		super.tupleSet(fromnode, offset, 54);
 	}
-	
+	/**
+	 * setHdr will set the header of this Node.
+	 *
+	 * @param numFlds
+	 *            number of fields
+	 * @param types[]
+	 *            contains the types that will be in this node
+	 * @param strSizes[]
+	 *            contains the sizes of the string
+	 * 
+	 * @exception IOException
+	 *                I/O errors
+	 * @exception InvalidTypeException
+	 *                Invalid tupe type
+	 * @exception InvalidTupleSizeException
+	 *                Tuple size too big
+	 *
+	 */
+	 
 	public void setHdr() throws InvalidTypeException, InvalidTupleSizeException, IOException{
 		AttrType[] types = {new AttrType(0),new AttrType(5)};
 		super.setHdr((short)2, types, new short[]{34});
