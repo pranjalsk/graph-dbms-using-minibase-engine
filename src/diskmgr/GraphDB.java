@@ -4,6 +4,7 @@ import heap.HFBufMgrException;
 import heap.HFDiskMgrException;
 import heap.HFException;
 
+import java.io.File;
 import java.io.IOException;
 
 import nodeheap.NodeHeapfile;
@@ -36,10 +37,10 @@ public class GraphDB extends DB {
 		return 0;
 	}
 
-	public NodeHeapfile createHeapFile(String nodeHeapFileName) throws HFException, HFBufMgrException, HFDiskMgrException, IOException {
+	public NodeHeapfile createNodeHeapFile(String nodeHeapFileName) throws HFException, HFBufMgrException, HFDiskMgrException, IOException {
 		
-		nhf = new NodeHeapfile(nodeHeapFileName);
-		return nhf;
+		 nhf = new NodeHeapfile(nodeHeapFileName);
+  		return nhf;
 		
 	}	
 
