@@ -2,7 +2,6 @@ package nodeheap;
 
 import java.io.*;
 
-
 import diskmgr.*;
 import bufmgr.*;
 import global.*;
@@ -237,7 +236,6 @@ public class NodeHeapfile implements Filetypes, GlobalConst {
 		// in the db->get_file_entry() call. In the second case, the
 		// file already exists and all that must be done is to fetch
 		// the header page into the buffer pool
-
 		// try to open the file
 
 		Page apage = new Page();
