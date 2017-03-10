@@ -56,7 +56,7 @@ public class BatchOperations {
 			taskName=inputArguments[0];
 			filePath=inputArguments[1];
 			graphDBName=inputArguments[2];
-	
+
 			int taskNumber = 0;
 			if(taskName.equalsIgnoreCase("batchnodeinsert"))
 				taskNumber = 10;
@@ -68,15 +68,24 @@ public class BatchOperations {
 				taskNumber = 13;
 			
 			FileReader fr = new FileReader(filePath);
-	    	GraphDB newGDB = new GraphDB(); //This is to be VERIFIED!!!
-	    	newGDB.openDB(graphDBName);
-	    	
+	    	 
+
+	    	GraphDB.initGraphDB(graphDBName);
+			GraphDB newGDB = new GraphDB(0); //This is to be VERIFIED!!!
+ 	    	
 	        switch(taskNumber){
 	        //Task : Batch node insert
 	        case 10:
-		        try {	        	
+		        try {	  
+		        	String sCurrentLine;
+		        			        
+		        	br = new BufferedReader(new FileReader(filePath));       
+					while ((sCurrentLine = br.readLine()) != null) {
+
 		        	BatchNodeInsert newNodeInsert = new BatchNodeInsert();
-		        	newNodeInsert.insertBatchNode(newGDB.nhf, fr);	        	
+		        	newNodeInsert.insertBatchNode(newGDB.nhf, sCurrentLine);
+		        	 
+					}
 		        }
 				catch (Exception e) {
 					e.printStackTrace();
@@ -86,8 +95,8 @@ public class BatchOperations {
 	        //Task : Batch Edge Insert
 	        case 11:
 	        	try {	        	
-		        	BatchEdgeInsert newEdgeInsert = new BatchEdgeInsert();
-		        	newEdgeInsert.insertBatchEdge(newGDB.ehf, fr);	        	
+		        	//BatchEdgeInsert newEdgeInsert = new BatchEdgeInsert();
+		        	//newEdgeInsert.insertBatchEdge(newGDB.ehf, fr);	        	
 		        }
 				catch (Exception e) {
 					e.printStackTrace();
@@ -97,8 +106,8 @@ public class BatchOperations {
 	        //Task : Batch Node Delete
 	        case 12:
 	        	try {	        	
-		        	BatchNodeDelete newNodeDelete = new BatchNodeDelete();
-		        	newNodeDelete.deleteBatchNode(newGDB.nhf, fr);	        	
+		        	//BatchNodeDelete newNodeDelete = new BatchNodeDelete();
+		        	//newNodeDelete.deleteBatchNode(newGDB.nhf, fr);	        	
 		        }
 				catch (Exception e) {
 					e.printStackTrace();
@@ -108,8 +117,8 @@ public class BatchOperations {
 	        //Task : Batch Edge Delete
 	        case 13:
 	        	try {	        	
-		        	BatchEdgeDelete newEdgeDelete = new BatchEdgeDelete();
-		        	newEdgeDelete.deleteBatchEdge(newGDB.ehf, fr);	        	
+		        	//BatchEdgeDelete newEdgeDelete = new BatchEdgeDelete();
+		        	//newEdgeDelete.deleteBatchEdge(newGDB.ehf, fr);	        	
 		        }
 				catch (Exception e) {
 					e.printStackTrace();
