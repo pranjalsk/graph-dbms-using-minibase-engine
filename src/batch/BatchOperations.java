@@ -66,9 +66,7 @@ public class BatchOperations {
 				taskNumber = 12;
 			else if(taskName.equalsIgnoreCase("batchedgedelete"))
 				taskNumber = 13;
-			
-			FileReader fr = new FileReader(filePath);
-	    	 
+			   	 
 
 	    	GraphDB.initGraphDB(graphDBName);
 			GraphDB newGDB = new GraphDB(0); //This is to be VERIFIED!!!
@@ -95,8 +93,8 @@ public class BatchOperations {
 	        //Task : Batch Edge Insert
 	        case 11:
 	        	try {	        	
-		        	//BatchEdgeInsert newEdgeInsert = new BatchEdgeInsert();
-		        	//newEdgeInsert.insertBatchEdge(newGDB.ehf, fr);	        	
+		        	BatchEdgeInsert newEdgeInsert = new BatchEdgeInsert();
+		        	newEdgeInsert.insertBatchEdge(newGDB.ehf, newGDB.nhf, filePath);	        	
 		        }
 				catch (Exception e) {
 					e.printStackTrace();
@@ -106,8 +104,8 @@ public class BatchOperations {
 	        //Task : Batch Node Delete
 	        case 12:
 	        	try {	        	
-		        	//BatchNodeDelete newNodeDelete = new BatchNodeDelete();
-		        	//newNodeDelete.deleteBatchNode(newGDB.nhf, fr);	        	
+		        	BatchNodeDelete newNodeDelete = new BatchNodeDelete();
+		        	newNodeDelete.deleteBatchNode(newGDB.nhf, newGDB.ehf, filePath);	        	
 		        }
 				catch (Exception e) {
 					e.printStackTrace();
@@ -117,8 +115,8 @@ public class BatchOperations {
 	        //Task : Batch Edge Delete
 	        case 13:
 	        	try {	        	
-		        	//BatchEdgeDelete newEdgeDelete = new BatchEdgeDelete();
-		        	//newEdgeDelete.deleteBatchEdge(newGDB.ehf, fr);	        	
+		        	BatchEdgeDelete newEdgeDelete = new BatchEdgeDelete();
+		        	newEdgeDelete.deleteBatchEdge(newGDB.ehf, newGDB.nhf, filePath);	        	
 		        }
 				catch (Exception e) {
 					e.printStackTrace();
