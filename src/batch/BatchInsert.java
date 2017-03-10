@@ -33,7 +33,7 @@ public class BatchInsert {
 		}
 	}// getNidFromNodeLabel
 	
-	public EID getEidFromEdgeLabel(String label, EdgeHeapFile ehf) throws Exception{
+	public EID getEidFromEdgeLabel(NID sourceNID, NID destinationNID, String edgeLabel, EdgeHeapFile ehf) throws Exception{
 		try{
 			EID newEid = new EID();
 			EScan newEscan = ehf.openScan();
@@ -41,9 +41,10 @@ public class BatchInsert {
 			boolean done = false;
 			
 			while(!done){
-				newEdge = newEscan.getNext(newEid);
-				String edgeLabel = newEdge.getLabel();
-				if(edgeLabel.equalsIgnoreCase(label)){
+				newEdge = newEscan.getNext(newEid);			
+				if(newEdge.getLabel().equalsIgnoreCase(edgeLabel) &&
+						newEdge.getSource().equals(sourceNID) &&
+						newEdge.getDestination().equals(destinationNID)){
 					done = true;			
 				}
 			}
