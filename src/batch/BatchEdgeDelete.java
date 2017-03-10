@@ -18,7 +18,9 @@ public class BatchEdgeDelete {
 				String edgeLabel = inputAttributes[2];
 				
 				BatchInsert batchinsert = new BatchInsert();
-				EID newEid = batchinsert.getEidFromEdgeLabel(edgeLabel, ehf);
+				NID sourceNID = batchinsert.getNidFromNodeLabel(sourceLabel, nhf);
+				NID destinationNID = batchinsert.getNidFromNodeLabel(destinationLabel, nhf);
+				EID newEid = batchinsert.getEidFromEdgeLabel(sourceNID, destinationNID, edgeLabel, ehf);
 				boolean deleteStatus = ehf.deleteRecord(newEid);				
 			}
 		}
