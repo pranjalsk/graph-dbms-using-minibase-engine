@@ -226,5 +226,23 @@ public class GraphDB extends DB {
 	}*/
 
 	
+	/*public static void main(String[] args) throws HFException, HFBufMgrException, HFDiskMgrException, GetFileEntryException, ConstructPageException, AddFileEntryException, IOException, heap.FieldNumberOutOfBoundException, InvalidSlotNumberException, InvalidTupleSizeException, SpaceNotAvailableException, FieldNumberOutOfBoundException {
+		initGraphDB("MyDB");
+		GraphDB gdb = new GraphDB(0);
+		//gdb.initGraphDB("GraphDBTest");
+		
+		Descriptor desc = new Descriptor();
+		desc.set(1, 2, 3, 4, 5);
+		
+		Node node = new Node();
+		node.setLabel("A");
+		node.setDesc(desc);
+		
+		gdb.insertNode(node.getLabel(), node.getDesc());
+		
+		System.out.println(gdb.nhf.getNodeCnt());
+		//System.out.println(gdb.nhf.);
+		
+	}*/
 
 }
