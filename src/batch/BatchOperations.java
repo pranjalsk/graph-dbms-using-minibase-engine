@@ -4,6 +4,8 @@ import global.Descriptor;
 import heap.HFBufMgrException;
 import heap.HFDiskMgrException;
 import heap.HFException;
+import heap.InvalidSlotNumberException;
+import heap.InvalidTupleSizeException;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -84,6 +86,9 @@ public class BatchOperations {
 		        	newNodeInsert.insertBatchNode(newGDB.nhf, sCurrentLine);
 		        	 
 					}
+					
+					printStatistics(newGDB);
+					
 		        }
 				catch (Exception e) {
 					e.printStackTrace();
@@ -94,7 +99,8 @@ public class BatchOperations {
 	        case 11:
 	        	try {	        	
 		        	BatchEdgeInsert newEdgeInsert = new BatchEdgeInsert();
-		        	newEdgeInsert.insertBatchEdge(newGDB.ehf, newGDB.nhf, filePath);	        	
+		        	newEdgeInsert.insertBatchEdge(newGDB.ehf, newGDB.nhf, filePath);
+		        	printStatistics(newGDB);
 		        }
 				catch (Exception e) {
 					e.printStackTrace();
@@ -105,7 +111,8 @@ public class BatchOperations {
 	        case 12:
 	        	try {	        	
 		        	BatchNodeDelete newNodeDelete = new BatchNodeDelete();
-		        	newNodeDelete.deleteBatchNode(newGDB.nhf, newGDB.ehf, filePath);	        	
+		        	newNodeDelete.deleteBatchNode(newGDB.nhf, newGDB.ehf, filePath);
+		        	printStatistics(newGDB);
 		        }
 				catch (Exception e) {
 					e.printStackTrace();
@@ -116,7 +123,8 @@ public class BatchOperations {
 	        case 13:
 	        	try {	        	
 		        	BatchEdgeDelete newEdgeDelete = new BatchEdgeDelete();
-		        	newEdgeDelete.deleteBatchEdge(newGDB.ehf, newGDB.nhf, filePath);	        	
+		        	newEdgeDelete.deleteBatchEdge(newGDB.ehf, newGDB.nhf, filePath);
+		        	printStatistics(newGDB);
 		        }
 				catch (Exception e) {
 					e.printStackTrace();
@@ -130,5 +138,11 @@ public class BatchOperations {
 	        }//switch
 		}//else
 	}//main
-
+	public static void printStatistics(GraphDB newGDB) throws Exception
+	{
+		int n=newGDB.getNodeCnt();
+		System.out.println("NodeCount "+n);
+		int n1=newGDB.getEdgeCnt();
+		System.out.println("EdgeCount "+n1);
+	}
 }
