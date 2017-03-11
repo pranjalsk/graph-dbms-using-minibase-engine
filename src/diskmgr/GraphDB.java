@@ -47,7 +47,7 @@ public class GraphDB extends DB {
 		}
 	}
 
-	public void initGraphDB(String db_name) {
+	public static void initGraphDB(String db_name) {
 		String dbpath = "/tmp/" + db_name + System.getProperty("user.name")
 				+ ".minibase-db";
 		String logpath = "/tmp/" + db_name + System.getProperty("user.name")
