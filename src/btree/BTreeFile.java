@@ -350,9 +350,9 @@ public class BTreeFile extends IndexFile
    *@exception NodeNotMatchException  node not match index page nor leaf page
    *@exception ConvertException error when convert between revord and byte 
    *             array
-   *@exception DeleteRecException error when delete in index page
+   *@exception DeleteRecException eIndexNodeLabelrror when delete in index page
    *@exception IndexSearchException error when search 
-   *@exception IteratorException iterator error
+   *@exception IteratorException iteIndexNodeLabelrator error
    *@exception LeafDeleteException error when delete in leaf page
    *@exception InsertException  error when insert in index page
    */    
