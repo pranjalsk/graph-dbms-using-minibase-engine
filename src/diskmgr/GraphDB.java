@@ -48,7 +48,7 @@ public class GraphDB extends DB {
 		}
 	}
 
-//	
+
 //	public void createBTNodeLabel(){
 //		NID nid = new NID();
 //		String key = null;
