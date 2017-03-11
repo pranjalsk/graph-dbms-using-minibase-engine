@@ -48,6 +48,7 @@ public class GraphDB extends DB {
 		}
 	}
 
+<<<<<<< HEAD
 //	
 //	public void createBTNodeLabel(){
 //		NID nid = new NID();
@@ -69,6 +70,9 @@ public class GraphDB extends DB {
 	
 	
 	public void initGraphDB(String db_name) {
+=======
+	public static void initGraphDB(String db_name) {
+>>>>>>> 90cda1e0f35d63d82c9ef841fe8d09539ba70b0d
 		String dbpath = "/tmp/" + db_name + System.getProperty("user.name")
 				+ ".minibase-db";
 		String logpath = "/tmp/" + db_name + System.getProperty("user.name")
