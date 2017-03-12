@@ -11,17 +11,28 @@ import heap.FieldNumberOutOfBoundException;
 
 public class Node extends Tuple {
 		
-		
+	//fldCnt needs to be set	
 	public Node() {
 		super();
+		this.setFldCnt(2);
 	}
 
 	public Node(byte[] aNode, int node_offset) {
 		super( aNode,  node_offset, 54);
+		this.setFldCnt(2);
+	}
+	public Node(int size) {
+		super(size);
+		this.setFldCnt(2);
 	}
 
 	public Node(Node fromNode) {
-		super((Tuple)fromNode);
+		data = fromNode.getNodeByteArray();
+		tuple_length = fromNode.getLength();
+		tuple_offset = 0;
+		fldCnt = fromNode.noOfFlds();
+		fldOffset = fromNode.copyFldOffset();
+
 	}
 
 	public String getLabel() throws FieldNumberOutOfBoundException, IOException{
@@ -31,7 +42,7 @@ public class Node extends Tuple {
 	public Descriptor getDesc() throws FieldNumberOutOfBoundException, IOException{
 		return super.getDescFld(2);
 	}
-	
+	//Need to pass 1 here vs 0 since 0 is excluded in Tuple.java
 	public Node setLabel(String label) throws FieldNumberOutOfBoundException, IOException{
 		return (Node)super.setStrFld(1, label);
 	}
@@ -54,7 +65,8 @@ public class Node extends Tuple {
 	}
 	
 	public void nodeCopy(Node fromNode){
-		super.tupleCopy((Tuple)fromNode);
+		byte[] temparray = fromNode.getNodeByteArray();
+		System.arraycopy(temparray, 0, data, tuple_offset, tuple_length);
 	}
 	
 	public void nodeInit(byte[] aNode, int node_offset){
