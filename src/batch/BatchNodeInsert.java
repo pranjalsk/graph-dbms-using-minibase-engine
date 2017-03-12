@@ -36,13 +36,6 @@ public class BatchNodeInsert {
 		node.setHdr();
 		node.setLabel(label);
 		node.setDesc(desc);
-		
-		//for testing node creation
-		System.out.println(node.getLabel());
-		for (int i = 0; i <5; i++) {
-			System.out.print(node.getDesc().get(i));	
-		}
-		System.out.println("Node created successfully");
 		return node;
 	}
 
