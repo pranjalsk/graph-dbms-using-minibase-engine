@@ -21,12 +21,12 @@ public class Tuple implements GlobalConst {
 	/**
 	 * start position of this tuple in data[]
 	 */
-	private int tuple_offset;
+	protected int tuple_offset;
 
 	/**
 	 * length of this tuple
 	 */
-	private int tuple_length;
+	protected int tuple_length;
 
 	/**
 	 * private field Number of fields in this tuple
@@ -39,13 +39,21 @@ public class Tuple implements GlobalConst {
 
 	protected short[] fldOffset;
 
+	public int getFldCnt() {
+		return (int)fldCnt;
+	}
+//for node insert operation we need to set fldCnt
+	public void setFldCnt(int fldCnt) {
+		this.fldCnt = (short)fldCnt;
+	}
+
 	/**
 	 * Class constructor Create a new tuple with length = max_size,tuple offset =
 	 * 0.
 	 */
 
 	public Tuple() {
-		// Creat a new tuple
+		// Create a new tuple
 		data = new byte[max_size];
 		tuple_offset = 0;
 		tuple_length = max_size;
