@@ -1,25 +1,28 @@
+package diskmgr;
 
-	package diskmgr;
-	
-	public class PCounter {
+public class PCounter {
 	private static int rCounter;
 	private static int wCounter;
+
 	public static void initialize() {
-	
-	rCounter =0;
-	wCounter =0;
+		rCounter = 0;
+		wCounter = 0;
 	}
+
 	public static void readIncrement() {
-	rCounter++;
+		rCounter++;
 	}
-	public static int getRCounter(){
+
+	public static int getRCounter() {
 		return rCounter;
 	}
+
 	public static void writeIncrement() {
-	wCounter++;
+		wCounter++;
 	}
-	public static int getWCounter(){
+
+	public static int getWCounter() {
 		return wCounter;
 	}
-	
-	}
+
+}
