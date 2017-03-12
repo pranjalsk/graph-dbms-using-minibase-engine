@@ -1,25 +1,11 @@
 package batch;
 
-import global.Descriptor;
-import heap.HFBufMgrException;
-import heap.HFDiskMgrException;
-import heap.HFException;
-import heap.InvalidSlotNumberException;
-import heap.InvalidTupleSizeException;
-
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.StringTokenizer;
 
-import nodeheap.NodeHeapfile;
-import diskmgr.DB;
-import diskmgr.DiskMgrException;
-import diskmgr.FileIOException;
 import diskmgr.GraphDB;
-import diskmgr.InvalidPageNumberException;
+import diskmgr.PCounter;
 
 public class BatchOperations {
 	 
@@ -144,5 +130,12 @@ public class BatchOperations {
 		System.out.println("NodeCount "+n);
 		int n1=newGDB.getEdgeCnt();
 		System.out.println("EdgeCount "+n1);
-	}
+		PCounter pCount = new PCounter();
+		System.out.println("Number of pages read in Node Heap File"+pCount.getRCounterForNHF(newGDB.nhf));
+		System.out.println("Number of pages written to Node Heap File"+pCount.getWCounterForNHF(newGDB.nhf));
+		System.out.println("Number of pages read in Edge Heap File"+pCount.getRCounterForEHF(newGDB.ehf));
+		System.out.println("Number of pages written to Edge Heap File"+pCount.getWCounterForEHF(newGDB.ehf));
+
+		
+	}   
 }
