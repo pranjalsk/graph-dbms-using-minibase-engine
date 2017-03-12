@@ -42,17 +42,23 @@ public class UnitTestingPhase2 {
 //		edgeTesting();
 		
 		GraphDB.initGraphDB("MyDB1");
-		System.out.println("Graph DB 1 creatsed");
-		GraphDB gdb = new GraphDB(0);
-		System.out.println("graph DB name: "+ gdb.db_name());
-		
-		GraphDB.initGraphDB("MyDB2");
-		System.out.println("Graph DB 1 creatsed");
-		GraphDB gdb2 = new GraphDB(0);
-		System.out.println("graph DB name: "+ gdb.db_name());
-		
+		System.out.println("MYDB Craeted");
 		GraphDB.initGraphDB("MyDB1");
-		System.out.println("graph DB name: "+ gdb.db_name());
+		System.out.println("MYDB again Craeted?");
+		GraphDB.initGraphDB("MyDB2");
+		
+		
+//		System.out.println("Graph DB 1 creatsed");
+//		GraphDB gdb = new GraphDB(0);
+//		System.out.println("graph DB name: "+ gdb.db_name());
+//		
+//		GraphDB.initGraphDB("MyDB2");
+//		System.out.println("Graph DB 1 creatsed");
+//		GraphDB gdb2 = new GraphDB(0);
+//		System.out.println("graph DB name: "+ gdb.db_name());
+//		
+//		GraphDB.initGraphDB("MyDB1");
+//		System.out.println("graph DB name: "+ gdb.db_name());
 		
 //		BatchNodeInsert b = new BatchNodeInsert();
 //		b.insertBatchNode(gdb.nhf, "A 1 2 3 4 5");
