@@ -47,13 +47,16 @@ public class GraphDB extends DB {
 		int KeyTypeDesc = AttrType.attrDesc;
 		
 		nhf = new NodeHeapfile("NodeHeapFile");
+		System.out.println("heap file created");
 		ehf = new EdgeHeapFile("EdgeHeapFile");
+		System.out.println("edge heap file cretaed");
 		btf_node = new BTreeFile("IndexNodeLabel", keyTypeString, 32, 1);
 		btf_edge_label = new BTreeFile("IndexEdgeLabel", keyTypeString, 32, 1);
 		btf_edge_weight = new BTreeFile("IndexEdgeWeight", keyTypeInt, 4, 1);
-		createBTNodeLabel();
-		createBTEdgeLabel();
-		createBTEdgeWeight();
+		System.out.println("BTree intitalization is ok");
+//		createBTNodeLabel();
+//		createBTEdgeLabel();
+//		createBTEdgeWeight();
 			
 
 		if (type == 1) {
@@ -105,48 +108,61 @@ public class GraphDB extends DB {
 	}
 
 	public void createBTNodeLabel() throws KeyTooLongException, KeyNotMatchException, LeafInsertRecException, IndexInsertRecException, ConstructPageException, UnpinPageException, PinPageException, NodeNotMatchException, ConvertException, DeleteRecException, IndexSearchException, IteratorException, LeafDeleteException, InsertException, IOException, InvalidTupleSizeException, heap.FieldNumberOutOfBoundException{
-		NID nid = new NID();
-		String key = null;
-		Node newNode = null;
-		NScan newNscan = nhf.openScan();
-		boolean done = false;
-		
-		while(!done){
-			newNode = newNscan.getNext(nid);
-			key = newNode.getLabel();
-			btf_node.insert(new StringKey(key), (RID) nid);			
+		try {
+			NID nid = new NID();
+			String key = null;
+			Node newNode = null;
+			NScan newNscan = nhf.openScan();
+			boolean done = false;
+			
+			while(!done){
+				newNode = newNscan.getNext(nid);
+				key = newNode.getLabel();
+				btf_node.insert(new StringKey(key), (RID) nid);			
+			}
+			newNscan.closescan();
+		} catch (Exception e) {
+			System.err.println("Empty node heap file");
+			e.printStackTrace();
 		}
-		newNscan.closescan();
 	}
 	
 	public void createBTEdgeLabel() throws KeyTooLongException, KeyNotMatchException, LeafInsertRecException, IndexInsertRecException, ConstructPageException, UnpinPageException, PinPageException, NodeNotMatchException, ConvertException, DeleteRecException, IndexSearchException, IteratorException, LeafDeleteException, InsertException, IOException, InvalidTupleSizeException, heap.FieldNumberOutOfBoundException{
-		EID eid = new EID();
-		String key = null;
-		Edge newEdge = null;
-		EScan newEscan = ehf.openScan();
-		boolean done = false;
-		
-		while(!done){
-			newEdge = newEscan.getNext(eid);
-			key = newEdge.getLabel();
-			btf_edge_label.insert(new StringKey(key), (RID) eid);			
+		try {
+			EID eid = new EID();
+			String key = null;
+			Edge newEdge = null;
+			EScan newEscan = ehf.openScan();
+			boolean done = false;
+			
+			while(!done){
+				newEdge = newEscan.getNext(eid);
+				key = newEdge.getLabel();
+				btf_edge_label.insert(new StringKey(key), (RID) eid);			
+			}
+			newEscan.closescan();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		newEscan.closescan();
 	}
 	
 	public void createBTEdgeWeight() throws KeyTooLongException, KeyNotMatchException, LeafInsertRecException, IndexInsertRecException, ConstructPageException, UnpinPageException, PinPageException, NodeNotMatchException, ConvertException, DeleteRecException, IndexSearchException, IteratorException, LeafDeleteException, InsertException, IOException, InvalidTupleSizeException, heap.FieldNumberOutOfBoundException{
-		EID eid = new EID();
-		int key;
-		Edge newEdge = null;
-		EScan newEscan = ehf.openScan();
-		boolean done = false;
-		
-		while(!done){
-			newEdge = newEscan.getNext(eid);
-			key = newEdge.getWeight();
-			btf_edge_weight.insert(new IntegerKey(key), (RID) eid);			
+		try {
+			EID eid = new EID();
+			int key;
+			Edge newEdge = null;
+			EScan newEscan = ehf.openScan();
+			boolean done = false;
+			
+			while(!done){
+				newEdge = newEscan.getNext(eid);
+				key = newEdge.getWeight();
+				btf_edge_weight.insert(new IntegerKey(key), (RID) eid);			
+			}
+			newEscan.closescan();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		newEscan.closescan();
 	}
 	
 	public int getNodeCnt() throws InvalidSlotNumberException,

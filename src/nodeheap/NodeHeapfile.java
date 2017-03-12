@@ -447,10 +447,9 @@ public class NodeHeapfile implements Filetypes, GlobalConst {
 					// calling a NHFPage function
 
 					anode = dpinfo.convertToNode();
-
-					byte[] tmpData = anode.getNodeByteArray();
-					currentDataPageNid = (NID) currentDirPage
-							.insertRecord(tmpData);
+						
+					byte[] tmpData = anode.getNodeByteArray();	//failing here****
+					currentDataPageNid = (NID) currentDirPage.insertRecord(tmpData);
 
 					NID tmpnid = currentDirPage.firstRecord();
 
