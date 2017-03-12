@@ -18,16 +18,15 @@ public class Node extends Tuple {
 	}
 
 	public Node(byte[] aNode, int node_offset) {
-<<<<<<< HEAD
+
 		super( aNode,  node_offset, 52);
-=======
-		super( aNode,  node_offset, 54);
+
 		this.setFldCnt(2);
 	}
 	public Node(int size) {
 		super(size);
 		this.setFldCnt(2);
->>>>>>> 314cc41000a399fa09ae12050ea15d2369e69c1d
+
 	}
 
 	public Node(Node fromNode) {

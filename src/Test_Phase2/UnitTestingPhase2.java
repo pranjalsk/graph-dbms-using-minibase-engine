@@ -38,17 +38,20 @@ public class UnitTestingPhase2 {
 
 	public static void main(String[] args) throws Exception {
 	
-		GraphDB.initGraphDB("MyDB");
-		System.out.println("Graph DB created");
-		GraphDB gdb = new GraphDB(0);
-		BatchNodeInsert b = new BatchNodeInsert();
-		b.insertBatchNode(gdb.nhf, "A 1 2 3 4 5");
-		System.out.println(gdb.nhf.getNodeCnt());	
+		nodeTesting();
+		edgeTesting();
+		
+//		GraphDB.initGraphDB("MyDB");
+//		System.out.println("Graph DB created");
+//		GraphDB gdb = new GraphDB(0);
+//		BatchNodeInsert b = new BatchNodeInsert();
+//		b.insertBatchNode(gdb.nhf, "A 1 2 3 4 5");
+//		System.out.println(gdb.nhf.getNodeCnt());	
 		
 	}
 	
 	//Node creation working fine
-	public void nodeTesting() throws InvalidTypeException, InvalidTupleSizeException, IOException, FieldNumberOutOfBoundException{
+	public static void nodeTesting() throws InvalidTypeException, InvalidTupleSizeException, IOException, FieldNumberOutOfBoundException{
 		Descriptor desc = new Descriptor();
 		desc.set(1, 2, 3, 4, 5);
 		
@@ -67,7 +70,7 @@ public class UnitTestingPhase2 {
 	}
 	
 	//Edge creation working fine
-	public void edgeTesting() throws InvalidTypeException, InvalidTupleSizeException, IOException, FieldNumberOutOfBoundException{
+	public static void edgeTesting() throws InvalidTypeException, InvalidTupleSizeException, IOException, FieldNumberOutOfBoundException{
 		PageId pageno = new PageId(2);
 		NID src = new NID(pageno , 1);
 		//NID src = new NID();
