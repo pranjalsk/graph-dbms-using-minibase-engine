@@ -38,12 +38,22 @@ public class UnitTestingPhase2 {
 
 	public static void main(String[] args) throws Exception {
 	
-		nodeTesting();
-		edgeTesting();
+//		nodeTesting();
+//		edgeTesting();
 		
-//		GraphDB.initGraphDB("MyDB");
-//		System.out.println("Graph DB created");
-//		GraphDB gdb = new GraphDB(0);
+		GraphDB.initGraphDB("MyDB1");
+		System.out.println("Graph DB 1 creatsed");
+		GraphDB gdb = new GraphDB(0);
+		System.out.println("graph DB name: "+ gdb.db_name());
+		
+		GraphDB.initGraphDB("MyDB2");
+		System.out.println("Graph DB 1 creatsed");
+		GraphDB gdb2 = new GraphDB(0);
+		System.out.println("graph DB name: "+ gdb.db_name());
+		
+		GraphDB.initGraphDB("MyDB1");
+		System.out.println("graph DB name: "+ gdb.db_name());
+		
 //		BatchNodeInsert b = new BatchNodeInsert();
 //		b.insertBatchNode(gdb.nhf, "A 1 2 3 4 5");
 //		System.out.println(gdb.nhf.getNodeCnt());	

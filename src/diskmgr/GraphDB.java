@@ -37,6 +37,8 @@ public class GraphDB extends DB {
 	public BTreeFile btf_edge_label;
 	public BTreeFile btf_edge_weight;
 	public int type;
+	public static String dbpath;
+	public static String logpath;
 
 	public GraphDB(int type) throws HFException, HFBufMgrException,
 			HFDiskMgrException, IOException, GetFileEntryException,
@@ -46,9 +48,9 @@ public class GraphDB extends DB {
 		int keyTypeInt = AttrType.attrInteger;
 		int KeyTypeDesc = AttrType.attrDesc;
 		
-		nhf = new NodeHeapfile("NodeHeapFile");
+		nhf = new NodeHeapfile("NodeHeapFile"+dbpath);
 		System.out.println("heap file created");
-		ehf = new EdgeHeapFile("EdgeHeapFile");
+		ehf = new EdgeHeapFile("EdgeHeapFile"+dbpath);
 		System.out.println("edge heap file cretaed");
 		btf_node = new BTreeFile("IndexNodeLabel", keyTypeString, 32, 1);
 		btf_edge_label = new BTreeFile("IndexEdgeLabel", keyTypeString, 32, 1);
@@ -67,12 +69,13 @@ public class GraphDB extends DB {
 	}
 
 	public static void initGraphDB(String db_name) {
-		String dbpath = "/tmp/" + db_name + System.getProperty("user.name")
+		dbpath = "/tmp/" + db_name + System.getProperty("user.name")
 				+ ".minibase-db";
-		String logpath = "/tmp/" + db_name + System.getProperty("user.name")
+		logpath = "/tmp/" + db_name + System.getProperty("user.name")
 				+ ".minibase-log";
 		SystemDefs sysdef = new SystemDefs(dbpath, 100, 100, "Clock");
-
+		
+		PCounter.initialize();
 		// Kill anything that might be hanging around
 		String newdbpath;
 		String newlogpath;
