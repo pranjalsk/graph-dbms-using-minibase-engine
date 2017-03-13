@@ -2,6 +2,7 @@ package Test_Phase2;
 
 import java.io.IOException;
 
+import batch.BatchEdgeInsert;
 import batch.BatchInsert;
 import batch.BatchNodeDelete;
 import batch.BatchNodeInsert;
@@ -62,12 +63,36 @@ public class UnitTestingPhase2 {
 		b.insertBatchNode(gdb.nhf, "C 1 5 3 4 5");
 		b.insertBatchNode(gdb.nhf, "D 1 2 2 4 5");
 		System.out.println("Nodecnt-->"+gdb.nhf.getNodeCnt());	
-		
 		scanNodeHeapFile();
-		BatchNodeDelete d = new BatchNodeDelete();
-		//d.deleteBatchNode(gdb.nhf, gdb.ehf, filePath);
 		
-		String nodeLabel = "B";
+		edgeInsertTest("A", "B", 445);
+		edgeInsertTest("B", "D", 829);
+		edgeInsertTest("C", "D", 747);
+		edgeInsertTest("A", "C", 478);
+		edgeInsertTest("B", "C", 329);
+		System.out.println("EdgeCount-->"+gdb.ehf.getEdgeCnt());
+
+	}
+	
+	public static void edgeInsertTest(String srcLbl, String destLbl, int edgeWeight) throws Exception{
+		BatchInsert batchinsert = new BatchInsert();
+		NID src  = batchinsert.getNidFromNodeLabel(srcLbl, gdb.nhf);
+		NID dest = batchinsert.getNidFromNodeLabel(destLbl, gdb.nhf);	
+				
+		Edge newEdge = new Edge();
+		newEdge.setHdr();
+		newEdge.setSource(src);
+		newEdge.setDestination(dest);
+		newEdge.setLabel("edge"+srcLbl+destLbl);
+		newEdge.setWeight(edgeWeight);	
+		EID newEid = new EID();
+		newEid = gdb.ehf.insertEdge(newEdge.getEdgeByteArray());	
+			
+	}
+	
+	
+	public static void deleteNodeFromHF(String Label) throws Exception{
+		String nodeLabel = Label;
 		BatchInsert batchinsert = new BatchInsert();
 		boolean deleteStatus = false;
 		NID currentNid = new NID(); //To store a copy of the nid
@@ -92,12 +117,9 @@ public class UnitTestingPhase2 {
 //			if(currentNid.equals(sourceNID) || currentNid.equals(destinationNID)){
 //				deleteStatus = gdb.ehf.deleteRecord(newEid);
 //			}//end-if					
-//		}//end-while			
-					
-		
+//		}//end-while				
 		scanNodeHeapFile();
 	}
-	
 	
 	public static void scanNodeHeapFile() throws InvalidTupleSizeException, IOException, InvalidTypeException, FieldNumberOutOfBoundException{
 		//scanning of records

@@ -20,14 +20,30 @@ public class Edge extends Tuple {
 	
 	public Edge() {
 		super();
-	}
-
-	public Edge(byte[] aEdge, int edge_offset) {
-		super( aEdge,  edge_offset, 52);
+		this.setFldCnt(6);
 	}
 	
-	public Edge(Node fromEdge) {
-		super((Tuple)fromEdge);
+	public Edge(byte[] aEdge, int edge_offset, int size) {
+		super( aEdge,  edge_offset, size);
+		this.setFldCnt(6);
+	}
+	
+	public Edge(byte[] aEdge, int edge_offset) {
+		super( aEdge,  edge_offset, 70);
+	}
+	
+	public Edge(int size) {
+		super(size);
+		this.setFldCnt(6);
+
+	}
+	
+	public Edge(Edge fromEdge) {
+		data = fromEdge.getEdgeByteArray();
+		tuple_length = fromEdge.getLength();
+		tuple_offset = 0;
+		fldCnt = fromEdge.noOfFlds();
+		fldOffset = fromEdge.copyFldOffset();
 	}		
 	
 	public NID getSource() throws FieldNumberOutOfBoundException, IOException{
@@ -102,17 +118,17 @@ public class Edge extends Tuple {
 	}
 	
 	public void edgeInit(byte[] aEdge, int edge_offset){
-		super.tupleInit(aEdge, edge_offset, 52);
+		super.tupleInit(aEdge, edge_offset, 70);
 	}
 	
 	public void edgeSet(byte[] fromEdge, int offset){
-		super.tupleSet(fromEdge, offset, 52);
+		super.tupleSet(fromEdge, offset, 70);
 	}
 	
 	public void setHdr() throws InvalidTypeException, InvalidTupleSizeException, IOException{
 		AttrType[] types = {new AttrType(1),new AttrType(1),new AttrType(1),new AttrType(1),
 				new AttrType(0),new AttrType(1)};
-		super.setHdr((short)6, types, new short[]{52}); //check about 54
+		super.setHdr((short)6, types, new short[]{32}); 
 	}
 	
 }
