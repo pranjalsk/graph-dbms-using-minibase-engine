@@ -70,10 +70,10 @@ public class UnitTestingPhase2 {
 		b.insertBatchNode(gdb.nhf, "A 500 500 500 500 500");
 		b.insertBatchNode(gdb.nhf, "C 550 512 529 515 503");
 		System.out.println("Nodecnt-->"+gdb.nhf.getNodeCnt());	
-//		scanNodeHeapFile();
+		scanNodeHeapFile();
 		
-		gdb.createZTFNodeDesc();
-		scanNode_ZIndexFile();
+//		gdb.createZTFNodeDesc();
+//		scanNode_ZIndexFile();
 //		gdb.createBTNodeLabel();
 //		scanNodeIndexFile();
 //		GraphDB.initGraphDB("MyDB");
