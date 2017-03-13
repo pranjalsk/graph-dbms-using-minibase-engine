@@ -8,6 +8,9 @@ import iterator.*;
 import heap.*;
 import java.io.*;
 
+import nodeheap.Node;
+import nodeheap.NodeHeapfile;
+
 import zindex.ZTFileScan;
 import zindex.ZTreeFile;
 
@@ -17,7 +20,7 @@ import zindex.ZTreeFile;
  * about the tuples and the index are passed to the constructor, then the user
  * calls <code>get_next()</code> to get the tuples.
  */
-public class IndexScan extends Iterator {
+public class NodeIndexScan extends Iterator {
 
 	/**
 	 * class constructor. set up the index scan.
@@ -55,7 +58,7 @@ public class IndexScan extends Iterator {
 	 * @exception IOException
 	 *                from the lower layer
 	 */
-	public IndexScan(IndexType index, final String relName,
+	public NodeIndexScan(IndexType index, final String relName,
 			final String indName, AttrType types[], short str_sizes[],
 			int noInFlds, int noOutFlds, FldSpec outFlds[], CondExpr selects[],
 			final int fldNum, final boolean indexOnly) throws IndexException,
@@ -68,10 +71,10 @@ public class IndexScan extends Iterator {
 
 		AttrType[] Jtypes = new AttrType[noOutFlds];
 		short[] ts_sizes;
-		Jtuple = new Tuple();
+		Jnode = new Node();
 
 		try {
-			ts_sizes = TupleUtils.setup_op_tuple(Jtuple, Jtypes, types,
+			ts_sizes = TupleUtils.setup_op_tuple(Jnode, Jtypes, types,
 					noInFlds, str_sizes, outFlds, noOutFlds);
 		} catch (TupleUtilsException e) {
 			throw new IndexException(e,
@@ -84,18 +87,18 @@ public class IndexScan extends Iterator {
 		_selects = selects;
 		perm_mat = outFlds;
 		_noOutFlds = noOutFlds;
-		tuple1 = new Tuple();
+		node1 = new Node();
 		try {
-			tuple1.setHdr((short) noInFlds, types, str_sizes);
+			node1.setHdr((short) noInFlds, types, str_sizes);
 		} catch (Exception e) {
 			throw new IndexException(e, "IndexScan.java: Heapfile error");
 		}
 
-		t1_size = tuple1.size();
+		t1_size = node1.size();
 		index_only = indexOnly; // added by bingjie miao
 
 		try {
-			f = new Heapfile(relName);
+			f = new NodeHeapfile(relName);
 		} catch (Exception e) {
 			throw new IndexException(e, "IndexScan.java: Heapfile not created");
 		}
@@ -121,6 +124,29 @@ public class IndexScan extends Iterator {
 			}
 
 			break;
+		case IndexType.Z_Index:
+			try {
+				indFile = new ZTreeFile();
+			} catch (GetFileEntryException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ConstructPageException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (AddFileEntryException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (PinPageException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			try {
+				indScan = (ZTFileScan) IndexUtils.ZTree_scan(selects, indFile);
+			} catch (Exception e) {
+				throw new IndexException(e,
+						"IndexScan.java: BTreeFile exceptions caught from IndexUtils.BTree_scan().");
+			}
+			break;
 		case IndexType.None:
 		default:
 			throw new UnknownIndexTypeException(
@@ -143,9 +169,9 @@ public class IndexScan extends Iterator {
 	 * @exception IOException
 	 *                from the lower layer
 	 */
-	public Tuple get_next() throws IndexException, UnknownKeyTypeException,
+	public Node get_next() throws IndexException, UnknownKeyTypeException,
 			IOException {
-		RID rid;
+		NID nid;
 		int unused;
 		KeyDataEntry nextentry = null;
 
@@ -165,14 +191,14 @@ public class IndexScan extends Iterator {
 				if (_types[_fldNum - 1].attrType == AttrType.attrInteger) {
 					attrType[0] = new AttrType(AttrType.attrInteger);
 					try {
-						Jtuple.setHdr((short) 1, attrType, s_sizes);
+						Jnode.setHdr((short) 1, attrType, s_sizes);
 					} catch (Exception e) {
 						throw new IndexException(e,
 								"IndexScan.java: Heapfile error");
 					}
 
 					try {
-						Jtuple.setIntFld(1, ((IntegerKey) nextentry.key)
+						Jnode.setIntFld(1, ((IntegerKey) nextentry.key)
 								.getKey().intValue());
 					} catch (Exception e) {
 						throw new IndexException(e,
@@ -190,14 +216,14 @@ public class IndexScan extends Iterator {
 					s_sizes[0] = _s_sizes[count - 1];
 
 					try {
-						Jtuple.setHdr((short) 1, attrType, s_sizes);
+						Jnode.setHdr((short) 1, attrType, s_sizes);
 					} catch (Exception e) {
 						throw new IndexException(e,
 								"IndexScan.java: Heapfile error");
 					}
 
 					try {
-						Jtuple.setStrFld(1,
+						Jnode.setStrFld(1,
 								((StringKey) nextentry.key).getKey());
 					} catch (Exception e) {
 						throw new IndexException(e,
@@ -208,26 +234,26 @@ public class IndexScan extends Iterator {
 					throw new UnknownKeyTypeException(
 							"Only Integer and String keys are supported so far");
 				}
-				return Jtuple;
+				return Jnode;
 			}
 
 			// not index_only, need to return the whole tuple
-			rid = ((LeafData) nextentry.data).getData();
+			nid = (NID)((LeafData) nextentry.data).getData();
 			try {
-				tuple1 = f.getRecord(rid);
+				node1 = f.getRecord(nid);
 			} catch (Exception e) {
 				throw new IndexException(e, "IndexScan.java: getRecord failed");
 			}
 
 			try {
-				tuple1.setHdr((short) _noInFlds, _types, _s_sizes);
+				node1.setHdr((short) _noInFlds, _types, _s_sizes);
 			} catch (Exception e) {
 				throw new IndexException(e, "IndexScan.java: Heapfile error");
 			}
 
 			boolean eval;
 			try {
-				eval = PredEval.Eval(_selects, tuple1, null, _types, null);
+				eval = PredEval.Eval(_selects, node1, null, _types, null);
 			} catch (Exception e) {
 				throw new IndexException(e, "IndexScan.java: Heapfile error");
 			}
@@ -235,14 +261,14 @@ public class IndexScan extends Iterator {
 			if (eval) {
 				// need projection.java
 				try {
-					Projection.Project(tuple1, _types, Jtuple, perm_mat,
+					Projection.Project(node1, _types, Jnode, perm_mat,
 							_noOutFlds);
 				} catch (Exception e) {
 					throw new IndexException(e,
 							"IndexScan.java: Heapfile error");
 				}
 
-				return Jtuple;
+				return Jnode;
 			}
 
 			try {
@@ -274,6 +300,14 @@ public class IndexScan extends Iterator {
 							"BTree error in destroying index scan.");
 				}
 			}
+			if (indScan instanceof ZTFileScan) {
+				try {
+					((ZTFileScan) indScan).DestroyBTreeFileScan();
+				} catch (Exception e) {
+					throw new IndexException(e,
+							"BTree error in destroying index scan.");
+				}
+			}
 			closeFlag = true;
 		}
 	}
@@ -286,9 +320,9 @@ public class IndexScan extends Iterator {
 	private CondExpr[] _selects;
 	private int _noInFlds;
 	private int _noOutFlds;
-	private Heapfile f;
-	private Tuple tuple1;
-	private Tuple Jtuple;
+	private NodeHeapfile f;
+	private Node node1;
+	private Node Jnode;
 	private int t1_size;
 	private int _fldNum;
 	private boolean index_only;

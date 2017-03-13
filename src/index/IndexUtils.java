@@ -3,7 +3,11 @@ package index;
 import global.*;
 import btree.*;
 import iterator.*;
+
 import java.io.*;
+
+import zindex.ZTFileScan;
+import zindex.ZTreeFile;
 
 /**
  * IndexUtils class opens an index scan based on selection conditions. Currently
@@ -208,6 +212,131 @@ public class IndexUtils {
 					"IndexUtils.java: Only Integer and String keys are supported so far");
 		}
 
+	}
+
+	public static ZTFileScan ZTree_scan(CondExpr[] selects, IndexFile indFile) throws IOException, UnknownKeyTypeException,
+	InvalidSelectionException, KeyNotMatchException,
+	UnpinPageException, PinPageException, IteratorException,
+	ConstructPageException, GetFileEntryException{
+		IndexFileScan indScan;
+
+		if (selects == null || selects[0] == null) {
+			indScan = ((ZTreeFile) indFile).new_scan(null, null);
+			return (ZTFileScan)indScan;
+		}
+
+		if (selects[1] == null) {
+			if (selects[0].type1.attrType != AttrType.attrSymbol
+					&& selects[0].type2.attrType != AttrType.attrSymbol) {
+				throw new InvalidSelectionException(
+						"IndexUtils.java: Invalid selection condition");
+			}
+
+			KeyClass key;
+
+			// symbol = value
+			if (selects[0].op.attrOperator == AttrOperator.aopEQ) {
+				if (selects[0].type1.attrType != AttrType.attrSymbol) {
+					key = getValue(selects[0], selects[0].type1, 1);
+					indScan = ((ZTreeFile) indFile).new_scan(key, key);
+				} else {
+					key = getValue(selects[0], selects[0].type2, 2);
+					indScan = ((ZTreeFile) indFile).new_scan(key, key);
+				}
+				return (ZTFileScan)indScan;
+			}
+
+			// symbol < value or symbol <= value
+			if (selects[0].op.attrOperator == AttrOperator.aopLT
+					|| selects[0].op.attrOperator == AttrOperator.aopLE) {
+				if (selects[0].type1.attrType != AttrType.attrSymbol) {
+					key = getValue(selects[0], selects[0].type1, 1);
+					indScan = ((BTreeFile) indFile).new_scan(null, key);
+				} else {
+					key = getValue(selects[0], selects[0].type2, 2);
+					indScan = ((BTreeFile) indFile).new_scan(null, key);
+				}
+				return (ZTFileScan)indScan;
+			}
+
+			// symbol > value or symbol >= value
+			if (selects[0].op.attrOperator == AttrOperator.aopGT
+					|| selects[0].op.attrOperator == AttrOperator.aopGE) {
+				if (selects[0].type1.attrType != AttrType.attrSymbol) {
+					key = getValue(selects[0], selects[0].type1, 1);
+					indScan = ((ZTreeFile) indFile).new_scan(key, null);
+				} else {
+					key = getValue(selects[0], selects[0].type2, 2);
+					indScan = ((ZTreeFile) indFile).new_scan(key, null);
+				}
+				return (ZTFileScan)indScan;
+			}
+
+			// error if reached here
+			System.err.println("Error -- in IndexUtils.BTree_scan()");
+			return null;
+		} else {
+			// selects[1] != null, must be a range query
+			if (selects[0].type1.attrType != AttrType.attrSymbol
+					&& selects[0].type2.attrType != AttrType.attrSymbol) {
+				throw new InvalidSelectionException(
+						"IndexUtils.java: Invalid selection condition");
+			}
+			if (selects[1].type1.attrType != AttrType.attrSymbol
+					&& selects[1].type2.attrType != AttrType.attrSymbol) {
+				throw new InvalidSelectionException(
+						"IndexUtils.java: Invalid selection condition");
+			}
+
+			// which symbol is higher??
+			KeyClass key1, key2;
+			AttrType type;
+
+			if (selects[0].type1.attrType != AttrType.attrSymbol) {
+				key1 = getValue(selects[0], selects[0].type1, 1);
+				type = selects[0].type1;
+			} else {
+				key1 = getValue(selects[0], selects[0].type2, 2);
+				type = selects[0].type2;
+			}
+			if (selects[1].type1.attrType != AttrType.attrSymbol) {
+				key2 = getValue(selects[1], selects[1].type1, 1);
+			} else {
+				key2 = getValue(selects[1], selects[1].type2, 2);
+			}
+
+			switch (type.attrType) {
+			case AttrType.attrString:
+				if (((StringKey) key1).getKey().compareTo(
+						((StringKey) key2).getKey()) < 0) {
+					indScan = ((ZTreeFile) indFile).new_scan(key1, key2);
+				} else {
+					indScan = ((ZTreeFile) indFile).new_scan(key2, key1);
+				}
+				return (ZTFileScan)indScan;
+
+			case AttrType.attrInteger:
+				if (((IntegerKey) key1).getKey().intValue() < ((IntegerKey) key2)
+						.getKey().intValue()) {
+					indScan = ((ZTreeFile) indFile).new_scan(key1, key2);
+				} else {
+					indScan = ((ZTreeFile) indFile).new_scan(key2, key1);
+				}
+				return (ZTFileScan)indScan;
+
+			case AttrType.attrReal:
+				/*
+				 * if ((FloatKey)key1.getKey().floatValue() <
+				 * (FloatKey)key2.getKey().floatValue()) { indScan =
+				 * ((BTreeFile)indFile).new_scan(key1, key2); } else { indScan =
+				 * ((BTreeFile)indFile).new_scan(key2, key1); } return indScan;
+				 */
+			default:
+				// error condition
+				throw new UnknownKeyTypeException(
+						"IndexUtils.java: Only Integer and String keys are supported so far");
+			}
+		} // end of else
 	}
 
 }
