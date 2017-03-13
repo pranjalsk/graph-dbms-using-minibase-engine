@@ -67,10 +67,13 @@ public class UnitTestingPhase2 {
 		b.insertBatchNode(gdb.nhf, "C 1 2 2 4 5");
 		System.out.println("Nodecnt-->"+gdb.nhf.getNodeCnt());	
 		scanNodeHeapFile();
-		gdb.createBTNodeLabel();
-		scanNodeIndexFile();
-		
-		
+//		gdb.createBTNodeLabel();
+//		scanNodeIndexFile();
+//		GraphDB.initGraphDB("MyDB");
+//		System.out.println("Graph DB 1 creatsed");
+//		GraphDB gdb = new GraphDB(0);
+//		b.insertBatchNode(gdb.nhf, "E 1 5 9 4 5");
+//		scanNodeHeapFile();
 //		edgeInsertTest("A", "B", 445);
 //		edgeInsertTest("B", "D", 829);
 //		edgeInsertTest("C", "D", 747);

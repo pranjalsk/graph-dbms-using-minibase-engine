@@ -31,8 +31,15 @@ public class BatchNodeDelete {
 				NID sourceNID = null;
 				NID destinationNID = null;
 				deleteStatus = false;
+				boolean done = false;
 				
-				while((newEdge = newEscan.getNext(newEid)) != null){
+				while(!done){
+					newEdge = newEscan.getNext(newEid);
+					if (newEdge == null) {
+						done = true;
+						break;
+					}
+					newEdge.setHdr();
 					sourceNID = newEdge.getSource();
 					destinationNID = newEdge.getDestination();
 					if(currentNid.equals(sourceNID) || currentNid.equals(destinationNID)){
