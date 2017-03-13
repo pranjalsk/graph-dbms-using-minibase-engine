@@ -44,6 +44,8 @@ public class GraphDB extends DB {
 			HFDiskMgrException, IOException, GetFileEntryException,
 			ConstructPageException, AddFileEntryException, KeyTooLongException, KeyNotMatchException, LeafInsertRecException, IndexInsertRecException, UnpinPageException, PinPageException, NodeNotMatchException, ConvertException, DeleteRecException, IndexSearchException, IteratorException, LeafDeleteException, InsertException, InvalidTupleSizeException, heap.FieldNumberOutOfBoundException {
 
+		this.type = type;
+		
 		int keyTypeString = AttrType.attrString;
 		int keyTypeInt = AttrType.attrInteger;
 		int KeyTypeDesc = AttrType.attrDesc;
@@ -61,11 +63,6 @@ public class GraphDB extends DB {
 //		createBTEdgeWeight();
 			
 
-		if (type == 1) {
-			// index files
-		} else {
-			// heap files
-		}
 	}
 
 	public static void initGraphDB(String db_name) {

@@ -40,29 +40,17 @@ public class UnitTestingPhase2 {
 	
 //		nodeTesting();
 //		edgeTesting();
+			
+		GraphDB.initGraphDB("MyDB");
+		System.out.println("Graph DB 1 creatsed");
+		GraphDB gdb = new GraphDB(0);
 		
-		GraphDB.initGraphDB("MyDB1");
-		System.out.println("MYDB Craeted");
-		GraphDB.initGraphDB("MyDB1");
-		System.out.println("MYDB again Craeted?");
-		GraphDB.initGraphDB("MyDB2");
-		
-		
-//		System.out.println("Graph DB 1 creatsed");
-//		GraphDB gdb = new GraphDB(0);
-//		System.out.println("graph DB name: "+ gdb.db_name());
-//		
-//		GraphDB.initGraphDB("MyDB2");
-//		System.out.println("Graph DB 1 creatsed");
-//		GraphDB gdb2 = new GraphDB(0);
-//		System.out.println("graph DB name: "+ gdb.db_name());
-//		
-//		GraphDB.initGraphDB("MyDB1");
-//		System.out.println("graph DB name: "+ gdb.db_name());
-		
-//		BatchNodeInsert b = new BatchNodeInsert();
-//		b.insertBatchNode(gdb.nhf, "A 1 2 3 4 5");
-//		System.out.println(gdb.nhf.getNodeCnt());	
+		BatchNodeInsert b = new BatchNodeInsert();
+		b.insertBatchNode(gdb.nhf, "A 1 2 3 4 5");
+		b.insertBatchNode(gdb.nhf, "B 6 2 3 4 5");
+		b.insertBatchNode(gdb.nhf, "C 1 5 3 4 5");
+		b.insertBatchNode(gdb.nhf, "D 1 2 2 4 5");
+		System.out.println("Nodecnt-->"+gdb.nhf.getNodeCnt());	
 		
 	}
 	

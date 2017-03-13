@@ -187,7 +187,10 @@ public class Tuple implements GlobalConst {
 	 */
 
 	public byte[] getTupleByteArray() {
+		//System.out.println("Tuple length-->"+ tuple_length);
 		byte[] tuplecopy = new byte[tuple_length];
+		//System.out.println(data.length);
+		if(data.length >= tuple_length)
 		System.arraycopy(data, tuple_offset, tuplecopy, 0, tuple_length);
 		return tuplecopy;
 	}

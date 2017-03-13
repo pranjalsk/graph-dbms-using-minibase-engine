@@ -19,7 +19,7 @@ public class Node extends Tuple {
 
 	public Node(byte[] aNode, int node_offset) {
 
-		super( aNode,  node_offset, 52);
+		super( aNode,  node_offset, 62);
 
 		this.setFldCnt(2);
 	}
@@ -73,11 +73,11 @@ public class Node extends Tuple {
 	}
 	
 	public void nodeInit(byte[] aNode, int node_offset){
-		super.tupleInit(aNode, node_offset, 52);
+		super.tupleInit(aNode, node_offset, 62);
 	}
 	
 	public void nodeSet(byte[] fromnode, int offset){
-		super.tupleSet(fromnode, offset, 52);
+		super.tupleSet(fromnode, offset, 62);
 	}
 	/**
 	 * setHdr will set the header of this Node.
@@ -100,7 +100,7 @@ public class Node extends Tuple {
 	 
 	public void setHdr() throws InvalidTypeException, InvalidTupleSizeException, IOException{
 		AttrType[] types = {new AttrType(0),new AttrType(5)};
-		super.setHdr((short)2, types, new short[]{32});
+		super.setHdr((short)2, types,new short [] {32});
 	}
 
 }
