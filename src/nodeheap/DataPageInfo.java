@@ -111,7 +111,7 @@ class DataPageInfo implements GlobalConst{
 
 
 	    // 2) creat a Tuple object using this array
-	    Node anode = new Node(data, offset); 
+	    Node anode = new Node(data, offset,size); 
 	 
 	    // 3) return tuple object
 	    return anode;

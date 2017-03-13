@@ -2,6 +2,7 @@ package Test_Phase2;
 
 import java.io.IOException;
 
+import batch.BatchInsert;
 import batch.BatchNodeInsert;
 import btree.AddFileEntryException;
 import btree.ConstructPageException;
@@ -18,20 +19,27 @@ import btree.LeafDeleteException;
 import btree.LeafInsertRecException;
 import btree.NodeNotMatchException;
 import btree.PinPageException;
+import btree.StringKey;
 import btree.UnpinPageException;
 
 import diskmgr.GraphDB;
+import edgeheap.EScan;
 import edgeheap.Edge;
 
 import global.Descriptor;
+import global.EID;
 import global.NID;
 import global.PageId;
+import global.RID;
 import heap.FieldNumberOutOfBoundException;
 import heap.HFBufMgrException;
 import heap.HFDiskMgrException;
 import heap.HFException;
 import heap.InvalidTupleSizeException;
 import heap.InvalidTypeException;
+import heap.Scan;
+import heap.Tuple;
+import nodeheap.NScan;
 import nodeheap.Node;
 
 public class UnitTestingPhase2 {
@@ -52,6 +60,16 @@ public class UnitTestingPhase2 {
 		b.insertBatchNode(gdb.nhf, "D 1 2 2 4 5");
 		System.out.println("Nodecnt-->"+gdb.nhf.getNodeCnt());	
 		
+		NID newNid = new NID();
+		NScan newNscan = gdb.nhf.openScan();
+		Node newNode = new Node();
+		
+		while(newNscan.getNext(newNid)!=null){
+			newNode = newNscan.getNext(newNid);
+			newNode.setHdr();
+			String nodeLabel = newNode.getLabel();
+			System.out.println(nodeLabel);
+		}
 	}
 	
 	//Node creation working fine

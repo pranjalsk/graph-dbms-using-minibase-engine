@@ -38,6 +38,10 @@ public class Node extends Tuple {
 
 	}
 
+	public Node(byte[] aNode, int node_offset, int size) {
+		super( aNode,  node_offset, size);
+	}
+
 	public String getLabel() throws FieldNumberOutOfBoundException, IOException{
 		return super.getStrFld(1);
 	}

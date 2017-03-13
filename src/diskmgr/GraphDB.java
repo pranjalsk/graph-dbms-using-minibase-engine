@@ -115,7 +115,7 @@ public class GraphDB extends DB {
 			NScan newNscan = nhf.openScan();
 			boolean done = false;
 			
-			while(!done){
+			while(newNscan.getNext(nid)!=null){
 				newNode = newNscan.getNext(nid);
 				key = newNode.getLabel();
 				btf_node.insert(new StringKey(key), (RID) nid);			
@@ -135,7 +135,7 @@ public class GraphDB extends DB {
 			EScan newEscan = ehf.openScan();
 			boolean done = false;
 			
-			while(!done){
+			while(newEscan.getNext(eid)!=null){
 				newEdge = newEscan.getNext(eid);
 				key = newEdge.getLabel();
 				btf_edge_label.insert(new StringKey(key), (RID) eid);			
@@ -154,7 +154,7 @@ public class GraphDB extends DB {
 			EScan newEscan = ehf.openScan();
 			boolean done = false;
 			
-			while(!done){
+			while(newEscan.getNext(eid)!=null){
 				newEdge = newEscan.getNext(eid);
 				key = newEdge.getWeight();
 				btf_edge_weight.insert(new IntegerKey(key), (RID) eid);			
@@ -254,25 +254,5 @@ public class GraphDB extends DB {
 		
 		return (edgeLabelCnt + nodeLabelCnt);		
 	}
-	
-	/*
-	 * public static void main(String[] args) throws HFException,
-	 * HFBufMgrException, HFDiskMgrException, GetFileEntryException,
-	 * ConstructPageException, AddFileEntryException, IOException,
-	 * heap.FieldNumberOutOfBoundException, InvalidSlotNumberException,
-	 * InvalidTupleSizeException, SpaceNotAvailableException,
-	 * FieldNumberOutOfBoundException { initGraphDB("MyDB"); GraphDB gdb = new
-	 * GraphDB(0); //gdb.initGraphDB("GraphDBTest");
-	 * 
-	 * Descriptor desc = new Descriptor(); desc.set(1, 2, 3, 4, 5);
-	 * 
-	 * Node node = new Node(); node.setLabel("A"); node.setDesc(desc);
-	 * 
-	 * gdb.insertNode(node.getLabel(), node.getDesc());
-	 * 
-	 * System.out.println(gdb.nhf.getNodeCnt()); //System.out.println(gdb.nhf.);
-	 * 
-	 * }
-	 */
 
 }
