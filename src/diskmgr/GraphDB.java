@@ -12,12 +12,24 @@ import java.util.HashSet;
 import btree.AddFileEntryException;
 import btree.BTreeFile;
 import btree.ConstructPageException;
+import btree.ConvertException;
+import btree.DeleteRecException;
 import btree.GetFileEntryException;
+import btree.IndexInsertRecException;
+import btree.IndexSearchException;
+import btree.InsertException;
+import btree.IntegerKey;
+import btree.IteratorException;
+import btree.KeyNotMatchException;
+import btree.KeyTooLongException;
+import btree.LeafDeleteException;
+import btree.LeafInsertRecException;
+import btree.NodeNotMatchException;
+import btree.PinPageException;
+import btree.StringKey;
+import btree.UnpinPageException;
 
 public class GraphDB extends DB {
-
-	private final static boolean OK = true;
-	private final static boolean FAIL = false;
 
 	public NodeHeapfile nhf;
 	public EdgeHeapFile ehf;
@@ -25,35 +37,44 @@ public class GraphDB extends DB {
 	public BTreeFile btf_edge_label;
 	public BTreeFile btf_edge_weight;
 	public int type;
+	public static String dbpath;
+	public static String logpath;
 
 	public GraphDB(int type) throws HFException, HFBufMgrException,
 			HFDiskMgrException, IOException, GetFileEntryException,
-			ConstructPageException, AddFileEntryException {
+			ConstructPageException, AddFileEntryException, KeyTooLongException, KeyNotMatchException, LeafInsertRecException, IndexInsertRecException, UnpinPageException, PinPageException, NodeNotMatchException, ConvertException, DeleteRecException, IndexSearchException, IteratorException, LeafDeleteException, InsertException, InvalidTupleSizeException, heap.FieldNumberOutOfBoundException {
 
+		this.type = type;
+		
 		int keyTypeString = AttrType.attrString;
 		int keyTypeInt = AttrType.attrInteger;
-		// int KeyTypeDesc = AttrType.attrDesc;
-
-		btf_node = new BTreeFile("IndexNodeLabel", keyTypeString, 34, 1);
-		btf_edge_label = new BTreeFile("IndexEdgeLabel", keyTypeString, 34, 1);
+		int KeyTypeDesc = AttrType.attrDesc;
+		
+		nhf = new NodeHeapfile("NodeHeapFile"+dbpath);
+		System.out.println("heap file created");
+		ehf = new EdgeHeapFile("EdgeHeapFile"+dbpath);
+		System.out.println("edge heap file cretaed");
+		btf_node = new BTreeFile("IndexNodeLabel", keyTypeString, 32, 1);
+		btf_edge_label = new BTreeFile("IndexEdgeLabel", keyTypeString, 32, 1);
 		btf_edge_weight = new BTreeFile("IndexEdgeWeight", keyTypeInt, 4, 1);
-		nhf = new NodeHeapfile("NodeHeapFile");
-		ehf = new EdgeHeapFile("EdgeHeapFile");
+		System.out.println("BTree intitalization is ok");
+//		createBTNodeLabel();
+//		createBTEdgeLabel();
+//		createBTEdgeWeight();
+			
 
-		if (type == 1) {
-			// index files
-		} else {
-			// heap files
-		}
 	}
 
 	public static void initGraphDB(String db_name) {
-		String dbpath = "/tmp/" + db_name + System.getProperty("user.name")
+
+		dbpath = "/tmp/" + db_name + System.getProperty("user.name")
+
 				+ ".minibase-db";
-		String logpath = "/tmp/" + db_name + System.getProperty("user.name")
+		logpath = "/tmp/" + db_name + System.getProperty("user.name")
 				+ ".minibase-log";
 		SystemDefs sysdef = new SystemDefs(dbpath, 100, 100, "Clock");
-
+		
+		PCounter.initialize();
 		// Kill anything that might be hanging around
 		String newdbpath;
 		String newlogpath;
@@ -88,51 +109,79 @@ public class GraphDB extends DB {
 
 	}
 
-	/*
-	 * public NID insertNode(String Label, Descriptor Desc) throws
-	 * InvalidSlotNumberException, InvalidTupleSizeException,
-	 * SpaceNotAvailableException, HFException, HFBufMgrException,
-	 * HFDiskMgrException, IOException, FieldNumberOutOfBoundException,
-	 * heap.FieldNumberOutOfBoundException { Node nd = new Node();
-	 * nd.setLabel(Label); nd.setDesc(Desc); return
-	 * nhf.insertNode(nd.getNodeByteArray()); }
-	 * 
-	 * public EID insertEdge(NID src, NID dest, String Label, int Weight) throws
-	 * InvalidSlotNumberException, InvalidTupleSizeException,
-	 * SpaceNotAvailableException, HFException, HFBufMgrException,
-	 * HFDiskMgrException, IOException, FieldNumberOutOfBoundException,
-	 * heap.FieldNumberOutOfBoundException {
-	 * 
-	 * Edge ed = new Edge(); ed.setSource(src); ed.setDestination(dest);
-	 * ed.setLabel(Label); ed.setWeight(Weight);
-	 * 
-	 * return ehf.insertEdge(ed.getEdgeByteArray()); }
-	 * 
-	 * public boolean deleteNodeRecord(String Label) throws
-	 * InvalidSlotNumberException, HFException, HFBufMgrException,
-	 * HFDiskMgrException, Exception { boolean status = OK; NScan scan = null;
-	 * NID nid = new NID();
-	 * 
-	 * if (status == OK) { System.out.println("- Delete  the record\n"); try {
-	 * scan = nhf.openScan(); } catch (Exception e) { status = FAIL;
-	 * System.err.println("*** Error opening scan\n"); e.printStackTrace(); } }
-	 * 
-	 * if (status == OK) { int i = 0; DummyNodeRecord rec = null; Node node =
-	 * new Node(); boolean done = false;
-	 * 
-	 * while (!done) { try { node = scan.getNext(nid); if (node == null) { done
-	 * = true; } } catch (Exception e) { status = FAIL; e.printStackTrace(); }
-	 * 
-	 * if (!done && status == OK) { try { rec = new DummyNodeRecord(node); }
-	 * catch (Exception e) { System.err.println("" + e); e.printStackTrace(); }
-	 * 
-	 * if (rec.iLabel.equals(Label)) { try { status = nhf.deleteRecord(nid); }
-	 * catch (Exception e) { status = FAIL;
-	 * System.err.println("*** Error deleting record " + i + "\n");
-	 * e.printStackTrace(); break; } } } ++i; } } scan.closescan(); scan = null;
-	 * return status; }
-	 */
-
+	public void createBTNodeLabel() throws KeyTooLongException, KeyNotMatchException, LeafInsertRecException, IndexInsertRecException, ConstructPageException, UnpinPageException, PinPageException, NodeNotMatchException, ConvertException, DeleteRecException, IndexSearchException, IteratorException, LeafDeleteException, InsertException, IOException, InvalidTupleSizeException, heap.FieldNumberOutOfBoundException{
+		try {
+			NID nid = new NID();
+			String key = null;
+			Node newNode = null;
+			NScan newNscan = nhf.openScan();
+			boolean done = false;
+			
+			while(!done){
+				newNode = newNscan.getNext(nid);
+				if (newNode==null) {
+					done = true;
+					break;
+				}
+				newNode.setHdr();
+				key = newNode.getLabel();
+				btf_node.insert(new StringKey(key), (RID) nid);			
+			}
+			newNscan.closescan();
+		} catch (Exception e) {
+			System.err.println("Empty node heap file");
+			e.printStackTrace();
+		}
+	}
+	
+	public void createBTEdgeLabel() throws KeyTooLongException, KeyNotMatchException, LeafInsertRecException, IndexInsertRecException, ConstructPageException, UnpinPageException, PinPageException, NodeNotMatchException, ConvertException, DeleteRecException, IndexSearchException, IteratorException, LeafDeleteException, InsertException, IOException, InvalidTupleSizeException, heap.FieldNumberOutOfBoundException{
+		try {
+			EID eid = new EID();
+			String key = null;
+			Edge newEdge = null;
+			EScan newEscan = ehf.openScan();
+			boolean done = false;
+			
+			while(!done){
+				newEdge = newEscan.getNext(eid);
+				if (newEdge == null) {
+					done = true;
+					break;
+				}
+				newEdge.setHdr();
+				key = newEdge.getLabel();
+				btf_edge_label.insert(new StringKey(key), (RID) eid);			
+			}
+			newEscan.closescan();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void createBTEdgeWeight() throws KeyTooLongException, KeyNotMatchException, LeafInsertRecException, IndexInsertRecException, ConstructPageException, UnpinPageException, PinPageException, NodeNotMatchException, ConvertException, DeleteRecException, IndexSearchException, IteratorException, LeafDeleteException, InsertException, IOException, InvalidTupleSizeException, heap.FieldNumberOutOfBoundException{
+		try {
+			EID eid = new EID();
+			int key;
+			Edge newEdge = null;
+			EScan newEscan = ehf.openScan();
+			boolean done = false;
+			
+			while(!done){
+				newEdge = newEscan.getNext(eid);
+				if (newEdge == null) {
+					done = true;
+					break;
+				}
+				newEdge.setHdr();
+				key = newEdge.getWeight();
+				btf_edge_weight.insert(new IntegerKey(key), (RID) eid);			
+			}
+			newEscan.closescan();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public int getNodeCnt() throws InvalidSlotNumberException,
 			InvalidTupleSizeException, HFDiskMgrException, HFBufMgrException,
 			IOException {
@@ -145,104 +194,82 @@ public class GraphDB extends DB {
 		return ehf.getEdgeCnt();
 	}
 
-/*	public int getSourceCnt() throws heap.FieldNumberOutOfBoundException,
-			InvalidSlotNumberException, InvalidTupleSizeException, HFException,
-			HFDiskMgrException, HFBufMgrException, IOException, Exception {
-
-		HashSet<NID> hs = new HashSet<NID>();
-
-		// create hashset to store source NIDs
-		// scan the edge heap file and fetch each source NID and add it(if not
-		// already in hashset)in hashset
-		//
-
-		boolean status = OK;
-		EScan scan = null;
-		EID eid = new EID();
-
-		if (status == OK) {
-			System.out.println("- Delete  the record\n");
-			try {
-				scan = ehf.openScan();
-			} catch (Exception e) {
-				status = FAIL;
-				System.err.println("*** Error opening scan\n");
-				e.printStackTrace();
-			}
-		}
-
-		if (status == OK) {
-			int i = 0;
-			DummyEdgeRecord rec = null;
-			Edge edge = new Edge();
+	public int getSourceCnt() {
+		try {
+			HashSet<NID> hashSet = new HashSet<NID>();
+			EID newEid = new EID();
+			EScan newEscan = ehf.openScan();
+			Edge newEdge = new Edge();
 			boolean done = false;
 
 			while (!done) {
-				try {
-					edge = scan.getNext(eid);
-					if (edge == null) {
-						done = true;
-					}
-				} catch (Exception e) {
-					status = FAIL;
-					e.printStackTrace();
+				newEdge = newEscan.getNext(newEid);
+				NID srcNID = newEdge.getSource();
+								
+				if (!hashSet.contains(srcNID)) {
+					hashSet.add(srcNID);
+					done = true;
 				}
-
-				if (!done && status == OK) {
-					try {
-						rec = new DummyEdgeRecord(edge);
-					} catch (Exception e) {
-						System.err.println("" + e);
-						e.printStackTrace();
-					}
-
-					try {
-
-						NID nid = rec.getSource();
-						// NID nid = ehf.getRecord(eid).getSource();
-						// scan over file
-						// create edge dummy record
-						//
-						if (!hs.contains(nid)) {
-							hs.add(nid);
-						}
-						status = OK;
-					} catch (Exception e) {
-						status = FAIL;
-						System.err.println("*** Error deleting record " + i
-								+ "\n");
-						e.printStackTrace();
-						break;
-					}
-
-				}
-				++i;
 			}
+			return hashSet.size();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return (Integer) null;
 		}
-		scan.closescan();
-		scan = null;
-		return hs.size();
 
-	}*/
+	}
 
-	
-	/*public static void main(String[] args) throws HFException, HFBufMgrException, HFDiskMgrException, GetFileEntryException, ConstructPageException, AddFileEntryException, IOException, heap.FieldNumberOutOfBoundException, InvalidSlotNumberException, InvalidTupleSizeException, SpaceNotAvailableException, FieldNumberOutOfBoundException {
-		initGraphDB("MyDB");
-		GraphDB gdb = new GraphDB(0);
-		//gdb.initGraphDB("GraphDBTest");
+	public int getDestinationCnt(){
+		try {
+			HashSet<NID> hashSet = new HashSet<NID>();
+			EID newEid = new EID();
+			EScan newEscan = ehf.openScan();
+			Edge newEdge = new Edge();
+			boolean done = false;
+
+			while (!done) {
+				newEdge = newEscan.getNext(newEid);
+				NID destNID = newEdge.getDestination();
+				if (!hashSet.contains(destNID)) {
+					hashSet.add(destNID);
+					done = true;
+				}
+			}
+			return hashSet.size();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return (Integer) null;
+		}
+	}
+
+	public int getLabelCnt() throws InvalidSlotNumberException, InvalidTupleSizeException, HFDiskMgrException, HFBufMgrException, IOException{
 		
-		Descriptor desc = new Descriptor();
-		desc.set(1, 2, 3, 4, 5);
+		int edgeLabelCnt = 0;
+		try {
+			HashSet<String> hashSet = new HashSet<String>();
+			EID newEid = new EID();
+			EScan newEscan = ehf.openScan();
+			Edge newEdge = new Edge();
+			boolean done = false;
+
+			while (!done) {
+				newEdge = newEscan.getNext(newEid);
+				String edgeLbl = newEdge.getLabel();
+								
+				if (!hashSet.contains(edgeLbl)) {
+					hashSet.add(edgeLbl);
+					done = true;
+				}
+			}
+			edgeLabelCnt = hashSet.size();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return (Integer) null;
+		}
 		
-		Node node = new Node();
-		node.setLabel("A");
-		node.setDesc(desc);
+		int nodeLabelCnt = nhf.getNodeCnt();
 		
-		gdb.insertNode(node.getLabel(), node.getDesc());
-		
-		System.out.println(gdb.nhf.getNodeCnt());
-		//System.out.println(gdb.nhf.);
-		
-	}*/
+		return (edgeLabelCnt + nodeLabelCnt);		
+	}
 
 }

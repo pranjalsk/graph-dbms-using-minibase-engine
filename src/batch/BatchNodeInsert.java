@@ -1,16 +1,12 @@
 package batch;
 
-import java.io.*;
-
-
-import global.*;
-import nodeheap.*;
-import heap.*;
-import diskmgr.*;
+import global.Descriptor;
+import nodeheap.Node;
+import nodeheap.NodeHeapfile;
 
 public class BatchNodeInsert {
 
-	public void insertBatchNode(NodeHeapfile nhf, String sCurrentLine) {
+	public void insertBatchNode(NodeHeapfile nhf, String sCurrentLine) throws Exception{
 		
 		// TODO Auto-generated method stub
 		
@@ -25,22 +21,21 @@ public class BatchNodeInsert {
 		Descriptor desc= new Descriptor();
 		desc.set(value1, value2, value3, value4, value5);
 		Node node=make_node(label,  desc);
-		nhf.insertNode(node.getNodeByteArray()); 
+		
+		nhf.insertNode(node.getNodeByteArray()); //failing here
  		}
 		catch(Exception ex)
-		{}
+		{
+			throw new Exception(ex);
+		}
 	}
 
-	private Node make_node(String label, Descriptor desc) {
+	private Node make_node(String label, Descriptor desc) throws Exception {
 		// TODO Auto-generated method stub
 		Node node =new Node();
-		try{
-		
+		node.setHdr();
 		node.setLabel(label);
 		node.setDesc(desc);
-		}
-		catch(Exception ex)
-		{}
 		return node;
 	}
 

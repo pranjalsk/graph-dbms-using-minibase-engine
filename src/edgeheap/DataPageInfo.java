@@ -78,7 +78,7 @@ class DataPageInfo implements GlobalConst{
        throws InvalidTupleSizeException, IOException
   {   
      // need check _atuple size == this.size ?otherwise, throw new exception
-    if (_aedge.getLength()!=12){
+    if (_aedge.getLength()!=70){
       throw new InvalidTupleSizeException(null, "HEAPFILE: TUPLE SIZE ERROR");
     }
 
@@ -129,7 +129,7 @@ class DataPageInfo implements GlobalConst{
 
 
 	    // 2) creat a Tuple object using this array
-	    Edge aedge = new Edge(data, offset); 
+	    Edge aedge = new Edge(data, offset, size); 
 	 
 	    // 3) return tuple object
 	    return aedge;

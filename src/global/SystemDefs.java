@@ -1,5 +1,8 @@
 package global;
 
+import java.io.File;
+import java.util.HashSet;
+
 import bufmgr.*;
 import diskmgr.*;
 import catalog.*;
@@ -13,6 +16,7 @@ public class SystemDefs {
 	public static String JavabaseLogName;
 	public static boolean MINIBASE_RESTART_FLAG = false;
 	public static String MINIBASE_DBNAME;
+	public static HashSet<String> hs = new HashSet<String>();
 
 	public SystemDefs() {
 	};
@@ -40,7 +44,16 @@ public class SystemDefs {
 
 	public void init(String dbname, String logname, int num_pgs,
 			int maxlogsize, int bufpoolsize, String replacement_policy) {
-
+		
+		
+		if (!hs.contains(dbname)) {
+			hs.add(dbname);
+			MINIBASE_RESTART_FLAG = false;
+		}
+		else{
+			MINIBASE_RESTART_FLAG = true;
+		}
+		
 		boolean status = true;
 		JavabaseBM = null;
 		JavabaseDB = null;
@@ -79,6 +92,7 @@ public class SystemDefs {
 			try {
 				JavabaseDB.openDB(dbname, num_pgs);
 				JavabaseBM.flushAllPages();
+				//MINIBASE_RESTART_FLAG = true;
 			} catch (Exception e) {
 				System.err.println("" + e);
 				e.printStackTrace();

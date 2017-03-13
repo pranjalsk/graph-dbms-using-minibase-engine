@@ -78,7 +78,7 @@ class DataPageInfo implements GlobalConst{
        throws InvalidTupleSizeException, IOException
   {   
      // need check _atuple size == this.size ?otherwise, throw new exception
-    if (_anode.getLength()!=12){
+    if (_anode.getLength()!=62){
       throw new InvalidTupleSizeException(null, "HEAPFILE: TUPLE SIZE ERROR");
     }
 
@@ -111,7 +111,7 @@ class DataPageInfo implements GlobalConst{
 
 
 	    // 2) creat a Tuple object using this array
-	    Node anode = new Node(data, offset); 
+	    Node anode = new Node(data, offset,size); 
 	 
 	    // 3) return tuple object
 	    return anode;

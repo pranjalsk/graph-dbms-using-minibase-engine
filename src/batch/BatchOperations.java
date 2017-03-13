@@ -1,23 +1,11 @@
 package batch;
 
-import global.Descriptor;
-import heap.HFBufMgrException;
-import heap.HFDiskMgrException;
-import heap.HFException;
-
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.StringTokenizer;
 
-import nodeheap.NodeHeapfile;
-import diskmgr.DB;
-import diskmgr.DiskMgrException;
-import diskmgr.FileIOException;
 import diskmgr.GraphDB;
-import diskmgr.InvalidPageNumberException;
+import diskmgr.PCounter;
 
 public class BatchOperations {
 	 
@@ -66,9 +54,7 @@ public class BatchOperations {
 				taskNumber = 12;
 			else if(taskName.equalsIgnoreCase("batchedgedelete"))
 				taskNumber = 13;
-			
-			FileReader fr = new FileReader(filePath);
-	    	 
+			   	 
 
 	    	GraphDB.initGraphDB(graphDBName);
 			GraphDB newGDB = new GraphDB(0); //This is to be VERIFIED!!!
@@ -86,6 +72,9 @@ public class BatchOperations {
 		        	newNodeInsert.insertBatchNode(newGDB.nhf, sCurrentLine);
 		        	 
 					}
+					
+					printStatistics(newGDB);
+					
 		        }
 				catch (Exception e) {
 					e.printStackTrace();
@@ -95,8 +84,9 @@ public class BatchOperations {
 	        //Task : Batch Edge Insert
 	        case 11:
 	        	try {	        	
-		        	//BatchEdgeInsert newEdgeInsert = new BatchEdgeInsert();
-		        	//newEdgeInsert.insertBatchEdge(newGDB.ehf, fr);	        	
+		        	BatchEdgeInsert newEdgeInsert = new BatchEdgeInsert();
+		        	newEdgeInsert.insertBatchEdge(newGDB.ehf, newGDB.nhf, filePath);
+		        	printStatistics(newGDB);
 		        }
 				catch (Exception e) {
 					e.printStackTrace();
@@ -106,8 +96,9 @@ public class BatchOperations {
 	        //Task : Batch Node Delete
 	        case 12:
 	        	try {	        	
-		        	//BatchNodeDelete newNodeDelete = new BatchNodeDelete();
-		        	//newNodeDelete.deleteBatchNode(newGDB.nhf, fr);	        	
+		        	BatchNodeDelete newNodeDelete = new BatchNodeDelete();
+		        	newNodeDelete.deleteBatchNode(newGDB.nhf, newGDB.ehf, filePath);
+		        	printStatistics(newGDB);
 		        }
 				catch (Exception e) {
 					e.printStackTrace();
@@ -117,8 +108,9 @@ public class BatchOperations {
 	        //Task : Batch Edge Delete
 	        case 13:
 	        	try {	        	
-		        	//BatchEdgeDelete newEdgeDelete = new BatchEdgeDelete();
-		        	//newEdgeDelete.deleteBatchEdge(newGDB.ehf, fr);	        	
+		        	BatchEdgeDelete newEdgeDelete = new BatchEdgeDelete();
+		        	newEdgeDelete.deleteBatchEdge(newGDB.ehf, newGDB.nhf, filePath);
+		        	printStatistics(newGDB);
 		        }
 				catch (Exception e) {
 					e.printStackTrace();
@@ -132,5 +124,18 @@ public class BatchOperations {
 	        }//switch
 		}//else
 	}//main
+	public static void printStatistics(GraphDB newGDB) throws Exception
+	{
+		int n=newGDB.getNodeCnt();
+		System.out.println("NodeCount "+n);
+		int n1=newGDB.getEdgeCnt();
+		System.out.println("EdgeCount "+n1);
+		PCounter pCount = new PCounter();
+		System.out.println("Number of pages read in Node Heap File"+pCount.getRCounterForNHF(newGDB.nhf));
+		System.out.println("Number of pages written to Node Heap File"+pCount.getWCounterForNHF(newGDB.nhf));
+		System.out.println("Number of pages read in Edge Heap File"+pCount.getRCounterForEHF(newGDB.ehf));
+		System.out.println("Number of pages written to Edge Heap File"+pCount.getWCounterForEHF(newGDB.ehf));
 
+		
+	}   
 }
