@@ -45,7 +45,15 @@ public class GraphDB extends DB {
 	public int type;
 	public static String dbpath;
 	public static String logpath;
+    public static String getGraphDBName() {
+		return graphDBName;
+	}
 
+	public static void setGraphDBName(String graphDBName) {
+		GraphDB.graphDBName = graphDBName;
+	}
+
+	public static String graphDBName;
 	public GraphDB(int type) throws HFException, HFBufMgrException,
 			HFDiskMgrException, IOException, GetFileEntryException,
 			ConstructPageException, AddFileEntryException, KeyTooLongException, KeyNotMatchException, LeafInsertRecException, IndexInsertRecException, UnpinPageException, PinPageException, NodeNotMatchException, ConvertException, DeleteRecException, IndexSearchException, IteratorException, LeafDeleteException, InsertException, InvalidTupleSizeException, heap.FieldNumberOutOfBoundException {
@@ -56,9 +64,9 @@ public class GraphDB extends DB {
 		int keyTypeInt = AttrType.attrInteger;
 		int KeyTypeDesc = AttrType.attrDesc;
 		
-		nhf = new NodeHeapfile("NodeHeapFile"+dbpath);
+		nhf = new NodeHeapfile("NodeHeapFile"+graphDBName);
 		System.out.println("heap file created");
-		ehf = new EdgeHeapFile("EdgeHeapFile"+dbpath);
+		ehf = new EdgeHeapFile("EdgeHeapFile"+graphDBName);
 		System.out.println("edge heap file cretaed");
 		
 		btf_node = new BTreeFile("IndexNodeLabel", keyTypeString, 32, 1);
@@ -103,7 +111,7 @@ public class GraphDB extends DB {
 	}
 
 	public static void initGraphDB(String db_name) {
-
+        graphDBName= db_name;
 		dbpath = "/tmp/" + db_name + System.getProperty("user.name")
 
 				+ ".minibase-db";
