@@ -63,9 +63,13 @@ public class UnitTestingPhase2 {
 		NID newNid = new NID();
 		NScan newNscan = gdb.nhf.openScan();
 		Node newNode = new Node();
+		boolean done = false;
 		
-		while(newNscan.getNext(newNid)!=null){
+		while(!done){
 			newNode = newNscan.getNext(newNid);
+			if (newNode == null) {
+				done = true;
+			}
 			newNode.setHdr();
 			String nodeLabel = newNode.getLabel();
 			System.out.println(nodeLabel);
