@@ -115,8 +115,11 @@ public class GraphDB extends DB {
 			NScan newNscan = nhf.openScan();
 			boolean done = false;
 			
-			while(newNscan.getNext(nid)!=null){
+			while(!done){
 				newNode = newNscan.getNext(nid);
+				if (newNode==null) {
+					done = true;
+				}
 				key = newNode.getLabel();
 				btf_node.insert(new StringKey(key), (RID) nid);			
 			}
@@ -135,8 +138,11 @@ public class GraphDB extends DB {
 			EScan newEscan = ehf.openScan();
 			boolean done = false;
 			
-			while(newEscan.getNext(eid)!=null){
+			while(!done){
 				newEdge = newEscan.getNext(eid);
+				if (newEdge == null) {
+					done = true;
+				}
 				key = newEdge.getLabel();
 				btf_edge_label.insert(new StringKey(key), (RID) eid);			
 			}
@@ -154,8 +160,11 @@ public class GraphDB extends DB {
 			EScan newEscan = ehf.openScan();
 			boolean done = false;
 			
-			while(newEscan.getNext(eid)!=null){
+			while(!done){
 				newEdge = newEscan.getNext(eid);
+				if (newEdge == null) {
+					done = true;
+				}
 				key = newEdge.getWeight();
 				btf_edge_weight.insert(new IntegerKey(key), (RID) eid);			
 			}

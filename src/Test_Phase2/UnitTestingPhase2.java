@@ -69,11 +69,14 @@ public class UnitTestingPhase2 {
 			newNode = newNscan.getNext(newNid);
 			if (newNode == null) {
 				done = true;
+				break;
 			}
 			newNode.setHdr();
 			String nodeLabel = newNode.getLabel();
 			System.out.println(nodeLabel);
 		}
+		newNscan.closescan();
+		System.out.println("test done");
 	}
 	
 	//Node creation working fine
