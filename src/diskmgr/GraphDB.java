@@ -9,6 +9,9 @@ import heap.*;
 import java.io.IOException;
 import java.util.HashSet;
 
+import zindex.DescriptorKey;
+import zindex.ZTreeFile;
+
 import btree.AddFileEntryException;
 import btree.BTreeFile;
 import btree.ConstructPageException;
@@ -20,6 +23,7 @@ import btree.IndexSearchException;
 import btree.InsertException;
 import btree.IntegerKey;
 import btree.IteratorException;
+import btree.KeyClass;
 import btree.KeyNotMatchException;
 import btree.KeyTooLongException;
 import btree.LeafDeleteException;
@@ -36,6 +40,8 @@ public class GraphDB extends DB {
 	public BTreeFile btf_node;
 	public BTreeFile btf_edge_label;
 	public BTreeFile btf_edge_weight;
+	public ZTreeFile ztf_node_desc;
+	
 	public int type;
 	public static String dbpath;
 	public static String logpath;
@@ -54,15 +60,46 @@ public class GraphDB extends DB {
 		System.out.println("heap file created");
 		ehf = new EdgeHeapFile("EdgeHeapFile"+dbpath);
 		System.out.println("edge heap file cretaed");
+		
 		btf_node = new BTreeFile("IndexNodeLabel", keyTypeString, 32, 1);
 		btf_edge_label = new BTreeFile("IndexEdgeLabel", keyTypeString, 32, 1);
 		btf_edge_weight = new BTreeFile("IndexEdgeWeight", keyTypeInt, 4, 1);
+//		ztf_node_desc = new ZTreeFile();
+		
 		System.out.println("BTree intitalization is ok");
 //		createBTNodeLabel();
 //		createBTEdgeLabel();
 //		createBTEdgeWeight();
+//  	createZTFNodeDesc();
 			
 
+	}
+
+	public void createZTFNodeDesc() {
+		try {
+			NID nid = new NID();
+			Descriptor desc = null;
+			Node newNode = null;
+			NScan newNscan = nhf.openScan();
+			boolean done = false;
+			
+			while(!done){
+				newNode = newNscan.getNext(nid);
+				if (newNode==null) {
+					done = true;
+					break;
+				}
+				newNode.setHdr();
+				desc = newNode.getDesc();
+				KeyClass data = new DescriptorKey(desc);
+				ztf_node_desc.insert(data, (RID) nid);
+			}
+			newNscan.closescan();
+		} catch (Exception e) {
+			System.err.println("Empty node heap file");
+			e.printStackTrace();
+		}
+		
 	}
 
 	public static void initGraphDB(String db_name) {
