@@ -2,6 +2,7 @@ package zindex;
 
 import java.io.IOException;
 
+import global.AttrType;
 import global.GlobalConst;
 import global.RID;
 import btree.AddFileEntryException;
@@ -37,7 +38,7 @@ public class ZTreeFile extends IndexFile implements GlobalConst {
 	BTreeFile zBTFile;
 	
 	public ZTreeFile() throws GetFileEntryException, ConstructPageException, AddFileEntryException, IOException, PinPageException {
-		zBTFile = new BTreeFile("zBTFile");
+		zBTFile = new BTreeFile("zBTFile",AttrType.attrString,21,1);
 	}
 
 	public void insert(KeyClass data, RID rid) throws KeyTooLongException,
@@ -80,9 +81,13 @@ public class ZTreeFile extends IndexFile implements GlobalConst {
 		
 	}
 
-	public ZTFileScan new_scan(KeyClass lo_key, KeyClass hi_key) {
+	public ZTFileScan new_scan(KeyClass lo_key, KeyClass hi_key) throws GetFileEntryException, PinPageException, ConstructPageException, KeyNotMatchException, IteratorException, UnpinPageException, IOException {
+		return new ZTFileScan(lo_key,hi_key);
 
-		return null;
+	}
+	
+	public ZTFileScan new_scan(KeyClass target, int distance) throws GetFileEntryException, PinPageException, ConstructPageException, KeyNotMatchException, IteratorException, UnpinPageException, IOException {
+		return new ZTFileScan(target,distance);
 
 	}
 
