@@ -3,6 +3,7 @@ package Test_Phase2;
 import java.io.IOException;
 
 import batch.BatchInsert;
+import batch.BatchNodeDelete;
 import batch.BatchNodeInsert;
 import btree.AddFileEntryException;
 import btree.ConstructPageException;
@@ -44,6 +45,8 @@ import nodeheap.Node;
 
 public class UnitTestingPhase2 {
 
+	static GraphDB gdb;
+	
 	public static void main(String[] args) throws Exception {
 	
 //		nodeTesting();
@@ -51,7 +54,7 @@ public class UnitTestingPhase2 {
 			
 		GraphDB.initGraphDB("MyDB");
 		System.out.println("Graph DB 1 creatsed");
-		GraphDB gdb = new GraphDB(0);
+		gdb = new GraphDB(0);
 		
 		BatchNodeInsert b = new BatchNodeInsert();
 		b.insertBatchNode(gdb.nhf, "A 1 2 3 4 5");
@@ -60,24 +63,67 @@ public class UnitTestingPhase2 {
 		b.insertBatchNode(gdb.nhf, "D 1 2 2 4 5");
 		System.out.println("Nodecnt-->"+gdb.nhf.getNodeCnt());	
 		
-		NID newNid = new NID();
-		NScan newNscan = gdb.nhf.openScan();
-		Node newNode = new Node();
-		boolean done = false;
+		scanNodeHeapFile();
+		BatchNodeDelete d = new BatchNodeDelete();
+		//d.deleteBatchNode(gdb.nhf, gdb.ehf, filePath);
 		
-		while(!done){
-			newNode = newNscan.getNext(newNid);
-			if (newNode == null) {
-				done = true;
-				break;
-			}
-			newNode.setHdr();
-			String nodeLabel = newNode.getLabel();
-			System.out.println(nodeLabel);
-		}
-		newNscan.closescan();
-		System.out.println("test done");
+		String nodeLabel = "B";
+		BatchInsert batchinsert = new BatchInsert();
+		boolean deleteStatus = false;
+		NID currentNid = new NID(); //To store a copy of the nid
+		
+		//Delete the node				
+		NID newNid = batchinsert.getNidFromNodeLabel(nodeLabel, gdb.nhf);
+		currentNid.copyNid(newNid);				
+		deleteStatus = gdb.nhf.deleteRecord(newNid);
+		
+//		//Delete all edges associated with the node
+//		EID newEid = new EID();
+//		EScan newEscan = gdb.ehf.openScan();
+//		Edge newEdge = new Edge();
+//		//boolean done = false;
+//		NID sourceNID = null;
+//		NID destinationNID = null;
+//		deleteStatus = false;
+//		
+//		while((newEdge = newEscan.getNext(newEid)) != null){
+//			sourceNID = newEdge.getSource();
+//			destinationNID = newEdge.getDestination();
+//			if(currentNid.equals(sourceNID) || currentNid.equals(destinationNID)){
+//				deleteStatus = gdb.ehf.deleteRecord(newEid);
+//			}//end-if					
+//		}//end-while			
+					
+		
+		scanNodeHeapFile();
 	}
+	
+	
+	public static void scanNodeHeapFile() throws InvalidTupleSizeException, IOException, InvalidTypeException, FieldNumberOutOfBoundException{
+		//scanning of records
+				NID newNid = new NID();
+				NScan newNscan = gdb.nhf.openScan();
+				Node newNode = new Node();
+				boolean done = false;
+				
+				while(!done){
+					newNode = newNscan.getNext(newNid);
+					if (newNode == null) {
+						done = true;
+						break;
+					}
+					newNode.setHdr();
+					String nodeLabel = newNode.getLabel();
+					System.out.println(nodeLabel);
+					for (int j = 0; j < 5; j++) {
+						System.out.print(newNode.getDesc().get(j));
+							
+					}
+				}
+				newNscan.closescan();
+				System.out.println("test done");
+	} 
+	
 	
 	//Node creation working fine
 	public static void nodeTesting() throws InvalidTypeException, InvalidTupleSizeException, IOException, FieldNumberOutOfBoundException{

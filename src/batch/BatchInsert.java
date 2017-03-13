@@ -20,6 +20,7 @@ public class BatchInsert {
 			
 			while(!done){
 				newNode = newNscan.getNext(newNid);
+				newNode.setHdr();
 				String nodeLabel = newNode.getLabel();
 				if(nodeLabel.equalsIgnoreCase(label)){
 					done = true;			
