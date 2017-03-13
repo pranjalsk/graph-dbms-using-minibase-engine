@@ -64,7 +64,7 @@ public class GraphDB extends DB {
 		btf_node = new BTreeFile("IndexNodeLabel", keyTypeString, 32, 1);
 		btf_edge_label = new BTreeFile("IndexEdgeLabel", keyTypeString, 32, 1);
 		btf_edge_weight = new BTreeFile("IndexEdgeWeight", keyTypeInt, 4, 1);
-//		ztf_node_desc = new ZTreeFile();
+		ztf_node_desc = new ZTreeFile();
 		
 		System.out.println("BTree intitalization is ok");
 //		createBTNodeLabel();
