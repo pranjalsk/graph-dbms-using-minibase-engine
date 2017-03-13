@@ -21,6 +21,10 @@ import btree.ScanDeleteException;
 import btree.ScanIteratorException;
 import btree.StringKey;
 import btree.UnpinPageException;
+import bufmgr.HashEntryNotFoundException;
+import bufmgr.InvalidFrameNumberException;
+import bufmgr.PageUnpinnedException;
+import bufmgr.ReplacerException;
 
 public class ZTFileScan extends IndexFileScan implements GlobalConst {
 	BTreeFile zBTFile;
@@ -124,6 +128,11 @@ public class ZTFileScan extends IndexFileScan implements GlobalConst {
 	public int keysize() {
 
 		return bScan.keysize();
+	}
+
+	public void DestroyBTreeFileScan() throws InvalidFrameNumberException, ReplacerException, PageUnpinnedException, HashEntryNotFoundException, IOException {
+		bScan.DestroyBTreeFileScan();
+		
 	}
 
 }

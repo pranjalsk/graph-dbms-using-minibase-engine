@@ -3,6 +3,8 @@ package index;
 import global.*;
 import bufmgr.*;
 import diskmgr.*;
+import edgeheap.Edge;
+import edgeheap.EdgeHeapFile;
 import btree.*;
 import iterator.*;
 import heap.*;
@@ -17,7 +19,7 @@ import zindex.ZTreeFile;
  * about the tuples and the index are passed to the constructor, then the user
  * calls <code>get_next()</code> to get the tuples.
  */
-public class IndexScan extends Iterator {
+public class EdgeIndexScan extends Iterator {
 
 	/**
 	 * class constructor. set up the index scan.
@@ -55,7 +57,7 @@ public class IndexScan extends Iterator {
 	 * @exception IOException
 	 *                from the lower layer
 	 */
-	public IndexScan(IndexType index, final String relName,
+	public EdgeIndexScan(IndexType index, final String relName,
 			final String indName, AttrType types[], short str_sizes[],
 			int noInFlds, int noOutFlds, FldSpec outFlds[], CondExpr selects[],
 			final int fldNum, final boolean indexOnly) throws IndexException,
@@ -68,10 +70,10 @@ public class IndexScan extends Iterator {
 
 		AttrType[] Jtypes = new AttrType[noOutFlds];
 		short[] ts_sizes;
-		Jtuple = new Tuple();
+		JEdge = new Edge();
 
 		try {
-			ts_sizes = TupleUtils.setup_op_tuple(Jtuple, Jtypes, types,
+			ts_sizes = TupleUtils.setup_op_tuple(JEdge, Jtypes, types,
 					noInFlds, str_sizes, outFlds, noOutFlds);
 		} catch (TupleUtilsException e) {
 			throw new IndexException(e,
@@ -84,18 +86,18 @@ public class IndexScan extends Iterator {
 		_selects = selects;
 		perm_mat = outFlds;
 		_noOutFlds = noOutFlds;
-		tuple1 = new Tuple();
+		edge1 = new Edge();
 		try {
-			tuple1.setHdr((short) noInFlds, types, str_sizes);
+			edge1.setHdr((short) noInFlds, types, str_sizes);
 		} catch (Exception e) {
 			throw new IndexException(e, "IndexScan.java: Heapfile error");
 		}
 
-		t1_size = tuple1.size();
+		t1_size = edge1.size();
 		index_only = indexOnly; // added by bingjie miao
 
 		try {
-			f = new Heapfile(relName);
+			f = new EdgeHeapFile(relName);
 		} catch (Exception e) {
 			throw new IndexException(e, "IndexScan.java: Heapfile not created");
 		}
@@ -143,9 +145,9 @@ public class IndexScan extends Iterator {
 	 * @exception IOException
 	 *                from the lower layer
 	 */
-	public Tuple get_next() throws IndexException, UnknownKeyTypeException,
+	public Edge get_next() throws IndexException, UnknownKeyTypeException,
 			IOException {
-		RID rid;
+		EID eid;
 		int unused;
 		KeyDataEntry nextentry = null;
 
@@ -165,14 +167,14 @@ public class IndexScan extends Iterator {
 				if (_types[_fldNum - 1].attrType == AttrType.attrInteger) {
 					attrType[0] = new AttrType(AttrType.attrInteger);
 					try {
-						Jtuple.setHdr((short) 1, attrType, s_sizes);
+						JEdge.setHdr((short) 1, attrType, s_sizes);
 					} catch (Exception e) {
 						throw new IndexException(e,
 								"IndexScan.java: Heapfile error");
 					}
 
 					try {
-						Jtuple.setIntFld(1, ((IntegerKey) nextentry.key)
+						JEdge.setIntFld(1, ((IntegerKey) nextentry.key)
 								.getKey().intValue());
 					} catch (Exception e) {
 						throw new IndexException(e,
@@ -190,14 +192,14 @@ public class IndexScan extends Iterator {
 					s_sizes[0] = _s_sizes[count - 1];
 
 					try {
-						Jtuple.setHdr((short) 1, attrType, s_sizes);
+						JEdge.setHdr((short) 1, attrType, s_sizes);
 					} catch (Exception e) {
 						throw new IndexException(e,
 								"IndexScan.java: Heapfile error");
 					}
 
 					try {
-						Jtuple.setStrFld(1,
+						JEdge.setStrFld(1,
 								((StringKey) nextentry.key).getKey());
 					} catch (Exception e) {
 						throw new IndexException(e,
@@ -208,26 +210,26 @@ public class IndexScan extends Iterator {
 					throw new UnknownKeyTypeException(
 							"Only Integer and String keys are supported so far");
 				}
-				return Jtuple;
+				return JEdge;
 			}
 
 			// not index_only, need to return the whole tuple
-			rid = ((LeafData) nextentry.data).getData();
+			eid = (EID)((LeafData) nextentry.data).getData();
 			try {
-				tuple1 = f.getRecord(rid);
+				edge1 = f.getRecord(eid);
 			} catch (Exception e) {
 				throw new IndexException(e, "IndexScan.java: getRecord failed");
 			}
 
 			try {
-				tuple1.setHdr((short) _noInFlds, _types, _s_sizes);
+				edge1.setHdr((short) _noInFlds, _types, _s_sizes);
 			} catch (Exception e) {
 				throw new IndexException(e, "IndexScan.java: Heapfile error");
 			}
 
 			boolean eval;
 			try {
-				eval = PredEval.Eval(_selects, tuple1, null, _types, null);
+				eval = PredEval.Eval(_selects, edge1, null, _types, null);
 			} catch (Exception e) {
 				throw new IndexException(e, "IndexScan.java: Heapfile error");
 			}
@@ -235,14 +237,14 @@ public class IndexScan extends Iterator {
 			if (eval) {
 				// need projection.java
 				try {
-					Projection.Project(tuple1, _types, Jtuple, perm_mat,
+					Projection.Project(edge1, _types, JEdge, perm_mat,
 							_noOutFlds);
 				} catch (Exception e) {
 					throw new IndexException(e,
 							"IndexScan.java: Heapfile error");
 				}
 
-				return Jtuple;
+				return JEdge;
 			}
 
 			try {
@@ -286,9 +288,9 @@ public class IndexScan extends Iterator {
 	private CondExpr[] _selects;
 	private int _noInFlds;
 	private int _noOutFlds;
-	private Heapfile f;
-	private Tuple tuple1;
-	private Tuple Jtuple;
+	private EdgeHeapFile f;
+	private Edge edge1;
+	private Edge JEdge;
 	private int t1_size;
 	private int _fldNum;
 	private boolean index_only;
