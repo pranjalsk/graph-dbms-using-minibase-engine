@@ -87,7 +87,7 @@ public class UnitTestingPhase2 {
 		newEdge.setWeight(edgeWeight);	
 		EID newEid = new EID();
 		newEid = gdb.ehf.insertEdge(newEdge.getEdgeByteArray());	
-			
+		scanEdgeHeapFile();
 	}
 	
 	
@@ -145,6 +145,32 @@ public class UnitTestingPhase2 {
 				newNscan.closescan();
 				System.out.println("test done");
 	} 
+	
+	public static void scanEdgeHeapFile() throws InvalidTupleSizeException, IOException, InvalidTypeException, FieldNumberOutOfBoundException{
+		//scanning of records
+				EID newEid = new EID();
+				EScan newEscan = gdb.ehf.openScan();
+				Edge newEdge = new Edge();
+				boolean done = false;
+				
+				while(!done){
+					newEdge = newEscan.getNext(newEid);
+					if (newEdge == null) {
+						done = true;
+						break;
+					}
+					newEdge.setHdr();
+					String edgeLabel = newEdge.getLabel();
+					int edgeWeight = newEdge.getWeight();
+					NID src = newEdge.getSource();
+					NID dest = newEdge.getDestination();
+					System.out.println(edgeLabel + edgeWeight);
+					
+				}
+				newEscan.closescan();
+				System.out.println("test done");
+	} 
+	
 	
 	
 	//Node creation working fine
