@@ -131,10 +131,9 @@ public class BatchOperations {
 		int n1=newGDB.getEdgeCnt();
 		System.out.println("EdgeCount "+n1);
 		PCounter pCount = new PCounter();
-		System.out.println("Number of pages read in Node Heap File"+pCount.getRCounterForNHF(newGDB.nhf));
-		System.out.println("Number of pages written to Node Heap File"+pCount.getWCounterForNHF(newGDB.nhf));
-		System.out.println("Number of pages read in Edge Heap File"+pCount.getRCounterForEHF(newGDB.ehf));
-		System.out.println("Number of pages written to Edge Heap File"+pCount.getWCounterForEHF(newGDB.ehf));
+		 
+		System.out.println("Number of pages read :"+pCount.getRCounter());
+		System.out.println("Number of pages written :"+pCount.getWCounter());
 
 		
 	}   
