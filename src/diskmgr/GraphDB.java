@@ -119,7 +119,9 @@ public class GraphDB extends DB {
 				newNode = newNscan.getNext(nid);
 				if (newNode==null) {
 					done = true;
+					break;
 				}
+				newNode.setHdr();
 				key = newNode.getLabel();
 				btf_node.insert(new StringKey(key), (RID) nid);			
 			}
@@ -142,7 +144,9 @@ public class GraphDB extends DB {
 				newEdge = newEscan.getNext(eid);
 				if (newEdge == null) {
 					done = true;
+					break;
 				}
+				newEdge.setHdr();
 				key = newEdge.getLabel();
 				btf_edge_label.insert(new StringKey(key), (RID) eid);			
 			}
@@ -164,7 +168,9 @@ public class GraphDB extends DB {
 				newEdge = newEscan.getNext(eid);
 				if (newEdge == null) {
 					done = true;
+					break;
 				}
+				newEdge.setHdr();
 				key = newEdge.getWeight();
 				btf_edge_weight.insert(new IntegerKey(key), (RID) eid);			
 			}

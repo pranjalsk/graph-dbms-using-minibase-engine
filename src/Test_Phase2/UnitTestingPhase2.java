@@ -7,6 +7,7 @@ import batch.BatchInsert;
 import batch.BatchNodeDelete;
 import batch.BatchNodeInsert;
 import btree.AddFileEntryException;
+import btree.BTFileScan;
 import btree.ConstructPageException;
 import btree.ConvertException;
 import btree.DeleteRecException;
@@ -15,12 +16,14 @@ import btree.IndexInsertRecException;
 import btree.IndexSearchException;
 import btree.InsertException;
 import btree.IteratorException;
+import btree.KeyDataEntry;
 import btree.KeyNotMatchException;
 import btree.KeyTooLongException;
 import btree.LeafDeleteException;
 import btree.LeafInsertRecException;
 import btree.NodeNotMatchException;
 import btree.PinPageException;
+import btree.ScanIteratorException;
 import btree.StringKey;
 import btree.UnpinPageException;
 
@@ -58,24 +61,27 @@ public class UnitTestingPhase2 {
 		gdb = new GraphDB(0);
 		
 		BatchNodeInsert b = new BatchNodeInsert();
-		b.insertBatchNode(gdb.nhf, "A 1 2 3 4 5");
-		b.insertBatchNode(gdb.nhf, "B 6 2 3 4 5");
-		b.insertBatchNode(gdb.nhf, "C 1 5 3 4 5");
-		b.insertBatchNode(gdb.nhf, "D 1 2 2 4 5");
+		b.insertBatchNode(gdb.nhf, "B 1 2 3 4 5");
+		b.insertBatchNode(gdb.nhf, "D 6 2 3 4 5");
+		b.insertBatchNode(gdb.nhf, "A 1 5 3 4 5");
+		b.insertBatchNode(gdb.nhf, "C 1 2 2 4 5");
 		System.out.println("Nodecnt-->"+gdb.nhf.getNodeCnt());	
 		scanNodeHeapFile();
+		gdb.createBTNodeLabel();
+		scanNodeIndexFile();
 		
-		edgeInsertTest("A", "B", 445);
-		edgeInsertTest("B", "D", 829);
-		edgeInsertTest("C", "D", 747);
-		edgeInsertTest("A", "C", 478);
-		edgeInsertTest("B", "C", 329);
-		System.out.println("EdgeCount-->"+gdb.ehf.getEdgeCnt());
-		scanEdgeHeapFile();
 		
-		deleteNodeFromHF("A");
-		//scanNodeHeapFile();
-		scanEdgeHeapFile();
+//		edgeInsertTest("A", "B", 445);
+//		edgeInsertTest("B", "D", 829);
+//		edgeInsertTest("C", "D", 747);
+//		edgeInsertTest("A", "C", 478);
+//		edgeInsertTest("B", "C", 329);
+//		System.out.println("EdgeCount-->"+gdb.ehf.getEdgeCnt());
+//		scanEdgeHeapFile();
+//		
+//		deleteNodeFromHF("A");
+//		//scanNodeHeapFile();
+//		scanEdgeHeapFile();
 		
 
 	}
@@ -159,6 +165,29 @@ public class UnitTestingPhase2 {
 				newNscan.closescan();
 				System.out.println("test done");
 	} 
+	
+	public static void scanNodeIndexFile() throws InvalidTupleSizeException, IOException, InvalidTypeException, FieldNumberOutOfBoundException, ScanIteratorException, KeyNotMatchException, IteratorException, ConstructPageException, PinPageException, UnpinPageException{
+		//scanning of records
+				NID newNid = new NID();
+				BTFileScan newNscan = gdb.btf_node.new_scan(null, null);
+				KeyDataEntry newKeyDataEntry = null;
+				boolean done = false;
+				
+				while(!done){
+					newKeyDataEntry = newNscan.get_next();
+					if (newKeyDataEntry == null) {
+						done = true;
+						break;
+					}
+					//newKeyDataEntry.setHdr();
+					String nodeLabel = newKeyDataEntry.data.toString();
+					System.out.println(nodeLabel);
+					
+				}
+				
+				System.out.println("test done");
+	}
+	
 	
 	public static void scanEdgeHeapFile() throws InvalidTupleSizeException, IOException, InvalidTypeException, FieldNumberOutOfBoundException{
 		//scanning of records
