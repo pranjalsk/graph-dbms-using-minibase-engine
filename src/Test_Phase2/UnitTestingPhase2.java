@@ -71,6 +71,12 @@ public class UnitTestingPhase2 {
 		edgeInsertTest("A", "C", 478);
 		edgeInsertTest("B", "C", 329);
 		System.out.println("EdgeCount-->"+gdb.ehf.getEdgeCnt());
+		scanEdgeHeapFile();
+		
+		deleteNodeFromHF("A");
+		//scanNodeHeapFile();
+		scanEdgeHeapFile();
+		
 
 	}
 	
@@ -87,7 +93,7 @@ public class UnitTestingPhase2 {
 		newEdge.setWeight(edgeWeight);	
 		EID newEid = new EID();
 		newEid = gdb.ehf.insertEdge(newEdge.getEdgeByteArray());	
-		scanEdgeHeapFile();
+	
 	}
 	
 	
@@ -102,22 +108,30 @@ public class UnitTestingPhase2 {
 		currentNid.copyNid(newNid);				
 		deleteStatus = gdb.nhf.deleteRecord(newNid);
 		
-//		//Delete all edges associated with the node
-//		EID newEid = new EID();
-//		EScan newEscan = gdb.ehf.openScan();
-//		Edge newEdge = new Edge();
-//		//boolean done = false;
-//		NID sourceNID = null;
-//		NID destinationNID = null;
-//		deleteStatus = false;
-//		
-//		while((newEdge = newEscan.getNext(newEid)) != null){
-//			sourceNID = newEdge.getSource();
-//			destinationNID = newEdge.getDestination();
-//			if(currentNid.equals(sourceNID) || currentNid.equals(destinationNID)){
-//				deleteStatus = gdb.ehf.deleteRecord(newEid);
-//			}//end-if					
-//		}//end-while				
+		//Delete all edges associated with the node
+		EID newEid = new EID();
+		EScan newEscan = gdb.ehf.openScan();
+		Edge newEdge = new Edge();
+		//boolean done = false;
+		NID sourceNID = null;
+		NID destinationNID = null;
+		deleteStatus = false;
+		boolean done = false;
+		
+		
+		while(!done){
+			newEdge = newEscan.getNext(newEid);
+			if (newEdge == null) {
+				done = true;
+				break;
+			}
+			newEdge.setHdr();
+			sourceNID = newEdge.getSource();
+			destinationNID = newEdge.getDestination();
+			if(currentNid.equals(sourceNID) || currentNid.equals(destinationNID)){
+				deleteStatus = gdb.ehf.deleteRecord(newEid);
+			}//end-if					
+		}//end-while				
 		scanNodeHeapFile();
 	}
 	
