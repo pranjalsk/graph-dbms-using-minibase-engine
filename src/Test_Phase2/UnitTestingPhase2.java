@@ -66,7 +66,7 @@ public class UnitTestingPhase2 {
 		
 		BatchNodeInsert b = new BatchNodeInsert();
 		b.insertBatchNode(gdb.nhf, "B 10000 10000 10000 10000 10000");
-		b.insertBatchNode(gdb.nhf, "D 529 529 442 553 440");
+		b.insertBatchNode(gdb.nhf, "D 500 500 500 500 400");
 		b.insertBatchNode(gdb.nhf, "A 500 500 500 500 500");
 		b.insertBatchNode(gdb.nhf, "C 550 512 529 515 503");
 		System.out.println("Nodecnt-->"+gdb.nhf.getNodeCnt());	
