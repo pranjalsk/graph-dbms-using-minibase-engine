@@ -147,7 +147,7 @@ public class NodeQuery {
 		CondExpr[] expr = new CondExpr[2];
 		expr[0] = new CondExpr();
 		expr[0].distance = distance;
-		expr[0].op = new AttrOperator(AttrOperator.aopEQ);
+		expr[0].op = new AttrOperator(AttrOperator.aopLE);
 		expr[0].type2 = new AttrType(AttrType.attrSymbol);
 		expr[0].type1 = new AttrType(AttrType.attrDesc);
 		expr[0].operand2.symbol = new FldSpec(new RelSpec(RelSpec.outer),2); 
