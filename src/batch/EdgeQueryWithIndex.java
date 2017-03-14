@@ -11,15 +11,15 @@ import index.EdgeIndexScan;
 import iterator.CondExpr;
 import iterator.FldSpec;
 import iterator.RelSpec;
-
 import btree.BTreeFile;
 
 public class EdgeQueryWithIndex {
 
 	/**
-	 * 
-	 * @param ehf
-	 * @param btf
+	 * When {QTYPE = 0,Index = 1} then the query will print the edge data in the order it occurs in the node heap
+	 * using edge label index file
+	 * @param ehf EdgeHeapFile
+	 * @param btf B-Tree Index file on edge label
 	 * @param edgeLabelLength
 	 * @param numBuf
 	 */
@@ -93,6 +93,14 @@ public class EdgeQueryWithIndex {
 		}
 	}
 	
+	/**
+	 * when {QTYPE = 3,Index =1} then the query will print the edge data in increasing alphanumerical order of edge labels.
+	 * using edge label index file
+	 * @param ehf edge heap file
+	 * @param btf b-tree index file on edge label
+	 * @param edgeLabelLength
+	 * @param numBuf
+	 */
 	public void query3(EdgeHeapFile ehf, BTreeFile btf, short edgeLabelLength,
 			short numBuf) {
 		System.out.println("query3");
@@ -150,6 +158,14 @@ public class EdgeQueryWithIndex {
 		}
 	}
 
+	/**
+	 * when {QTYPE = 4,Index =1} then the query will print the edge data in increasing order of weights.
+	 * using B-Tree index file on edge weight
+	 * @param ehf edge heap file
+	 * @param btf b tree index file on edge weight
+	 * @param edgeLabelLength
+	 * @param numBuf
+	 */
 	public void query4(EdgeHeapFile ehf, BTreeFile btf, short edgeLabelLength, short numBuf){
 		System.out.println("query4");
 
@@ -205,7 +221,16 @@ public class EdgeQueryWithIndex {
 		
 	}
 
-	
+	/**
+	 * when {QTYPE = 5,Index =1} then the query will take a lower and upper bound on edge weights, and will return the matching
+		edge data using edge weight index file
+	 * @param ehf edge heap file
+	 * @param btf B tree index file on edge weight
+	 * @param edgeLabelLength
+	 * @param numBuf
+	 * @param bound1 
+	 * @param bound2
+	 */
 	public void query5(EdgeHeapFile ehf, BTreeFile btf, short edgeLabelLength, short numBuf, int bound1, int bound2){
 		System.out.println("query5");
 
@@ -286,7 +311,6 @@ public class EdgeQueryWithIndex {
 			e.printStackTrace();
 		}
 		
-	}
-	
+	}	
 	
 }
