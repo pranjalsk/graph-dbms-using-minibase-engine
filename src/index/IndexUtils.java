@@ -258,10 +258,10 @@ public class IndexUtils {
 					|| selects[0].op.attrOperator == AttrOperator.aopLE) {
 				if (selects[0].type1.attrType != AttrType.attrSymbol) {
 					key = getValue(selects[0], selects[0].type1, 1);
-					indScan = ((ZTreeFile) indFile).new_scan(null, key);
+					indScan = ((ZTreeFile) indFile).new_scan(key, (int)selects[0].distance);
 				} else {
 					key = getValue(selects[0], selects[0].type2, 2);
-					indScan = ((ZTreeFile) indFile).new_scan(null, key);
+					indScan = ((ZTreeFile) indFile).new_scan(key, (int)selects[0].distance);
 				}
 				return (ZTFileScan)indScan;
 			}
@@ -279,17 +279,6 @@ public class IndexUtils {
 				return (ZTFileScan)indScan;
 			}
 			
-			if (selects[0].op.attrOperator == AttrOperator.spatialRANGE){
-				if (selects[0].type1.attrType != AttrType.attrSymbol) {
-					key = getValue(selects[0], selects[0].type1, 1);
-					indScan = ((ZTreeFile) indFile).new_scan(key, (int)selects[0].distance);
-				} else {
-					key = getValue(selects[0], selects[0].type2, 2);
-					indScan = ((ZTreeFile) indFile).new_scan(key, (int)selects[0].distance);
-				}
-				return (ZTFileScan)indScan;
-			}
-
 			// error if reached here
 			System.err.println("Error -- in IndexUtils.BTree_scan()");
 			return null;
