@@ -2,6 +2,9 @@ package Test_Phase2;
 
 import java.io.IOException;
 
+import zindex.DescriptorKey;
+import zindex.ZTFileScan;
+
 import batch.BatchEdgeInsert;
 import batch.BatchInsert;
 import batch.BatchNodeDelete;
@@ -17,6 +20,7 @@ import btree.IndexInsertRecException;
 import btree.IndexSearchException;
 import btree.InsertException;
 import btree.IteratorException;
+import btree.KeyClass;
 import btree.KeyDataEntry;
 import btree.KeyNotMatchException;
 import btree.KeyTooLongException;
@@ -63,10 +67,10 @@ public class QueryTest {
 		gdb = new GraphDB(0);
 		
 		BatchNodeInsert b = new BatchNodeInsert();
-		b.insertBatchNode(gdb.nhf, "B 1 2 3 4 5");
-		b.insertBatchNode(gdb.nhf, "D 6 2 3 4 5");
-		b.insertBatchNode(gdb.nhf, "A 1 5 3 4 5");
-		b.insertBatchNode(gdb.nhf, "C 1 2 2 4 5");
+		b.insertBatchNode(gdb.nhf, "B 10000 10000 10000 10000 10000");
+		b.insertBatchNode(gdb.nhf, "D 500 500 500 500 400");
+		b.insertBatchNode(gdb.nhf, "A 500 500 500 500 500");
+		b.insertBatchNode(gdb.nhf, "C 550 512 529 515 503");
 		System.out.println("Nodecnt-->"+gdb.nhf.getNodeCnt());	
 		scanNodeHeapFile();
 		
@@ -87,7 +91,7 @@ public class QueryTest {
 		
 		
 //		gdb.createZTFNodeDesc();
-		
+//		scanNode_ZIndexFile();
 //		gdb.createBTNodeLabel();
 //		scanNodeIndexFile();
 //		GraphDB.initGraphDB("MyDB");
@@ -110,6 +114,45 @@ public class QueryTest {
 
 	}
 	
+	public static void scanNode_ZIndexFile() throws GetFileEntryException, PinPageException, ConstructPageException, KeyNotMatchException, IteratorException, UnpinPageException, IOException {
+		//scanning of records
+		NID newNid = new NID();
+
+		Descriptor desc_low = new Descriptor();
+		desc_low.set(500,500,500,500,500);
+
+		Descriptor desc_high =new Descriptor();
+		desc_high.set(6,2,3,4,5);
+		
+		KeyClass low_key = /*null;*/new DescriptorKey(desc_low);
+		KeyClass high_key = /*null;*/new DescriptorKey(desc_high);
+		int distance = 100;
+		ZTFileScan newDscan = gdb.ztf_node_desc.new_scan(low_key, distance);
+		KeyDataEntry newKeyDataEntry = null;
+		boolean done = false;
+		
+		
+		while(!done){
+			try {
+				newKeyDataEntry = newDscan.get_next();
+			} catch (ScanIteratorException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if (newKeyDataEntry == null) {
+				done = true;
+				break;
+			}
+			//newKeyDataEntry.setHdr();
+			String nodeLabel = newKeyDataEntry.data.toString();
+			System.out.println(nodeLabel);
+			
+		}
+		
+		System.out.println("test done");
+		
+	}
+
 	public static void edgeInsertTest(String srcLbl, String destLbl, int edgeWeight) throws Exception{
 		BatchInsert batchinsert = new BatchInsert();
 		NID src  = batchinsert.getNidFromNodeLabel(srcLbl, gdb.nhf);

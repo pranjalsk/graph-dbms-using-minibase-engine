@@ -1,6 +1,7 @@
 package zindex;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 import com.sun.xml.internal.ws.api.ha.StickyFeature;
 
@@ -20,6 +21,10 @@ import btree.ScanDeleteException;
 import btree.ScanIteratorException;
 import btree.StringKey;
 import btree.UnpinPageException;
+import bufmgr.HashEntryNotFoundException;
+import bufmgr.InvalidFrameNumberException;
+import bufmgr.PageUnpinnedException;
+import bufmgr.ReplacerException;
 
 public class ZTFileScan extends IndexFileScan implements GlobalConst {
 	BTreeFile zBTFile;
@@ -28,18 +33,30 @@ public class ZTFileScan extends IndexFileScan implements GlobalConst {
 	KeyClass target;
 	int distance;
 
-	public ZTFileScan() throws GetFileEntryException, PinPageException,
+	public ZTFileScan(KeyClass lowKey,KeyClass highKey) throws GetFileEntryException, PinPageException,
 			ConstructPageException, KeyNotMatchException, IteratorException,
 			UnpinPageException, IOException {
 		zBTFile = new BTreeFile("zBTFile");
-		bScan = zBTFile.new_scan(null, null);
 		rangeScan = false;
+		if(lowKey instanceof DescriptorKey && highKey instanceof DescriptorKey){
+			String zLow = ZValue.getZValue(((DescriptorKey) lowKey).getKey());
+			KeyClass key_low = new StringKey(zLow);
+			String zHigh = ZValue.getZValue(((DescriptorKey) highKey).getKey());
+			KeyClass key_high = new StringKey(zHigh);
+			bScan = zBTFile.new_scan(key_low, key_high);
+		}else{
+			bScan = zBTFile.new_scan(lowKey, highKey);
+		}
+		
 	}
 
 	public ZTFileScan(KeyClass target, int distance)
 			throws GetFileEntryException, PinPageException,
 			ConstructPageException {
 		zBTFile = new BTreeFile("zBTFile");
+		rangeScan = true;
+		this.target = target;
+		this.distance = distance;
 		try {
 			bScan = zBTFile.new_scan(getLowKey(), getHighKey());
 		} catch (KeyNotMatchException e) {
@@ -55,9 +72,6 @@ public class ZTFileScan extends IndexFileScan implements GlobalConst {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		rangeScan = true;
-		this.target = target;
-		this.distance = distance;
 	}
 
 	public KeyDataEntry get_next() throws ScanIteratorException {
@@ -68,6 +82,7 @@ public class ZTFileScan extends IndexFileScan implements GlobalConst {
 			KeyDataEntry next;
 			do {
 				next = bScan.get_next();
+				if(next == null) break;
 				KeyClass zVal = next.key;
 				String stringKey = zVal.toString();
 				keyDesc = ZValue.getDescriptor(stringKey);
@@ -83,22 +98,28 @@ public class ZTFileScan extends IndexFileScan implements GlobalConst {
 		return false;
 	}
 	
-	private KeyClass getLowKey(){
+	private KeyClass getLowKey() throws KeyNotMatchException, UnsupportedEncodingException{
 		Descriptor desc = new Descriptor();
 		Descriptor tar = ((DescriptorKey)target).getKey();
 		desc.set(tar.get(0)-distance, tar.get(1)-distance, tar.get(2)-distance, tar.get(3)-distance, tar.get(4)-distance);
-		KeyClass lowKey = new DescriptorKey(desc);
+		KeyClass lowKey = new StringKey(getZValue(desc));
+		if(desc.get(0) < 0 || desc.get(1) < 0 || desc.get(2) < 0 || desc.get(3) < 0 || desc.get(4) < 0){
+			return null;
+		}
 		return lowKey;
 	}
 	
-	private KeyClass getHighKey(){
+	private KeyClass getHighKey() throws KeyNotMatchException, UnsupportedEncodingException{
 		Descriptor desc = new Descriptor();
 		Descriptor tar = ((DescriptorKey)target).getKey();
 		desc.set(tar.get(0)+distance, tar.get(1)+distance, tar.get(2)+distance, tar.get(3)+distance, tar.get(4)+distance);
-		KeyClass highKey = new DescriptorKey(desc);
+		KeyClass highKey = new StringKey(getZValue(desc));
 		return highKey;
 	}
 	
+	private String getZValue(Descriptor desc) throws KeyNotMatchException, UnsupportedEncodingException{
+		return ZValue.getZValue(desc);
+	}
 	public void delete_current() throws ScanDeleteException {
 		bScan.delete_current();
 
@@ -107,6 +128,11 @@ public class ZTFileScan extends IndexFileScan implements GlobalConst {
 	public int keysize() {
 
 		return bScan.keysize();
+	}
+
+	public void DestroyBTreeFileScan() throws InvalidFrameNumberException, ReplacerException, PageUnpinnedException, HashEntryNotFoundException, IOException {
+		bScan.DestroyBTreeFileScan();
+		
 	}
 
 }

@@ -45,7 +45,15 @@ public class GraphDB extends DB {
 	public int type;
 	public static String dbpath;
 	public static String logpath;
+    public static String getGraphDBName() {
+		return graphDBName;
+	}
 
+	public static void setGraphDBName(String graphDBName) {
+		GraphDB.graphDBName = graphDBName;
+	}
+
+	public static String graphDBName;
 	public GraphDB(int type) throws HFException, HFBufMgrException,
 			HFDiskMgrException, IOException, GetFileEntryException,
 			ConstructPageException, AddFileEntryException, KeyTooLongException, KeyNotMatchException, LeafInsertRecException, IndexInsertRecException, UnpinPageException, PinPageException, NodeNotMatchException, ConvertException, DeleteRecException, IndexSearchException, IteratorException, LeafDeleteException, InsertException, InvalidTupleSizeException, heap.FieldNumberOutOfBoundException {
@@ -56,15 +64,15 @@ public class GraphDB extends DB {
 		int keyTypeInt = AttrType.attrInteger;
 		int KeyTypeDesc = AttrType.attrDesc;
 		
-		nhf = new NodeHeapfile("NodeHeapFile"+dbpath);
+		nhf = new NodeHeapfile("NodeHeapFile"+graphDBName);
 		System.out.println("heap file created");
-		ehf = new EdgeHeapFile("EdgeHeapFile"+dbpath);
+		ehf = new EdgeHeapFile("EdgeHeapFile"+graphDBName);
 		System.out.println("edge heap file cretaed");
 		
 		btf_node = new BTreeFile("IndexNodeLabel", keyTypeString, 32, 1);
 		btf_edge_label = new BTreeFile("IndexEdgeLabel", keyTypeString, 32, 1);
 		btf_edge_weight = new BTreeFile("IndexEdgeWeight", keyTypeInt, 4, 1);
-//		ztf_node_desc = new ZTreeFile();
+		ztf_node_desc = new ZTreeFile();
 		
 		System.out.println("BTree intitalization is ok");
 //		createBTNodeLabel();
@@ -103,13 +111,13 @@ public class GraphDB extends DB {
 	}
 
 	public static void initGraphDB(String db_name) {
-
+        graphDBName= db_name;
 		dbpath = "/tmp/" + db_name + System.getProperty("user.name")
 
 				+ ".minibase-db";
 		logpath = "/tmp/" + db_name + System.getProperty("user.name")
 				+ ".minibase-log";
-		SystemDefs sysdef = new SystemDefs(dbpath, 100, 100, "Clock");
+		SystemDefs sysdef = new SystemDefs(dbpath, 300, 100, "Clock");
 		
 		PCounter.initialize();
 		// Kill anything that might be hanging around
