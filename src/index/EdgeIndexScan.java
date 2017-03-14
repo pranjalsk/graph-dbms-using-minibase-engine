@@ -214,7 +214,8 @@ public class EdgeIndexScan extends Iterator {
 			}
 
 			// not index_only, need to return the whole tuple
-			eid = (EID)((LeafData) nextentry.data).getData();
+			RID ridTemp = ((LeafData) nextentry.data).getData();
+			eid = new EID(ridTemp.pageNo,ridTemp.slotNo);
 			try {
 				edge1 = f.getRecord(eid);
 			} catch (Exception e) {

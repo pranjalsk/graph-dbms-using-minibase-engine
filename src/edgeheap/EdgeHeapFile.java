@@ -31,6 +31,14 @@ public class EdgeHeapFile implements Filetype, GlobalConst{
 	int _ftype;
 	private boolean _file_deleted;
 	private String _fileName;
+	public String get_fileName() {
+		return _fileName;
+	}
+
+	public void set_fileName(String _fileName) {
+		this._fileName = _fileName;
+	}
+
 	private static int tempfilecount = 0;
 	
 	private EHFPage _newDatapage(DataPageInfo dpinfop) throws HFException,
