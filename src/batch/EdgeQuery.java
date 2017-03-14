@@ -1,5 +1,9 @@
 package batch;
 
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
+
 import edgeheap.EScan;
 import edgeheap.Edge;
 import edgeheap.EdgeHeapFile;
@@ -41,19 +45,6 @@ public class EdgeQuery {
 				sourceNID = edge.getSource();
 				destinationNID = edge.getDestination();
 				Node sourceNode = null, destinationNode = null;
-			/*	NID nid = new NID();
-				nscan = nhf.openScan();
-				Node tempNode, sourceNode = null, destinationNode = null;
-				while((tempNode = nscan.getNext(nid))!= null){
-					//System.out.println("Page Number: "+nid.pageNo.pid+" , Slot Number: "+nid.slotNo);
-					System.out.println("Here: "+edgeWeight);
-					tempNode.setHdr();
-					if(sourceNID.equals(nid))
-						sourceNode = new Node(tempNode);
-					else if(destinationNID.equals(nid)){
-						destinationNode = new Node(tempNode);
-					}
-				}*/
 				sourceNode = nhf.getRecord(sourceNID);
 				sourceNode.setHdr();
 				destinationNode = nhf.getRecord(destinationNID);
@@ -76,6 +67,109 @@ public class EdgeQuery {
 		
 	}
 	
+	public void query1(EdgeHeapFile ehf, NodeHeapfile nhf) {
+		System.out.println("edgequery 0");
+		EID eid = new EID();
+		Edge edge;
+		try {
+
+			NScan nscan;
+			EScan escan = ehf.openScan();
+			edge = escan.getNext(eid);
+			String edgeLabel;
+			int edgeWeight;
+
+			Map<String, ArrayList<Edge>> sorceNodeToEdgeMap = new TreeMap<String, ArrayList<Edge>>();
+			while (edge != null) {
+				edge.setHdr();
+				NID sourceNID = new NID();
+				sourceNID = edge.getSource();
+				Node sourceNode = nhf.getRecord(sourceNID);
+				sourceNode.setHdr();
+				String sourceLabel = sourceNode.getLabel();
+				if(sorceNodeToEdgeMap.containsKey(sourceLabel)){
+					ArrayList<Edge> tempList = sorceNodeToEdgeMap.get(sourceLabel);
+					tempList.add(new Edge(edge));
+					sorceNodeToEdgeMap.put(sourceLabel, tempList);
+				}else{
+					ArrayList<Edge> tempList = new ArrayList<Edge>();
+					tempList.add(new Edge(edge));
+					sorceNodeToEdgeMap.put(sourceLabel, tempList);
+				}
+				edge = escan.getNext(eid);
+			}
+			
+			for (String sourceNodeLab : sorceNodeToEdgeMap.keySet()) {
+				ArrayList<Edge> edgeList = sorceNodeToEdgeMap.get(sourceNodeLab);
+				for(Edge edgeToPrint: edgeList){
+					System.out.println(edgeToPrint.getLabel() + " "
+						+ edgeToPrint.getWeight() + " Source NID:"
+						+ edgeToPrint.getSource().pageNo + ", "
+						+ edgeToPrint.getSource().slotNo +" Destination NID:"
+						+ edgeToPrint.getDestination().pageNo + ", "
+						+ edgeToPrint.getDestination().slotNo + " " + sourceNodeLab);
+				}
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		
+		
+	}
+	
+	public void query2(EdgeHeapFile ehf, NodeHeapfile nhf) {
+		System.out.println("edgequery 0");
+		EID eid = new EID();
+		Edge edge;
+		try {
+
+			NScan nscan;
+			EScan escan = ehf.openScan();
+			edge = escan.getNext(eid);
+			String edgeLabel;
+			int edgeWeight;
+
+			Map<String, ArrayList<Edge>> destNodeToEdgeMap = new TreeMap<String, ArrayList<Edge>>();
+			while (edge != null) {
+				edge.setHdr();
+				NID destNID = new NID();
+				destNID = edge.getDestination();
+				Node destNode = nhf.getRecord(destNID);
+				destNode.setHdr();
+				String destLabel = destNode.getLabel();
+				if(destNodeToEdgeMap.containsKey(destLabel)){
+					ArrayList<Edge> tempList = destNodeToEdgeMap.get(destLabel);
+					tempList.add(new Edge(edge));
+					destNodeToEdgeMap.put(destLabel, tempList);
+				}else{
+					ArrayList<Edge> tempList = new ArrayList<Edge>();
+					tempList.add(new Edge(edge));
+					destNodeToEdgeMap.put(destLabel, tempList);
+				}
+				edge = escan.getNext(eid);
+			}
+			
+			for (String destNodeLab : destNodeToEdgeMap.keySet()) {
+				ArrayList<Edge> edgeList = destNodeToEdgeMap.get(destNodeLab);
+				for(Edge edgeToPrint: edgeList){
+					System.out.println(edgeToPrint.getLabel() + " "
+						+ edgeToPrint.getWeight() + " Source NID:"
+						+ edgeToPrint.getSource().pageNo + ", "
+						+ edgeToPrint.getSource().slotNo + " Destination NID:"
+						+ edgeToPrint.getDestination().pageNo + ", "
+						+ edgeToPrint.getDestination().slotNo + " " + destNodeLab);
+				}
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		
+		
+	}
 	
 	public void query3(EdgeHeapFile ehf, short edgeLabelLength, short numBuf){
 		System.out.println("edgequery 3");

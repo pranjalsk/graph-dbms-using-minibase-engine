@@ -11,6 +11,7 @@ import batch.BatchNodeDelete;
 import batch.BatchNodeInsert;
 import batch.EdgeQueryWithIndex;
 import batch.NodeQuery;
+import batch.NodeQueryWithIndex;
 import btree.AddFileEntryException;
 import btree.BTFileScan;
 import btree.ConstructPageException;
@@ -87,25 +88,27 @@ public class QueryTest {
 		b.insertBatchNode(gdb.nhf, "Q 550 512 529 515 503");
 		b.insertBatchNode(gdb.nhf, "R 550 512 529 515 503");
 		System.out.println("Nodecnt-->"+gdb.nhf.getNodeCnt());	
-		scanNodeHeapFile();
+//		scanNodeHeapFile();
 		
-		//NodeQuery nq = new NodeQuery();
-		//NodeHeapfile nhf = gdb.nhf;
-		//nq.query0(nhf);
-		
-		short nodeLabelLength = 32, edgeLabelLength=32, numBuf = 12;
-		//nq.query1(nhf, nodeLabelLength, numBuf);
-		
-		//Descriptor targetDescriptor = new Descriptor();
-		//targetDescriptor.set(3, 3, 3, 3, 3);
+
+		NodeQuery nq = new NodeQuery();
+		NodeHeapfile nhf = gdb.nhf;
+//		nq.query0(nhf);
+//		System.out.println("query 0 without index completed.");
+		short nodeLabelLength = 32, numBuf = 12;
+//		nq.query1(nhf, nodeLabelLength, numBuf);
+//		
+		Descriptor targetDescriptor = new Descriptor();
+		targetDescriptor.set(500, 500, 500, 500,500);
 		//nq.query2(nhf, nodeLabelLength, numBuf, targetDescriptor);
 		
-		//double distance = 3.1622776601683795;
+		double distance = 100;
 		
-		//nq.query3(nhf, nodeLabelLength, numBuf, targetDescriptor, distance);
+//		nq.query3(nhf, nodeLabelLength, numBuf, targetDescriptor, distance);
+//		System.out.println("query 3 without index completed.");
+
 		
-		
-//		gdb.createZTFNodeDesc();
+		gdb.createZTFNodeDesc();
 //		scanNode_ZIndexFile();
 //		gdb.createBTNodeLabel();
 //		scanNodeIndexFile();
@@ -123,14 +126,15 @@ public class QueryTest {
 		edgeInsertTest("A", "C", 478);
 		edgeInsertTest("B", "C", 329);
 		System.out.println("EdgeCount-->"+gdb.ehf.getEdgeCnt());
-		scanEdgeHeapFile();
-		
-		gdb.createBTEdgeLabel();
-		gdb.createBTEdgeWeight();
-		
-//		deleteNodeFromHF("A");
-//		//scanNodeHeapFile();
+
 //		scanEdgeHeapFile();
+//		
+
+//		deleteNodeFromHF("A");
+//		scanNodeHeapFile();
+//		scanEdgeHeapFile();
+
+	
 		
 		EdgeQueryWithIndex eqi = new EdgeQueryWithIndex();
 //		eqi.query3(gdb.ehf, gdb.btf_edge_label, edgeLabelLength, numBuf);
@@ -146,6 +150,25 @@ public class QueryTest {
 //		System.out.println("query 5 with index completed");
 		
 
+		NodeQueryWithIndex nqi = new NodeQueryWithIndex();
+//		short nodeLabelLength = 32, numBuf = 12;
+//		nqi.query0(gdb.nhf, gdb.btf_node, nodeLabelLength, numBuf);
+//		System.out.println("query 0 with index completed.");
+//		nqi.query1(gdb.nhf, gdb.btf_node, nodeLabelLength, numBuf);
+//		System.out.println("query 1 with index completed.");
+		nqi.query2(gdb.nhf, gdb.ztf_node_desc, nodeLabelLength, numBuf, targetDescriptor, distance);
+		System.out.println("query 2 with index completed.");
+		nq.query2(gdb.nhf, nodeLabelLength, numBuf, targetDescriptor, distance);
+		System.out.println("query 2 without index completed.");
+//		nqi.query3(gdb.nhf, gdb.ztf_node_desc, nodeLabelLength, numBuf, targetDescriptor, distance);
+//		System.out.println("query 3 with index completed.");
+//		String targetLabel = new String("B");
+//		nqi.query4(gdb.nhf, gdb.btf_node, gdb.ehf, nodeLabelLength, numBuf, targetLabel);
+//		System.out.println("query 4 with index completed.");
+//		nqi.query5(gdb.nhf, gdb.ztf_node_desc ,gdb.ehf,nodeLabelLength, numBuf, targetDescriptor, distance);
+//		System.out.println("query 5 with index completed.");
+//		nq.query5(gdb.nhf, gdb.ehf,nodeLabelLength, numBuf, targetDescriptor, distance);
+//		System.out.println("query 5 without index completed.");
 	}
 	
 	public static void scanNode_ZIndexFile() throws GetFileEntryException, PinPageException, ConstructPageException, KeyNotMatchException, IteratorException, UnpinPageException, IOException {

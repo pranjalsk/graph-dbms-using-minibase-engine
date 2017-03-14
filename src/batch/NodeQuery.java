@@ -2,6 +2,8 @@ package batch;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import edgeheap.EScan;
 import edgeheap.Edge;
@@ -93,7 +95,8 @@ public class NodeQuery {
 		}
 	}
 
-	public void query2(NodeHeapfile nhf, short nodeLabelLength, short numBuf, Descriptor targetDescriptor) {
+	public void query2(NodeHeapfile nhf, short nodeLabelLength, short numBuf, Descriptor targetDescriptor, double distance){
+		System.out.println("nodequery 3");
 		String nodeHeapFileName = nhf.get_fileName();
 		AttrType[] attrType = new AttrType[2];
 		short[] stringSize = new short[1];
@@ -105,33 +108,35 @@ public class NodeQuery {
 		projlist[0] = new FldSpec(rel, 1);
 		projlist[1] = new FldSpec(rel, 2);
 
-		TupleOrder[] order = new TupleOrder[2];
-		order[0] = new TupleOrder(TupleOrder.Ascending);
-		order[1] = new TupleOrder(TupleOrder.Descending);
-
-		Node node;
-		
+		CondExpr[] expr = null;
+		Map<Double, Node> distanceToNodeMap = new TreeMap<Double, Node>();
 		try {
-			NFileScan nfscan = new NFileScan(nodeHeapFileName, attrType, stringSize, (short) 2, 2, projlist, null);
-			Sort sort = new Sort(attrType, (short) 2, stringSize, nfscan, 2, order[0], nodeLabelLength, numBuf, 0,
-					targetDescriptor);
-
+			NFileScan nfscan = new NFileScan(nodeHeapFileName, attrType, stringSize, (short) 2, 2, projlist, expr);
 			String nodeLabel;
 			Descriptor nodeDescriptor;
+			Node node = new Node();
 			Tuple t;
-			t = sort.get_next();
-
-			node = (Node) sort.get_next();
+			t = nfscan.get_next();
 			while (t != null) {
 				node.nodeInit(t.getTupleByteArray(), t.getOffset());
 				node.setHdr();
 				nodeLabel = node.getLabel();
 				nodeDescriptor = node.getDesc();
-				System.out.println(nodeLabel + " " + nodeDescriptor.get(0) + " " + nodeDescriptor.get(1) + " "
-						+ nodeDescriptor.get(2) + " " + nodeDescriptor.get(3) + " " + nodeDescriptor.get(4));
-				t = sort.get_next();
+				double distanceFromTar = nodeDescriptor.distance(targetDescriptor);
+				distanceToNodeMap.put(distanceFromTar,new Node( node));
+				t = nfscan.get_next();
 			}
-		} catch (Exception e) {
+			for(double dist: distanceToNodeMap.keySet()){
+				node = distanceToNodeMap.get(dist);
+				nodeLabel = node.getLabel();
+				nodeDescriptor = node.getDesc();
+				System.out.println(nodeLabel + " " + nodeDescriptor.get(0)
+						+ " " + nodeDescriptor.get(1) + " "
+						+ nodeDescriptor.get(2) + " " + nodeDescriptor.get(3)
+						+ " " + nodeDescriptor.get(4)+ " " +dist);
+			}
+		}
+		catch(Exception e){
 			e.printStackTrace();
 		}
 	}
