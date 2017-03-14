@@ -1,7 +1,6 @@
 package diskmgr;
 
 import edgeheap.*;
-import edgeheap.FieldNumberOutOfBoundException;
 import global.*;
 import nodeheap.*;
 import heap.*;
@@ -12,29 +11,12 @@ import java.util.HashSet;
 import zindex.DescriptorKey;
 import zindex.ZTreeFile;
 
-import btree.AddFileEntryException;
-import btree.BTreeFile;
-import btree.ConstructPageException;
-import btree.ConvertException;
-import btree.DeleteRecException;
-import btree.GetFileEntryException;
-import btree.IndexInsertRecException;
-import btree.IndexSearchException;
-import btree.InsertException;
-import btree.IntegerKey;
-import btree.IteratorException;
-import btree.KeyClass;
-import btree.KeyNotMatchException;
-import btree.KeyTooLongException;
-import btree.LeafDeleteException;
-import btree.LeafInsertRecException;
-import btree.NodeNotMatchException;
-import btree.PinPageException;
-import btree.StringKey;
-import btree.UnpinPageException;
+import btree.*;
+
 
 public class GraphDB extends DB {
 
+	// Declare all 6 type of files 
 	public NodeHeapfile nhf;
 	public EdgeHeapFile ehf;
 	public BTreeFile btf_node;
@@ -45,6 +27,8 @@ public class GraphDB extends DB {
 	public int type;
 	public static String dbpath;
 	public static String logpath;
+	public static String graphDBName;
+	
     public static String getGraphDBName() {
 		return graphDBName;
 	}
@@ -52,49 +36,19 @@ public class GraphDB extends DB {
 	public static void setGraphDBName(String graphDBName) {
 		GraphDB.graphDBName = graphDBName;
 	}
-
-	public static String graphDBName;
-	public GraphDB(int type) throws HFException, HFBufMgrException,
-			HFDiskMgrException, IOException, GetFileEntryException,
-			ConstructPageException, AddFileEntryException, KeyTooLongException, KeyNotMatchException, LeafInsertRecException, IndexInsertRecException, UnpinPageException, PinPageException, NodeNotMatchException, ConvertException, DeleteRecException, IndexSearchException, IteratorException, LeafDeleteException, InsertException, InvalidTupleSizeException, heap.FieldNumberOutOfBoundException {
-
-		this.type = type;
-		
-		int keyTypeString = AttrType.attrString;
-		int keyTypeInt = AttrType.attrInteger;
-		int KeyTypeDesc = AttrType.attrDesc;
-		
-		nhf = new NodeHeapfile("NodeHeapFile");
-		System.out.println("heap file created");
-		ehf = new EdgeHeapFile("EdgeHeapFile");
-		System.out.println("edge heap file cretaed");
-		
-		btf_node = new BTreeFile("IndexNodeLabel", keyTypeString, 32, 1);
-		btf_edge_label = new BTreeFile("IndexEdgeLabel", keyTypeString, 32, 1);
-		btf_edge_weight = new BTreeFile("IndexEdgeWeight", keyTypeInt, 4, 1);
-		ztf_node_desc = new ZTreeFile();
-		
-		System.out.println("BTree intitalization is ok");
-//		createBTNodeLabel();
-//		createBTEdgeLabel();
-//		createBTEdgeWeight();
-//  	createZTFNodeDesc();
-			
-
-	}
-
 	
-
+	/**
+	 *  Creates a new database of the db_name passed as argument 
+	 * @param db_name Name of the database
+	 */
 	public static void initGraphDB(String db_name) {
         graphDBName= db_name;
-		dbpath = "/tmp/" + db_name + System.getProperty("user.name")
-
-				+ ".minibase-db";
-		logpath = "/tmp/" + db_name + System.getProperty("user.name")
-				+ ".minibase-log";
-		SystemDefs sysdef = new SystemDefs(dbpath, 300, 100, "Clock");
+		dbpath = "/tmp/" + db_name + System.getProperty("user.name") + ".minibase-db";
+		logpath = "/tmp/" + db_name + System.getProperty("user.name") + ".minibase-log";
 		
-//		PCounter.initialize();
+		@SuppressWarnings("unused")
+		SystemDefs sysdef = new SystemDefs(dbpath, 300, 100, "Clock"); //Number of pages=300, Buffer pool=100 pages
+		
 		// Kill anything that might be hanging around
 		String newdbpath;
 		String newlogpath;
@@ -128,7 +82,58 @@ public class GraphDB extends DB {
 		}
 
 	}
+	
+	/**
+	 * Constructor of graphDB initializes heap files and index files
+	 * @param type
+	 * @throws HFException
+	 * @throws HFBufMgrException
+	 * @throws HFDiskMgrException
+	 * @throws IOException
+	 * @throws GetFileEntryException
+	 * @throws ConstructPageException
+	 * @throws AddFileEntryException
+	 * @throws KeyTooLongException
+	 * @throws KeyNotMatchException
+	 * @throws LeafInsertRecException
+	 * @throws IndexInsertRecException
+	 * @throws UnpinPageException
+	 * @throws PinPageException
+	 * @throws NodeNotMatchException
+	 * @throws ConvertException
+	 * @throws DeleteRecException
+	 * @throws IndexSearchException
+	 * @throws IteratorException
+	 * @throws LeafDeleteException
+	 * @throws InsertException
+	 * @throws InvalidTupleSizeException
+	 * @throws heap.FieldNumberOutOfBoundException
+	 */
+	public GraphDB(int type) throws HFException, HFBufMgrException,
+			HFDiskMgrException, IOException, GetFileEntryException,
+			ConstructPageException, AddFileEntryException, KeyTooLongException, KeyNotMatchException, LeafInsertRecException, IndexInsertRecException, UnpinPageException, PinPageException, NodeNotMatchException, ConvertException, DeleteRecException, IndexSearchException, IteratorException, LeafDeleteException, InsertException, InvalidTupleSizeException, heap.FieldNumberOutOfBoundException {
 
+		this.type = type;
+		
+		int keyTypeString = AttrType.attrString;
+		int keyTypeInt = AttrType.attrInteger;
+		
+		nhf = new NodeHeapfile("NodeHeapFile"+ graphDBName);
+		//System.out.println("heap file created");
+		ehf = new EdgeHeapFile("EdgeHeapFile"+ graphDBName);
+		//System.out.println("edge heap file created");
+		
+		btf_node = new BTreeFile("IndexNodeLabel", keyTypeString, 32, 1);
+		btf_edge_label = new BTreeFile("IndexEdgeLabel", keyTypeString, 32, 1);
+		btf_edge_weight = new BTreeFile("IndexEdgeWeight", keyTypeInt, 4, 1);
+		ztf_node_desc = new ZTreeFile();
+		
+	}
+
+	//Methods to create index files
+	/**
+	 * creates a Z tree index file on the descriptor field of node
+	 */
 	public void createZTFNodeDesc() {
 		try {
 			NID nid = new NID();
@@ -152,10 +157,29 @@ public class GraphDB extends DB {
 		} catch (Exception e) {
 			System.err.println("Empty node heap file");
 			e.printStackTrace();
-		}
-		
+		}		
 	}
 	
+	/**
+	 * creates a B-tree index file on node label attribute
+	 * @throws KeyTooLongException
+	 * @throws KeyNotMatchException
+	 * @throws LeafInsertRecException
+	 * @throws IndexInsertRecException
+	 * @throws ConstructPageException
+	 * @throws UnpinPageException
+	 * @throws PinPageException
+	 * @throws NodeNotMatchException
+	 * @throws ConvertException
+	 * @throws DeleteRecException
+	 * @throws IndexSearchException
+	 * @throws IteratorException
+	 * @throws LeafDeleteException
+	 * @throws InsertException
+	 * @throws IOException
+	 * @throws InvalidTupleSizeException
+	 * @throws heap.FieldNumberOutOfBoundException
+	 */
 	public void createBTNodeLabel() throws KeyTooLongException, KeyNotMatchException, LeafInsertRecException, IndexInsertRecException, ConstructPageException, UnpinPageException, PinPageException, NodeNotMatchException, ConvertException, DeleteRecException, IndexSearchException, IteratorException, LeafDeleteException, InsertException, IOException, InvalidTupleSizeException, heap.FieldNumberOutOfBoundException{
 		try {
 			NID nid = new NID();
@@ -181,6 +205,26 @@ public class GraphDB extends DB {
 		}
 	}
 	
+	/**
+	 * creates a B-tree on the edge label field
+	 * @throws KeyTooLongException
+	 * @throws KeyNotMatchException
+	 * @throws LeafInsertRecException
+	 * @throws IndexInsertRecException
+	 * @throws ConstructPageException
+	 * @throws UnpinPageException
+	 * @throws PinPageException
+	 * @throws NodeNotMatchException
+	 * @throws ConvertException
+	 * @throws DeleteRecException
+	 * @throws IndexSearchException
+	 * @throws IteratorException
+	 * @throws LeafDeleteException
+	 * @throws InsertException
+	 * @throws IOException
+	 * @throws InvalidTupleSizeException
+	 * @throws heap.FieldNumberOutOfBoundException
+	 */
 	public void createBTEdgeLabel() throws KeyTooLongException, KeyNotMatchException, LeafInsertRecException, IndexInsertRecException, ConstructPageException, UnpinPageException, PinPageException, NodeNotMatchException, ConvertException, DeleteRecException, IndexSearchException, IteratorException, LeafDeleteException, InsertException, IOException, InvalidTupleSizeException, heap.FieldNumberOutOfBoundException{
 		try {
 			EID eid = new EID();
@@ -205,6 +249,26 @@ public class GraphDB extends DB {
 		}
 	}
 	
+	/**
+	 * creates B-Tree index file on edge weight field
+	 * @throws KeyTooLongException
+	 * @throws KeyNotMatchException
+	 * @throws LeafInsertRecException
+	 * @throws IndexInsertRecException
+	 * @throws ConstructPageException
+	 * @throws UnpinPageException
+	 * @throws PinPageException
+	 * @throws NodeNotMatchException
+	 * @throws ConvertException
+	 * @throws DeleteRecException
+	 * @throws IndexSearchException
+	 * @throws IteratorException
+	 * @throws LeafDeleteException
+	 * @throws InsertException
+	 * @throws IOException
+	 * @throws InvalidTupleSizeException
+	 * @throws heap.FieldNumberOutOfBoundException
+	 */
 	public void createBTEdgeWeight() throws KeyTooLongException, KeyNotMatchException, LeafInsertRecException, IndexInsertRecException, ConstructPageException, UnpinPageException, PinPageException, NodeNotMatchException, ConvertException, DeleteRecException, IndexSearchException, IteratorException, LeafDeleteException, InsertException, IOException, InvalidTupleSizeException, heap.FieldNumberOutOfBoundException{
 		try {
 			EID eid = new EID();
@@ -229,18 +293,37 @@ public class GraphDB extends DB {
 		}
 	}
 	
+	//Statistical information about heap files methods
+	
+	/**
+	 * returns the node count in the node heap file
+	 * @return NodeCount
+	 * @throws InvalidSlotNumberException
+	 * @throws InvalidTupleSizeException
+	 * @throws HFDiskMgrException
+	 * @throws HFBufMgrException
+	 * @throws IOException
+	 */
 	public int getNodeCnt() throws InvalidSlotNumberException,
 			InvalidTupleSizeException, HFDiskMgrException, HFBufMgrException,
 			IOException {
 		return nhf.getNodeCnt();
 	}
 
+	/**
+	 * returns the edge count in the edge heap file
+	 * @return EdgeCount
+	 */
 	public int getEdgeCnt() throws InvalidSlotNumberException,
 			InvalidTupleSizeException, HFDiskMgrException, HFBufMgrException,
 			IOException {
 		return ehf.getEdgeCnt();
 	}
 
+	/**
+	 * return the distinct sources in the edge heap file
+	 * @return distinct SourceCount
+	 */
 	public int getSourceCnt() {
 		try {
 			HashSet<NID> hashSet = new HashSet<NID>();
@@ -264,11 +347,15 @@ public class GraphDB extends DB {
 			return hashSet.size();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return (Integer) null;
+			return 0;
 		}
 
 	}
 
+	/**
+	 * return the distinct destination in the edge heap file
+	 * @return distinct DestinationCount
+	 */
 	public int getDestinationCnt(){
 		try {
 			HashSet<NID> hashSet = new HashSet<NID>();
@@ -292,10 +379,19 @@ public class GraphDB extends DB {
 			return hashSet.size();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return (Integer) null;
+			return 0;
 		}
 	}
 
+	/**
+	 * returns the total number of distinct labels in node heap file and edge heap file
+	 * @return total LabelCount
+	 * @throws InvalidSlotNumberException
+	 * @throws InvalidTupleSizeException
+	 * @throws HFDiskMgrException
+	 * @throws HFBufMgrException
+	 * @throws IOException
+	 */
 	public int getLabelCnt() throws InvalidSlotNumberException, InvalidTupleSizeException, HFDiskMgrException, HFBufMgrException, IOException{
 		
 		int edgeLabelCnt = 0;
@@ -308,17 +404,21 @@ public class GraphDB extends DB {
 
 			while (!done) {
 				newEdge = newEscan.getNext(newEid);
+				if (newEdge == null) {
+					done = true;
+					break;
+				}
+				newEdge.setHdr();
 				String edgeLbl = newEdge.getLabel();
 								
 				if (!hashSet.contains(edgeLbl)) {
 					hashSet.add(edgeLbl);
-					done = true;
 				}
 			}
 			edgeLabelCnt = hashSet.size();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return (Integer) null;
+			return 0;
 		}
 		
 		int nodeLabelCnt = nhf.getNodeCnt();

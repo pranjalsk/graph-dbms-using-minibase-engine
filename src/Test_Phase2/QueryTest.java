@@ -9,6 +9,7 @@ import batch.BatchEdgeInsert;
 import batch.BatchInsert;
 import batch.BatchNodeDelete;
 import batch.BatchNodeInsert;
+import batch.EdgeQueryWithIndex;
 import batch.NodeQuery;
 import btree.AddFileEntryException;
 import btree.BTFileScan;
@@ -74,20 +75,20 @@ public class QueryTest {
 		System.out.println("Nodecnt-->"+gdb.nhf.getNodeCnt());	
 		scanNodeHeapFile();
 		
-		NodeQuery nq = new NodeQuery();
-		NodeHeapfile nhf = gdb.nhf;
-		nq.query0(nhf);
+		//NodeQuery nq = new NodeQuery();
+		//NodeHeapfile nhf = gdb.nhf;
+		//nq.query0(nhf);
 		
-		short nodeLabelLength = 32, numBuf = 12;
-		nq.query1(nhf, nodeLabelLength, numBuf);
+		short nodeLabelLength = 32, edgeLabelLength=32, numBuf = 12;
+		//nq.query1(nhf, nodeLabelLength, numBuf);
 		
-		Descriptor targetDescriptor = new Descriptor();
-		targetDescriptor.set(3, 3, 3, 3, 3);
+		//Descriptor targetDescriptor = new Descriptor();
+		//targetDescriptor.set(3, 3, 3, 3, 3);
 		//nq.query2(nhf, nodeLabelLength, numBuf, targetDescriptor);
 		
-		double distance = 3.1622776601683795;
+		//double distance = 3.1622776601683795;
 		
-		nq.query3(nhf, nodeLabelLength, numBuf, targetDescriptor, distance);
+		//nq.query3(nhf, nodeLabelLength, numBuf, targetDescriptor, distance);
 		
 		
 //		gdb.createZTFNodeDesc();
@@ -99,17 +100,33 @@ public class QueryTest {
 //		GraphDB gdb = new GraphDB(0);
 //		b.insertBatchNode(gdb.nhf, "E 1 5 9 4 5");
 //		scanNodeHeapFile();
-//		edgeInsertTest("A", "B", 445);
-//		edgeInsertTest("B", "D", 829);
-//		edgeInsertTest("C", "D", 747);
-//		edgeInsertTest("A", "C", 478);
-//		edgeInsertTest("B", "C", 329);
-//		System.out.println("EdgeCount-->"+gdb.ehf.getEdgeCnt());
-//		scanEdgeHeapFile();
-//		
+		edgeInsertTest("A", "B", 445);
+		edgeInsertTest("B", "D", 829);
+		edgeInsertTest("C", "D", 747);
+		edgeInsertTest("A", "C", 478);
+		edgeInsertTest("B", "C", 329);
+		System.out.println("EdgeCount-->"+gdb.ehf.getEdgeCnt());
+		scanEdgeHeapFile();
+		
+		gdb.createBTEdgeLabel();
+		gdb.createBTEdgeWeight();
+		
 //		deleteNodeFromHF("A");
 //		//scanNodeHeapFile();
 //		scanEdgeHeapFile();
+		
+		EdgeQueryWithIndex eqi = new EdgeQueryWithIndex();
+//		eqi.query3(gdb.ehf, gdb.btf_edge_label, edgeLabelLength, numBuf);
+//        System.out.println("query 3 with index completed.");
+        
+//        eqi.query4(gdb.ehf, gdb.btf_edge_weight, edgeLabelLength, numBuf);
+//        System.out.println("query 4 with index completed");
+		
+//		eqi.query0(gdb.ehf, gdb.btf_edge_label, edgeLabelLength, numBuf);
+//		System.out.println("query 0 with index completed");
+		
+//		eqi.query5(gdb.ehf, gdb.btf_edge_weight, edgeLabelLength, numBuf, 800, 445);
+//		System.out.println("query 5 with index completed");
 		
 
 	}

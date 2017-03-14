@@ -16,6 +16,13 @@ import btree.BTreeFile;
 
 public class EdgeQueryWithIndex {
 
+	/**
+	 * 
+	 * @param ehf
+	 * @param btf
+	 * @param edgeLabelLength
+	 * @param numBuf
+	 */
 	public void query0(EdgeHeapFile ehf, BTreeFile btf, short edgeLabelLength,
 			short numBuf) {
 		System.out.println("query0");
