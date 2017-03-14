@@ -70,7 +70,7 @@ public class BatchOperations {
 					System.out.println("Error: Invalid input,please add all the input parameters");
 			}
 		   else {
-				taskName = inputArguments[0];
+				 
 				System.out.println("Task Name: "+taskName);
 				 
 				if (taskName.equalsIgnoreCase("batchnodeinsert"))
