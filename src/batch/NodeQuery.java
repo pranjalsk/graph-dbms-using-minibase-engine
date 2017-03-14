@@ -24,6 +24,7 @@ import nodeheap.NScan;
 import nodeheap.Node;
 import nodeheap.NodeHeapfile;
 
+//Node Query on Heap Files
 public class NodeQuery {
 
 	public void query0(NodeHeapfile nhf) {

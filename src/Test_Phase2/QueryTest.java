@@ -9,6 +9,7 @@ import batch.BatchEdgeInsert;
 import batch.BatchInsert;
 import batch.BatchNodeDelete;
 import batch.BatchNodeInsert;
+import batch.EdgeQueryWithIndex;
 import batch.NodeQuery;
 import batch.NodeQueryWithIndex;
 import btree.AddFileEntryException;
@@ -75,6 +76,7 @@ public class QueryTest {
 		System.out.println("Nodecnt-->"+gdb.nhf.getNodeCnt());	
 //		scanNodeHeapFile();
 		
+
 		NodeQuery nq = new NodeQuery();
 		NodeHeapfile nhf = gdb.nhf;
 //		nq.query0(nhf);
@@ -90,6 +92,7 @@ public class QueryTest {
 		
 //		nq.query3(nhf, nodeLabelLength, numBuf, targetDescriptor, distance);
 //		System.out.println("query 3 without index completed.");
+
 		
 		gdb.createZTFNodeDesc();
 //		scanNode_ZIndexFile();
@@ -106,12 +109,29 @@ public class QueryTest {
 		edgeInsertTest("A", "C", 478);
 		edgeInsertTest("B", "C", 329);
 		System.out.println("EdgeCount-->"+gdb.ehf.getEdgeCnt());
+
 //		scanEdgeHeapFile();
 //		
+
 //		deleteNodeFromHF("A");
 //		scanNodeHeapFile();
 //		scanEdgeHeapFile();
+
 	
+		
+		EdgeQueryWithIndex eqi = new EdgeQueryWithIndex();
+//		eqi.query3(gdb.ehf, gdb.btf_edge_label, edgeLabelLength, numBuf);
+//        System.out.println("query 3 with index completed.");
+        
+//        eqi.query4(gdb.ehf, gdb.btf_edge_weight, edgeLabelLength, numBuf);
+//        System.out.println("query 4 with index completed");
+		
+//		eqi.query0(gdb.ehf, gdb.btf_edge_label, edgeLabelLength, numBuf);
+//		System.out.println("query 0 with index completed");
+		
+//		eqi.query5(gdb.ehf, gdb.btf_edge_weight, edgeLabelLength, numBuf, 800, 445);
+//		System.out.println("query 5 with index completed");
+		
 
 		NodeQueryWithIndex nqi = new NodeQueryWithIndex();
 //		short nodeLabelLength = 32, numBuf = 12;
