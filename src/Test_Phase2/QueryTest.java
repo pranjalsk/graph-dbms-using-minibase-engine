@@ -73,7 +73,21 @@ public class QueryTest {
 		b.insertBatchNode(gdb.nhf, "B 10000 10000 10000 10000 10000");
 		b.insertBatchNode(gdb.nhf, "D 500 500 500 500 400");
 		b.insertBatchNode(gdb.nhf, "A 500 500 500 500 500");
-		b.insertBatchNode(gdb.nhf, "C 550 512 529 515 503");
+		b.insertBatchNode(gdb.nhf, "C 500 500 500 500 500");
+		b.insertBatchNode(gdb.nhf, "E 550 512 529 515 503");
+		b.insertBatchNode(gdb.nhf, "F 550 512 529 515 503");
+		b.insertBatchNode(gdb.nhf, "G 550 512 529 515 503");
+		b.insertBatchNode(gdb.nhf, "H 550 512 529 515 503");
+		b.insertBatchNode(gdb.nhf, "I 550 512 529 515 503");
+		b.insertBatchNode(gdb.nhf, "J 550 512 529 515 503");
+		b.insertBatchNode(gdb.nhf, "K 550 512 529 43 503");
+		b.insertBatchNode(gdb.nhf, "L 550 512 529 515 503");
+		b.insertBatchNode(gdb.nhf, "M 550 512 529 515 503");
+		b.insertBatchNode(gdb.nhf, "N 550 512 529 515 503");
+		b.insertBatchNode(gdb.nhf, "O 550 512 529 515 503");
+		b.insertBatchNode(gdb.nhf, "P 550 512 529 515 503");
+		b.insertBatchNode(gdb.nhf, "Q 550 512 529 515 503");
+		b.insertBatchNode(gdb.nhf, "R 550 512 529 515 503");
 		System.out.println("Nodecnt-->"+gdb.nhf.getNodeCnt());	
 //		scanNodeHeapFile();
 		
@@ -105,8 +119,11 @@ public class QueryTest {
 //		b.insertBatchNode(gdb.nhf, "E 1 5 9 4 5");
 //		scanNodeHeapFile();
 		edgeInsertTest("A", "B", 445);
+		System.out.println("Edge AB created");
 		edgeInsertTest("B", "D", 829);
+		System.out.println("Edge BD created");
 		edgeInsertTest("C", "D", 747);
+		System.out.println("Edge CD created");
 		edgeInsertTest("A", "C", 478);
 		edgeInsertTest("B", "C", 329);
 		System.out.println("EdgeCount-->"+gdb.ehf.getEdgeCnt());

@@ -554,7 +554,7 @@ public class EHFPage extends Page implements ConstSlot, GlobalConst {
 			offset = getSlotOffset(slotNo);
 			record = new byte[recLen];
 			System.arraycopy(data, offset, record, 0, recLen);
-			Edge tuple = new Edge(record, 0);
+			Edge tuple = new Edge(record, 0,recLen);
 			return tuple;
 		}
 
@@ -596,7 +596,7 @@ public class EHFPage extends Page implements ConstSlot, GlobalConst {
 				&& (pageNo.pid == curPage.pid)) {
 
 			offset = getSlotOffset(slotNo);
-			Edge edge = new Edge(data, offset);
+			Edge edge = new Edge(data, offset, recLen);
 			return edge;
 		}
 

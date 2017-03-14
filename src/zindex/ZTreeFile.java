@@ -38,7 +38,7 @@ public class ZTreeFile extends IndexFile implements GlobalConst {
 	BTreeFile zBTFile;
 	
 	public ZTreeFile() throws GetFileEntryException, ConstructPageException, AddFileEntryException, IOException, PinPageException {
-		zBTFile = new BTreeFile("zBTFile",AttrType.attrString,21,1);
+		zBTFile = new BTreeFile("zBTFile",AttrType.attrString,34,1);
 	}
 
 	public void insert(KeyClass data, RID rid) throws KeyTooLongException,

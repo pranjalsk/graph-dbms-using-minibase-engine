@@ -25,6 +25,7 @@ public class BatchEdgeInsert {
 				NID destinationNID = batchinsert.getNidFromNodeLabel(destinationLabel, nhf);
 				
 				Edge newEdge = new Edge();
+				newEdge.setHdr();
 				newEdge.setSource(sourceNID);
 				newEdge.setDestination(destinationNID);
 				newEdge.setLabel(edgeLabel);
