@@ -119,7 +119,7 @@ public class GraphDB extends DB {
 				+ ".minibase-log";
 		SystemDefs sysdef = new SystemDefs(dbpath, 300, 100, "Clock");
 		
-		PCounter.initialize();
+//		PCounter.initialize();
 		// Kill anything that might be hanging around
 		String newdbpath;
 		String newlogpath;
