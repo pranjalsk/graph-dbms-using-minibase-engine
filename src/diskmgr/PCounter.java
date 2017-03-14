@@ -1,7 +1,5 @@
 package diskmgr;
 
-import edgeheap.*;
-import nodeheap.NodeHeapfile;
 
 public class PCounter {
 	private static int rCounter;
@@ -14,28 +12,20 @@ public class PCounter {
 	}
 
 	public static void readIncrement() {
-		rCounter++;
+		rCounter= rCounter + 1;
 	}
 
-	public int getRCounterForNHF(NodeHeapfile file){
-		return rCounter;
-	}
-	public int getRCounterForEHF(EdgeHeapFile file){
-
+	public int getRCounter(){
 		return rCounter;
 	}
 
 	public static void writeIncrement() {
-		wCounter++;
+		wCounter= wCounter + 1;
 	}
-
 	
-	public int getWCounterForNHF(NodeHeapfile file){
+	public int getWCounter(){
 		return wCounter;
 	}
-	public int getWCounterForEHF(EdgeHeapFile file){
 
-		return wCounter;
-	}
 
 }
