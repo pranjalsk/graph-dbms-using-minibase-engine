@@ -64,9 +64,9 @@ public class GraphDB extends DB {
 		int keyTypeInt = AttrType.attrInteger;
 		int KeyTypeDesc = AttrType.attrDesc;
 		
-		nhf = new NodeHeapfile("NodeHeapFile"+graphDBName);
+		nhf = new NodeHeapfile("NodeHeapFile");
 		System.out.println("heap file created");
-		ehf = new EdgeHeapFile("EdgeHeapFile"+graphDBName);
+		ehf = new EdgeHeapFile("EdgeHeapFile");
 		System.out.println("edge heap file cretaed");
 		
 		btf_node = new BTreeFile("IndexNodeLabel", keyTypeString, 32, 1);
@@ -83,32 +83,7 @@ public class GraphDB extends DB {
 
 	}
 
-	public void createZTFNodeDesc() {
-		try {
-			NID nid = new NID();
-			Descriptor desc = null;
-			Node newNode = null;
-			NScan newNscan = nhf.openScan();
-			boolean done = false;
-			
-			while(!done){
-				newNode = newNscan.getNext(nid);
-				if (newNode==null) {
-					done = true;
-					break;
-				}
-				newNode.setHdr();
-				desc = newNode.getDesc();
-				KeyClass data = new DescriptorKey(desc);
-				ztf_node_desc.insert(data, (RID) nid);
-			}
-			newNscan.closescan();
-		} catch (Exception e) {
-			System.err.println("Empty node heap file");
-			e.printStackTrace();
-		}
-		
-	}
+	
 
 	public static void initGraphDB(String db_name) {
         graphDBName= db_name;
@@ -154,6 +129,33 @@ public class GraphDB extends DB {
 
 	}
 
+	public void createZTFNodeDesc() {
+		try {
+			NID nid = new NID();
+			Descriptor desc = null;
+			Node newNode = null;
+			NScan newNscan = nhf.openScan();
+			boolean done = false;
+			
+			while(!done){
+				newNode = newNscan.getNext(nid);
+				if (newNode==null) {
+					done = true;
+					break;
+				}
+				newNode.setHdr();
+				desc = newNode.getDesc();
+				KeyClass data = new DescriptorKey(desc);
+				ztf_node_desc.insert(data, (RID) nid);
+			}
+			newNscan.closescan();
+		} catch (Exception e) {
+			System.err.println("Empty node heap file");
+			e.printStackTrace();
+		}
+		
+	}
+	
 	public void createBTNodeLabel() throws KeyTooLongException, KeyNotMatchException, LeafInsertRecException, IndexInsertRecException, ConstructPageException, UnpinPageException, PinPageException, NodeNotMatchException, ConvertException, DeleteRecException, IndexSearchException, IteratorException, LeafDeleteException, InsertException, IOException, InvalidTupleSizeException, heap.FieldNumberOutOfBoundException{
 		try {
 			NID nid = new NID();
@@ -249,11 +251,14 @@ public class GraphDB extends DB {
 
 			while (!done) {
 				newEdge = newEscan.getNext(newEid);
+				if (newEdge == null) {
+					done = true;
+					break;
+				}
+				newEdge.setHdr();
 				NID srcNID = newEdge.getSource();
-								
 				if (!hashSet.contains(srcNID)) {
 					hashSet.add(srcNID);
-					done = true;
 				}
 			}
 			return hashSet.size();
@@ -274,10 +279,14 @@ public class GraphDB extends DB {
 
 			while (!done) {
 				newEdge = newEscan.getNext(newEid);
+				if (newEdge == null) {
+					done =true;
+					break;
+				}
+				newEdge.setHdr();
 				NID destNID = newEdge.getDestination();
 				if (!hashSet.contains(destNID)) {
 					hashSet.add(destNID);
-					done = true;
 				}
 			}
 			return hashSet.size();

@@ -33,16 +33,22 @@ db:
 	make -C chainexception
 	make -C btree
 	make -C bufmgr
+	make -c zindex
 	make -C diskmgr
 	make -C heap
 	make -C index
 	make -C iterator
+	make -C nodeheap
+	make -C edgeheap
 	
 doc:
 	$(JAVADOC) $(DOCFILES)
 
 test: 
 	cd tests; make bmtest dbtest; whoami; make hftest bttest indextest jointest sorttest sortmerge
+
+graphtest:
+	cd batch; whoami; make batchoperations
 
 clean:
 	\rm -f $(CLASSPATH)/*.class *~ \#* core $(JARFILES) TRACE

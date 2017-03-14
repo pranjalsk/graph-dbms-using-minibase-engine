@@ -3,8 +3,6 @@ package zindex;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-import com.sun.xml.internal.ws.api.ha.StickyFeature;
-
 import global.Descriptor;
 import global.GlobalConst;
 import btree.BTFileScan;

@@ -142,9 +142,8 @@ public class BatchOperations {
 
 							BatchNodeInsert newNodeInsert = new BatchNodeInsert();
 							newNodeInsert.insertBatchNode(newGDB.nhf, sCurrentLine);
-
 						}
-
+						System.out.println("Nodes insertion done");
 						printStatistics(newGDB);
 
 					} catch (Exception e) {
@@ -157,6 +156,7 @@ public class BatchOperations {
 					try {
 						BatchEdgeInsert newEdgeInsert = new BatchEdgeInsert();
 						newEdgeInsert.insertBatchEdge(newGDB.ehf, newGDB.nhf, filePath);
+						System.out.println("Batch edge inserted");
 						printStatistics(newGDB);
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -247,10 +247,10 @@ public class BatchOperations {
 	}// main
 
 	public static void printStatistics(GraphDB newGDB) throws Exception {
-		int n = newGDB.getNodeCnt();
-		System.out.println("NodeCount " + n);
-		int n1 = newGDB.getEdgeCnt();
-		System.out.println("EdgeCount " + n1);
+//		int n = newGDB.getNodeCnt();
+//		System.out.println("NodeCount " + n);
+		//int n1 = newGDB.getEdgeCnt();
+		//System.out.println("EdgeCount " + n1);
 		PCounter pCount = new PCounter();
 		System.out.println("Number of pages read :"+pCount.getRCounter());
 		System.out.println("Number of pages written :"+pCount.getWCounter());
