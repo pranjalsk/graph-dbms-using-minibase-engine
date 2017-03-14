@@ -127,6 +127,7 @@ public class PredEval {
 					break;
 				case AttrType.attrDesc:
 					value.setHdr((short) 1, val_type, null);
+					System.out.println("Target Descriptor: "+temp_ptr.operand2.attrDesc);
 					value.setDescFld(1, temp_ptr.operand2.attrDesc);
 					tuple2 = value;
 					break;
@@ -134,17 +135,21 @@ public class PredEval {
 					break;
 				}
 
-				// Got the arguments, now perform a comparison.
-				try {
-					comp_res = TupleUtils.CompareTupleWithTuple(
-							comparison_type, tuple1, fld1, tuple2, fld2);
-				} catch (TupleUtilsException e) {
-					throw new PredEvalException(e,
-							"TupleUtilsException is caught by PredEval.java");
-				}
+			
 				op_res = false;
 				
 				if(temp_ptr.type1.attrType != AttrType.attrDesc){
+					
+					// Got the arguments, now perform a comparison.
+					try {
+						comp_res = TupleUtils.CompareTupleWithTuple(
+								comparison_type, tuple1, fld1, tuple2, fld2);
+					} catch (TupleUtilsException e) {
+						throw new PredEvalException(e,
+								"TupleUtilsException is caught by PredEval.java");
+					}
+					
+					
 					switch (temp_ptr.op.attrOperator) {
 					case AttrOperator.aopEQ:
 						if (comp_res == 0)
@@ -178,33 +183,42 @@ public class PredEval {
 						break;
 					}
 				}else{
+					double distanceBetweenDescriptors=0;
+					try {
+						distanceBetweenDescriptors = TupleUtils.getDistanceBetweenDescriptors(comparison_type, tuple1, fld1, tuple2, fld2);
+						System.out.println("distanceBetweenDescriptors: "+distanceBetweenDescriptors);
+					} catch (TupleUtilsException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
 					switch (temp_ptr.op.attrOperator) {
 					case AttrOperator.aopEQ:
-						if (comp_res == temp_ptr.distance)
+						if (distanceBetweenDescriptors == temp_ptr.distance)
 							op_res = true;
 						break;
 					case AttrOperator.aopLT:
-						if (comp_res < temp_ptr.distance)
+						if (distanceBetweenDescriptors < temp_ptr.distance)
 							op_res = true;
 						break;
 					case AttrOperator.aopGT:
-						if (comp_res > temp_ptr.distance)
+						if (distanceBetweenDescriptors > temp_ptr.distance)
 							op_res = true;
 						break;
 					case AttrOperator.aopNE:
-						if (comp_res != temp_ptr.distance)
+						if (distanceBetweenDescriptors != temp_ptr.distance)
 							op_res = true;
 						break;
 					case AttrOperator.aopLE:
-						if (comp_res <= temp_ptr.distance)
+						if (distanceBetweenDescriptors <= temp_ptr.distance)
 							op_res = true;
 						break;
 					case AttrOperator.aopGE:
-						if (comp_res >= temp_ptr.distance)
+						if (distanceBetweenDescriptors >= temp_ptr.distance)
 							op_res = true;
 						break;
 					case AttrOperator.aopNOT:
-						if (comp_res != temp_ptr.distance)
+						if (distanceBetweenDescriptors != temp_ptr.distance)
 							op_res = true;
 						break;
 					default:
@@ -230,4 +244,6 @@ public class PredEval {
 		return true;
 
 	}
+	
+	
 }

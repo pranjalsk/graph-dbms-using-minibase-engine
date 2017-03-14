@@ -116,6 +116,7 @@ public class Projection
 	  switch (perm_mat[i].relation.key)
 	    {
 	    case RelSpec.outer:      // Field of outer (t1)
+	      System.out.println("Symbol:"+type1[perm_mat[i].offset-1].attrType);
 	      switch (type1[perm_mat[i].offset-1].attrType)
 		{
 		case AttrType.attrInteger:
@@ -126,6 +127,9 @@ public class Projection
 		  break;
 		case AttrType.attrString:
 		  Jtuple.setStrFld(i+1, t1.getStrFld(perm_mat[i].offset));
+		  break;
+		case AttrType.attrDesc:
+		  Jtuple.setDescFld(i+1, t1.getDescFld(perm_mat[i].offset));
 		  break;
 		default:
 		  
