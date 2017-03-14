@@ -27,8 +27,6 @@ public class BTreeFile extends IndexFile
   
   private static FileOutputStream fos;
   private static DataOutputStream trace;
-  
-  
   /** It causes a structured trace to be written to a
    * file.  This output is
    * used to drive a visualization tool that shows the inner workings of the
@@ -43,7 +41,7 @@ public class BTreeFile extends IndexFile
       fos=new FileOutputStream(filename);
       trace=new DataOutputStream(fos);
     }
-  
+
   /** Stop tracing. And close trace file. 
    *@exception IOException error from the lower layer
    */
@@ -61,6 +59,9 @@ public class BTreeFile extends IndexFile
   private  PageId  headerPageId;
   private String  dbname;  
   
+	public String get_fileName() {
+		return new String(dbname);
+	}
   /**
    * Access method to data member.
    * @return  Return a BTreeHeaderPage object that is the header page

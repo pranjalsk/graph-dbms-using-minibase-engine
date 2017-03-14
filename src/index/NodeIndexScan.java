@@ -118,6 +118,7 @@ public class NodeIndexScan extends Iterator {
 
 			try {
 				indScan = (BTFileScan) IndexUtils.BTree_scan(selects, indFile);
+				
 			} catch (Exception e) {
 				throw new IndexException(e,
 						"IndexScan.java: BTreeFile exceptions caught from IndexUtils.BTree_scan().");
@@ -238,7 +239,8 @@ public class NodeIndexScan extends Iterator {
 			}
 
 			// not index_only, need to return the whole tuple
-			nid = (NID)((LeafData) nextentry.data).getData();
+			RID ridTemp = ((LeafData) nextentry.data).getData();
+			nid = new NID(ridTemp.pageNo,ridTemp.slotNo);
 			try {
 				node1 = f.getRecord(nid);
 			} catch (Exception e) {
