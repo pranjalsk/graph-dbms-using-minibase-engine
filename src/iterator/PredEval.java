@@ -186,7 +186,6 @@ public class PredEval {
 					double distanceBetweenDescriptors=0;
 					try {
 						distanceBetweenDescriptors = TupleUtils.getDistanceBetweenDescriptors(comparison_type, tuple1, fld1, tuple2, fld2);
-						System.out.println("distanceBetweenDescriptors: "+distanceBetweenDescriptors);
 					} catch (TupleUtilsException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
