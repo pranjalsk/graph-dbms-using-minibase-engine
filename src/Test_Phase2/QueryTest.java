@@ -9,6 +9,7 @@ import batch.BatchEdgeInsert;
 import batch.BatchInsert;
 import batch.BatchNodeDelete;
 import batch.BatchNodeInsert;
+import batch.EdgeQuery;
 import batch.EdgeQueryWithIndex;
 import batch.NodeQuery;
 import batch.NodeQueryWithIndex;
@@ -81,7 +82,7 @@ public class QueryTest {
 		NodeHeapfile nhf = gdb.nhf;
 //		nq.query0(nhf);
 //		System.out.println("query 0 without index completed.");
-		short nodeLabelLength = 32, numBuf = 12;
+		short nodeLabelLength = 32, edgeLabelLength = 32, numBuf = 12;
 //		nq.query1(nhf, nodeLabelLength, numBuf);
 //		
 		Descriptor targetDescriptor = new Descriptor();
@@ -94,7 +95,7 @@ public class QueryTest {
 //		System.out.println("query 3 without index completed.");
 
 		
-		gdb.createZTFNodeDesc();
+//		gdb.createZTFNodeDesc();
 //		scanNode_ZIndexFile();
 //		gdb.createBTNodeLabel();
 //		scanNodeIndexFile();
@@ -109,6 +110,7 @@ public class QueryTest {
 		edgeInsertTest("A", "C", 478);
 		edgeInsertTest("B", "C", 329);
 		System.out.println("EdgeCount-->"+gdb.ehf.getEdgeCnt());
+		gdb.createBTEdgeLabel();
 
 //		scanEdgeHeapFile();
 //		
@@ -118,8 +120,13 @@ public class QueryTest {
 //		scanEdgeHeapFile();
 
 	
-		
+		EdgeQuery eq = new EdgeQuery();
 		EdgeQueryWithIndex eqi = new EdgeQueryWithIndex();
+		
+//		eq.query1(gdb.ehf, gdb.nhf);
+//		System.out.println("query 1 without index completed");
+		eq.query2(gdb.ehf, gdb.nhf);
+		System.out.println("query 2 without index completed");
 //		eqi.query3(gdb.ehf, gdb.btf_edge_label, edgeLabelLength, numBuf);
 //        System.out.println("query 3 with index completed.");
         
@@ -128,7 +135,10 @@ public class QueryTest {
 		
 //		eqi.query0(gdb.ehf, gdb.btf_edge_label, edgeLabelLength, numBuf);
 //		System.out.println("query 0 with index completed");
-		
+//		eqi.query1(gdb.ehf, gdb.btf_edge_label, gdb.nhf,edgeLabelLength, numBuf);
+//		System.out.println("query 1 with index completed");
+		eqi.query2(gdb.ehf, gdb.btf_edge_label, gdb.nhf,edgeLabelLength, numBuf);
+		System.out.println("query 2 with index completed");
 //		eqi.query5(gdb.ehf, gdb.btf_edge_weight, edgeLabelLength, numBuf, 800, 445);
 //		System.out.println("query 5 with index completed");
 		
@@ -139,10 +149,10 @@ public class QueryTest {
 //		System.out.println("query 0 with index completed.");
 //		nqi.query1(gdb.nhf, gdb.btf_node, nodeLabelLength, numBuf);
 //		System.out.println("query 1 with index completed.");
-		nqi.query2(gdb.nhf, gdb.ztf_node_desc, nodeLabelLength, numBuf, targetDescriptor, distance);
-		System.out.println("query 2 with index completed.");
-		nq.query2(gdb.nhf, nodeLabelLength, numBuf, targetDescriptor, distance);
-		System.out.println("query 2 without index completed.");
+//		nqi.query2(gdb.nhf, gdb.ztf_node_desc, nodeLabelLength, numBuf, targetDescriptor, distance);
+//		System.out.println("query 2 with index completed.");
+//		nq.query2(gdb.nhf, nodeLabelLength, numBuf, targetDescriptor, distance);
+//		System.out.println("query 2 without index completed.");
 //		nqi.query3(gdb.nhf, gdb.ztf_node_desc, nodeLabelLength, numBuf, targetDescriptor, distance);
 //		System.out.println("query 3 with index completed.");
 //		String targetLabel = new String("B");
