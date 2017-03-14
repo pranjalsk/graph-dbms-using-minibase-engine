@@ -2,6 +2,8 @@ package batch;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import zindex.ZTreeFile;
 
@@ -128,9 +130,11 @@ public class NodeQueryWithIndex {
 		}
 	}
 
-	public void query2(NodeHeapfile nhf, short nodeLabelLength, short numBuf,
-			Descriptor targetDescriptor) {
+	public void query2(NodeHeapfile nhf, ZTreeFile ztf, short nodeLabelLength,
+			short numBuf, Descriptor targetDescriptor, double distance) {
+
 		String nodeHeapFileName = nhf.get_fileName();
+		String nodeIndexFileName = "";
 		AttrType[] attrType = new AttrType[2];
 		short[] stringSize = new short[1];
 		stringSize[0] = nodeLabelLength;
@@ -141,35 +145,38 @@ public class NodeQueryWithIndex {
 		projlist[0] = new FldSpec(rel, 1);
 		projlist[1] = new FldSpec(rel, 2);
 
-		TupleOrder[] order = new TupleOrder[2];
-		order[0] = new TupleOrder(TupleOrder.Ascending);
-		order[1] = new TupleOrder(TupleOrder.Descending);
-
-		Node node;
-
+		CondExpr[] expr = null;
+		
+		IndexType indType = new IndexType(3);
+		Node node = new Node();
+		Map<Double, Node> distanceToNodeMap = new TreeMap<Double, Node>();
 		try {
-			NFileScan nfscan = new NFileScan(nodeHeapFileName, attrType,
-					stringSize, (short) 2, 2, projlist, null);
-			Sort sort = new Sort(attrType, (short) 2, stringSize, nfscan, 2,
-					order[0], nodeLabelLength, numBuf, 0, targetDescriptor);
-
+			NodeIndexScan nIscan = new NodeIndexScan(indType, nodeHeapFileName,
+					nodeIndexFileName, attrType, stringSize, 2, 2, projlist,
+					expr, 1, false);
+			node = nIscan.get_next();
 			String nodeLabel;
 			Descriptor nodeDescriptor;
-			Tuple t;
-			t = sort.get_next();
 
-			node = (Node) sort.get_next();
-			while (t != null) {
-				node.nodeInit(t.getTupleByteArray(), t.getOffset());
+			while (node != null) {
 				node.setHdr();
+				nodeLabel = node.getLabel();
+				nodeDescriptor = node.getDesc();
+				double distanceFromTar = nodeDescriptor.distance(targetDescriptor);
+				distanceToNodeMap.put(distanceFromTar,new Node( node));
+				node = nIscan.get_next();
+			}
+			
+			for(double dist: distanceToNodeMap.keySet()){
+				node = distanceToNodeMap.get(dist);
 				nodeLabel = node.getLabel();
 				nodeDescriptor = node.getDesc();
 				System.out.println(nodeLabel + " " + nodeDescriptor.get(0)
 						+ " " + nodeDescriptor.get(1) + " "
 						+ nodeDescriptor.get(2) + " " + nodeDescriptor.get(3)
-						+ " " + nodeDescriptor.get(4));
-				t = sort.get_next();
+						+ " " + nodeDescriptor.get(4)+ " " +dist);
 			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
