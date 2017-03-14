@@ -53,7 +53,7 @@ public class ZTreeFile extends IndexFile implements GlobalConst {
 			String zVal = ZValue.getZValue(((DescriptorKey) data).getKey());
 			KeyClass keyString = new StringKey(zVal);
 
-			zBTFile.insert(keyString, rid);
+			//zBTFile.insert(keyString, rid);
 		} else {
 			throw new KeyNotMatchException();
 		}

@@ -43,6 +43,10 @@ public class BatchInsert {
 			
 			while(!done){
 				newEdge = newEscan.getNext(newEid);	
+				if(newEdge == null){
+					done = true;
+					break;
+				}
 				newEdge.setHdr();
 				if(newEdge.getLabel().equalsIgnoreCase(edgeLabel) &&
 						newEdge.getSource().equals(sourceNID) &&
