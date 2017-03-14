@@ -62,6 +62,7 @@ public class BTreeFile extends IndexFile
 	public String get_fileName() {
 		return new String(dbname);
 	}
+	
   /**
    * Access method to data member.
    * @return  Return a BTreeHeaderPage object that is the header page
@@ -1054,7 +1055,6 @@ public class BTreeFile extends IndexFile
 	trace.writeBytes("VISIT node " + pageno + lineSep);
 	trace.flush();
       }
-      
       
       // ASSERTION
       // - pageno and sortPage is the root of the btree

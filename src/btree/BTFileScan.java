@@ -56,7 +56,6 @@ public class BTFileScan extends IndexFileScan implements GlobalConst {
 			} else {
 				entry = leafPage.getNext(curRid);
 			}
-
 			while (entry == null) {
 				nextpage = leafPage.getNextPage();
 				SystemDefs.JavabaseBM.unpinPage(leafPage.getCurPage(), true);
