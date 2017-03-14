@@ -56,12 +56,23 @@ public class BatchOperations {
 
 			String commandLineInvocation = br.readLine().trim();
 			String inputArguments[] = commandLineInvocation.split(" ");
-			if (inputArguments.length <= 0) {
-				System.out.println("Error: Invalid input");
-			} else {
+			
+			taskName=inputArguments[0];
+			int taskNumber = 0;
+
+			if(inputArguments.length != 3) {
+				if (taskName.equalsIgnoreCase("exit")){
+				System.out.println("Exiting out of the program");
+				System.exit(0);
+					
+				}
+				else
+					System.out.println("Error: Invalid input,please add all the input parameters");
+			}
+		   else {
 				taskName = inputArguments[0];
 				System.out.println("Task Name: "+taskName);
-				int taskNumber = 0;
+				 
 				if (taskName.equalsIgnoreCase("batchnodeinsert"))
 					taskNumber = 10;
 				else if (taskName.equalsIgnoreCase("batchedgeinsert"))
@@ -74,9 +85,7 @@ public class BatchOperations {
 					taskNumber = 14;
 				else if (taskName.equalsIgnoreCase("edgequery"))
 					taskNumber = 15;
-				else if (taskName.equalsIgnoreCase("exit"))
-					break;
-				
+			
 				System.out.println("Task Number: "+ taskNumber);
 				
 				if (taskNumber == 10 || taskNumber == 11 || taskNumber == 12 || taskNumber == 13) {
