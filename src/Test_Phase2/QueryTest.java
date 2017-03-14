@@ -6,6 +6,7 @@ import batch.BatchEdgeInsert;
 import batch.BatchInsert;
 import batch.BatchNodeDelete;
 import batch.BatchNodeInsert;
+import batch.NodeQuery;
 import btree.AddFileEntryException;
 import btree.BTFileScan;
 import btree.ConstructPageException;
@@ -46,8 +47,9 @@ import heap.Scan;
 import heap.Tuple;
 import nodeheap.NScan;
 import nodeheap.Node;
+import nodeheap.NodeHeapfile;
 
-public class UnitTestingPhase2 {
+public class QueryTest {
 
 	static GraphDB gdb;
 	
@@ -67,6 +69,22 @@ public class UnitTestingPhase2 {
 		b.insertBatchNode(gdb.nhf, "C 1 2 2 4 5");
 		System.out.println("Nodecnt-->"+gdb.nhf.getNodeCnt());	
 		scanNodeHeapFile();
+		
+		NodeQuery nq = new NodeQuery();
+		NodeHeapfile nhf = gdb.nhf;
+		nq.query0(nhf);
+		
+		short nodeLabelLength = 32, numBuf = 12;
+		nq.query1(nhf, nodeLabelLength, numBuf);
+		
+		Descriptor targetDescriptor = new Descriptor();
+		targetDescriptor.set(3, 3, 3, 3, 3);
+		//nq.query2(nhf, nodeLabelLength, numBuf, targetDescriptor);
+		
+		double distance = 3.1622776601683795;
+		
+		nq.query3(nhf, nodeLabelLength, numBuf, targetDescriptor, distance);
+		
 		
 //		gdb.createZTFNodeDesc();
 		
