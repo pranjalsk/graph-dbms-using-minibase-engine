@@ -132,7 +132,9 @@ public class ZValue {
 	}
 
 	private static byte[] longToBytes(long x) {
-		ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
+
+		ByteBuffer buffer = ByteBuffer.allocate(0x8);
+
 		buffer.putLong(x);
 		return buffer.array();
 	}

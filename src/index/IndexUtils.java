@@ -6,6 +6,7 @@ import iterator.*;
 
 import java.io.*;
 
+import zindex.DescriptorKey;
 import zindex.ZTFileScan;
 import zindex.ZTreeFile;
 
@@ -201,6 +202,11 @@ public class IndexUtils {
 				return new IntegerKey(new Integer(cd.operand1.integer));
 			else
 				return new IntegerKey(new Integer(cd.operand2.integer));
+		case AttrType.attrDesc:
+			if (choice == 1)
+				return new DescriptorKey(new Descriptor(cd.operand1.attrDesc));
+			else
+				return new DescriptorKey(new Descriptor(cd.operand2.attrDesc));
 		case AttrType.attrReal:
 			/*
 			 * // need FloatKey class in bt.java if (choice == 1) return new
@@ -218,6 +224,7 @@ public class IndexUtils {
 	InvalidSelectionException, KeyNotMatchException,
 	UnpinPageException, PinPageException, IteratorException,
 	ConstructPageException, GetFileEntryException{
+		
 		IndexFileScan indScan;
 
 		if (selects == null || selects[0] == null) {
@@ -251,10 +258,10 @@ public class IndexUtils {
 					|| selects[0].op.attrOperator == AttrOperator.aopLE) {
 				if (selects[0].type1.attrType != AttrType.attrSymbol) {
 					key = getValue(selects[0], selects[0].type1, 1);
-					indScan = ((BTreeFile) indFile).new_scan(null, key);
+					indScan = ((ZTreeFile) indFile).new_scan(null, key);
 				} else {
 					key = getValue(selects[0], selects[0].type2, 2);
-					indScan = ((BTreeFile) indFile).new_scan(null, key);
+					indScan = ((ZTreeFile) indFile).new_scan(null, key);
 				}
 				return (ZTFileScan)indScan;
 			}
@@ -268,6 +275,17 @@ public class IndexUtils {
 				} else {
 					key = getValue(selects[0], selects[0].type2, 2);
 					indScan = ((ZTreeFile) indFile).new_scan(key, null);
+				}
+				return (ZTFileScan)indScan;
+			}
+			
+			if (selects[0].op.attrOperator == AttrOperator.spatialRANGE){
+				if (selects[0].type1.attrType != AttrType.attrSymbol) {
+					key = getValue(selects[0], selects[0].type1, 1);
+					indScan = ((ZTreeFile) indFile).new_scan(key, (int)selects[0].distance);
+				} else {
+					key = getValue(selects[0], selects[0].type2, 2);
+					indScan = ((ZTreeFile) indFile).new_scan(key, (int)selects[0].distance);
 				}
 				return (ZTFileScan)indScan;
 			}

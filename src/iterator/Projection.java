@@ -116,7 +116,6 @@ public class Projection
 	  switch (perm_mat[i].relation.key)
 	    {
 	    case RelSpec.outer:      // Field of outer (t1)
-	      System.out.println("Symbol:"+type1[perm_mat[i].offset-1].attrType);
 	      switch (type1[perm_mat[i].offset-1].attrType)
 		{
 		case AttrType.attrInteger:

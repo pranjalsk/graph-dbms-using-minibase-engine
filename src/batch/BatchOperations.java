@@ -56,12 +56,23 @@ public class BatchOperations {
 
 			String commandLineInvocation = br.readLine().trim();
 			String inputArguments[] = commandLineInvocation.split(" ");
-			if (inputArguments.length <= 0) {
-				System.out.println("Error: Invalid input");
-			} else {
-				taskName = inputArguments[0];
+			
+			taskName=inputArguments[0];
+			int taskNumber = 0;
+
+			if(inputArguments.length != 3) {
+				if (taskName.equalsIgnoreCase("exit")){
+				System.out.println("Exiting out of the program");
+				System.exit(0);
+					
+				}
+				else
+					System.out.println("Error: Invalid input,please add all the input parameters");
+			}
+		   else {
+				 
 				System.out.println("Task Name: "+taskName);
-				int taskNumber = 0;
+				 
 				if (taskName.equalsIgnoreCase("batchnodeinsert"))
 					taskNumber = 10;
 				else if (taskName.equalsIgnoreCase("batchedgeinsert"))
@@ -74,9 +85,7 @@ public class BatchOperations {
 					taskNumber = 14;
 				else if (taskName.equalsIgnoreCase("edgequery"))
 					taskNumber = 15;
-				else if (taskName.equalsIgnoreCase("exit"))
-					break;
-				
+			
 				System.out.println("Task Number: "+ taskNumber);
 				
 				if (taskNumber == 10 || taskNumber == 11 || taskNumber == 12 || taskNumber == 13) {
@@ -133,9 +142,8 @@ public class BatchOperations {
 
 							BatchNodeInsert newNodeInsert = new BatchNodeInsert();
 							newNodeInsert.insertBatchNode(newGDB.nhf, sCurrentLine);
-
 						}
-
+						System.out.println("Nodes insertion done");
 						printStatistics(newGDB);
 
 					} catch (Exception e) {
@@ -148,6 +156,7 @@ public class BatchOperations {
 					try {
 						BatchEdgeInsert newEdgeInsert = new BatchEdgeInsert();
 						newEdgeInsert.insertBatchEdge(newGDB.ehf, newGDB.nhf, filePath);
+						System.out.println("Batch edge inserted");
 						printStatistics(newGDB);
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -238,10 +247,10 @@ public class BatchOperations {
 	}// main
 
 	public static void printStatistics(GraphDB newGDB) throws Exception {
-		int n = newGDB.getNodeCnt();
-		System.out.println("NodeCount " + n);
-		int n1 = newGDB.getEdgeCnt();
-		System.out.println("EdgeCount " + n1);
+//		int n = newGDB.getNodeCnt();
+//		System.out.println("NodeCount " + n);
+		//int n1 = newGDB.getEdgeCnt();
+		//System.out.println("EdgeCount " + n1);
 		PCounter pCount = new PCounter();
 		System.out.println("Number of pages read :"+pCount.getRCounter());
 		System.out.println("Number of pages written :"+pCount.getWCounter());
