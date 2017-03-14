@@ -151,7 +151,7 @@ public class GraphDB extends DB {
 				newNode.setHdr();
 				desc = newNode.getDesc();
 				KeyClass data = new DescriptorKey(desc);
-				//ztf_node_desc.insert(data, (RID) nid);
+				ztf_node_desc.insert(data, (RID) nid);
 			}
 			newNscan.closescan();
 		} catch (Exception e) {
