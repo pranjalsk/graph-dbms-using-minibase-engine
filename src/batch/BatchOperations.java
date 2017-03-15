@@ -11,11 +11,13 @@ import btree.BTreeFile;
 
 import Test_Phase2.QueryTest;
 
+import diskmgr.DB;
 import diskmgr.GraphDB;
 import diskmgr.PCounter;
 import global.AttrType;
 import global.Descriptor;
 import global.NID;
+import global.SystemDefs;
 import global.TupleOrder;
 import heap.FieldNumberOutOfBoundException;
 import heap.InvalidTupleSizeException;
@@ -42,16 +44,16 @@ public class BatchOperations {
 	private static double distance = 0;
 	private static short nodeLabelLength = 32;
 	static GraphDB gdb;
+	public static String dbpath;
+	public static String logpath;
+	static HashSet<String> hs;
+	
 
+	
 	public static void main(String[] args) throws Exception {
-
-		// HashSet<String> hs = new HashSet<String>();
-		// if (!hs.contains(graphDBName)) {
-		// hs.add(graphDBName);
-		GraphDB.initGraphDB("MyDBDefault");
-		// }
-		gdb = new GraphDB(0);
-
+		
+		hs = new HashSet<String>();
+		
 		/*
 		 * Menu Driven Program (CUI for Batch operations) Enter the task name of
 		 * your choice Enter the input file path Enter the GraphDB name Call the
@@ -105,10 +107,22 @@ public class BatchOperations {
 
 				System.out.println("Task Number: " + taskNumber);
 
+				//---------------------------------
+				filePath = inputArguments[1];
+				graphDBName = inputArguments[2];
+				if (!hs.contains(graphDBName)) {
+					hs.add(graphDBName);
+					GraphDB.initGraphDB(graphDBName);	
+					gdb = new GraphDB(0);
+				}
+				else{
+					gdb.openDB(graphDBName);
+				}
+				
+				
 				if (taskNumber == 10 || taskNumber == 11 || taskNumber == 12
 						|| taskNumber == 13) {
-					filePath = inputArguments[1];
-					graphDBName = inputArguments[2];
+					
 				} else if (taskNumber == 14) {
 					graphDBName = inputArguments[1];
 					numBuf = Integer.parseInt(inputArguments[2]);
