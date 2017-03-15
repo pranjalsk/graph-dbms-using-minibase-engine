@@ -104,22 +104,15 @@ public class BatchOperations {
 					taskNumber = 15;
 
 
-				//---------------------------------
-				filePath = inputArguments[1];
-				graphDBName = inputArguments[2];
-				if (!hs.contains(graphDBName)) {
-					hs.add(graphDBName);
-					GraphDB.initGraphDB(graphDBName);	
-					gdb = new GraphDB(0);
-				}
-				else{
-					gdb.openDB(graphDBName);
-				}
+				
 				
 				
 				if (taskNumber == 10 || taskNumber == 11 || taskNumber == 12
 						|| taskNumber == 13) {
-					
+
+					//---------------------------------
+					filePath = inputArguments[1];
+					graphDBName = inputArguments[2];
 				} else if (taskNumber == 14) {
 					graphDBName = inputArguments[1];
 					numBuf = Integer.parseInt(inputArguments[2]);
@@ -160,7 +153,15 @@ public class BatchOperations {
 						edgeWtBound2 = Integer.parseInt(inputArguments[6]);
 					}
 				}
-
+				System.out.println("tasknumber"+taskNumber);
+				if (!hs.contains(graphDBName)) {
+					hs.add(graphDBName);
+					GraphDB.initGraphDB(graphDBName);	
+					gdb = new GraphDB(0);
+				}
+				else{
+					gdb.openDB(graphDBName);
+				}
 				switch (taskNumber) {
 
 				// Task : Batch node insert
@@ -225,7 +226,6 @@ public class BatchOperations {
 								gdb.btf_node,gdb.btf_edge_label, gdb.btf_edge_weight,
 								filePath);
 						printStatistics(gdb);
-						System.out.println(gdb.getEdgeCnt());
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -233,6 +233,7 @@ public class BatchOperations {
 
 				// Task : Node Query
 				case 14:
+					System.out.println("task 14");
 					NodeQuery nq = new NodeQuery();
 					NodeQueryWithIndex nqi = new NodeQueryWithIndex();
 					try {
@@ -257,7 +258,6 @@ public class BatchOperations {
 						// index scan
 						else if (index == 1) {
 							if (qtype == 0) {
-								System.out.println("qtype0");
 								nqi.query0(gdb.nhf, gdb.btf_node, nodeLabelLength, (short)numBuf);
 							} else if (qtype == 1) {
 								nqi.query1(gdb.nhf, gdb.btf_node, nodeLabelLength, (short)numBuf);
@@ -271,7 +271,7 @@ public class BatchOperations {
 								nqi.query5(gdb.nhf, gdb.ztf_node_desc, gdb.btf_node,gdb.ehf, nodeLabelLength, (short)numBuf, targetDescriptor, distance);
 							}
 						}
-
+						printStatistics(gdb);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -321,7 +321,7 @@ public class BatchOperations {
 								eqi.query6(gdb.ehf, gdb.btf_edge_label, gdb.nhf, edgeLabelLength, (short)numBuf);
 							}
 						}
-
+						printStatistics(gdb);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
