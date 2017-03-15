@@ -347,7 +347,6 @@ public class EdgeQuery {
 			e = efscan.get_next();
 
 			while (e != null) {
-				System.out.println("Here");
 				edge.edgeInit(e.getTupleByteArray(), e.getOffset());
 				edge.setHdr();
 				edgeLabel = edge.getLabel();
@@ -421,10 +420,13 @@ public class EdgeQuery {
 									+ " are incident on Node " + incidentNode.getLabel());
 						}
 					}
-				} catch (FieldNumberOutOfBoundException | IOException e) {
+				} catch (FieldNumberOutOfBoundException  e) {
 
 					e.printStackTrace();
 
+				}catch(IOException e) {
+
+					e.printStackTrace();
 				}
 
 			}

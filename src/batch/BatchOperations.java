@@ -99,13 +99,14 @@ public class BatchOperations {
 				else if (taskName.equalsIgnoreCase("edgequery"))
 					taskNumber = 15;
 
-				System.out.println("Task Number: " + taskNumber);
 
 				if (taskNumber == 10 || taskNumber == 11 || taskNumber == 12
 						|| taskNumber == 13) {
 					filePath = inputArguments[1];
 					graphDBName = inputArguments[2];
 				} else if (taskNumber == 14) {
+					NodeQuery nq = new NodeQuery();
+					NodeQueryWithIndex nqi = new NodeQueryWithIndex();
 					graphDBName = inputArguments[1];
 					numBuf = Integer.parseInt(inputArguments[2]);
 					qtype = Integer.parseInt(inputArguments[3]);
@@ -118,6 +119,16 @@ public class BatchOperations {
 					int d1, d2, d3, d4, d5;
 					double dist;
 					String label;
+					if (qtype == 1){
+						
+						if(index == 0){
+
+						}
+						else if(index == 1){
+							nqi.query0(newGDB.nhf, newGDB.btf_node, nodeLabelLength, (short)numBuf);
+						}
+						
+					}
 					if (qtype == 2) {
 						d1 = Integer.parseInt(inputArguments[5]);
 						d2 = Integer.parseInt(inputArguments[6]);
