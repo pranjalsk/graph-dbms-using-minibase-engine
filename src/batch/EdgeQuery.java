@@ -299,8 +299,17 @@ public class EdgeQuery {
 	 * @param lowWeight Lower limit of Weight
 	 * @param highWeight Higher limit of Weight
 	 */
-	public void query5(EdgeHeapFile ehf, short edgeLabelLength, short numBuf, int lowWeight, int highWeight) {
+	public void query5(EdgeHeapFile ehf, short edgeLabelLength, short numBuf, int bound1, int bound2) {
 	
+		int lowerBound, upperBound;
+		if (bound1 >= bound2) {
+			upperBound = bound1;
+			lowerBound = bound2;
+		} else {
+			upperBound = bound2;
+			lowerBound = bound1;
+		}
+		
 		String edgeHeapFileName = ehf.get_fileName();
 		AttrType[] attrType = new AttrType[6];
 		short[] stringSize = new short[1];
@@ -327,13 +336,13 @@ public class EdgeQuery {
 		expr[0].type2 = new AttrType(AttrType.attrSymbol);
 		expr[0].type1 = new AttrType(AttrType.attrInteger);
 		expr[0].operand2.symbol = new FldSpec(new RelSpec(RelSpec.outer), 6);
-		expr[0].operand1.integer = lowWeight;
+		expr[0].operand1.integer = upperBound;
 		expr[1] = new CondExpr();
 		expr[1].op = new AttrOperator(AttrOperator.aopLE);
 		expr[1].type2 = new AttrType(AttrType.attrSymbol);
 		expr[1].type1 = new AttrType(AttrType.attrInteger);
 		expr[1].operand2.symbol = new FldSpec(new RelSpec(RelSpec.outer), 6);
-		expr[1].operand1.integer = highWeight;
+		expr[1].operand1.integer = lowerBound;
 		expr[2] = null;
 
 		Edge edge = new Edge();
@@ -345,9 +354,7 @@ public class EdgeQuery {
 
 			Edge e;
 			e = efscan.get_next();
-
 			while (e != null) {
-				System.out.println("Here");
 				edge.edgeInit(e.getTupleByteArray(), e.getOffset());
 				edge.setHdr();
 				edgeLabel = edge.getLabel();
@@ -357,7 +364,7 @@ public class EdgeQuery {
 				destinationNodeSlotID = edge.getDestination().slotNo;
 				edgeWeight = edge.getWeight();
 
-				System.out.println("Label: " + edgeLabel + " , Weight : " + edgeWeight + "Source Node PageID: "+sourceNodePageID + " , Source Node SlotID: " + sourceNodeSlotID + " , Destination Node PageID: " + destinationNodePageID + " , Destination Node SlotID: "
+				System.out.println("Label: " + edgeLabel + " , Weight : " + edgeWeight + " Source Node PageID: "+sourceNodePageID + " , Source Node SlotID: " + sourceNodeSlotID + " , Destination Node PageID: " + destinationNodePageID + " , Destination Node SlotID: "
 						+ destinationNodeSlotID );
 				e = efscan.get_next();
 			}
