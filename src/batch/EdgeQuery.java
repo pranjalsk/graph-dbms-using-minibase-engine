@@ -428,10 +428,13 @@ public class EdgeQuery {
 									+ " are incident on Node " + incidentNode.getLabel());
 						}
 					}
-				} catch (FieldNumberOutOfBoundException | IOException e) {
+				} catch (FieldNumberOutOfBoundException  e) {
 
 					e.printStackTrace();
 
+				}catch(IOException e) {
+
+					e.printStackTrace();
 				}
 
 			}
