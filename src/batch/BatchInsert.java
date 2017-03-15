@@ -6,14 +6,15 @@ import edgeheap.*;
 import nodeheap.*;
 import global.*;
 import heap.*;
+import btree.*;
 
 public class BatchInsert {
 	/* Function to find the NID for a given Node label
 	 * We get the node heap file from the GraphDB instance; this is passed as argument
 	 */
-	public NID getNidFromNodeLabel(String label, NodeHeapfile nhf) throws Exception{
+	public NID getNidFromNodeLabel(String nodeLabel, BTreeFile btf_node) throws Exception{
 		try{
-			NID newNid = new NID();
+			/*NID newNid = new NID();
 			NScan newNscan = nhf.openScan();
 			Node newNode = new Node();
 			boolean done = false;
@@ -26,7 +27,17 @@ public class BatchInsert {
 					done = true;			
 				}
 			}
-			return newNid;
+			return newNid;*/
+			
+			RID newRid = new RID();
+			KeyClass key = new StringKey(nodeLabel);
+			BTFileScan newScan = btf_node.new_scan(key, key);	
+			KeyDataEntry newEntry = newScan.get_next();
+			LeafData newData = (LeafData)newEntry.data;
+			newRid = newData.getData();
+			NID newnid = new NID(newRid.pageNo, newRid.slotNo);
+			
+			return newnid;
 		}
 		catch(Exception e){
 			e.printStackTrace();
@@ -34,7 +45,7 @@ public class BatchInsert {
 		}
 	}// getNidFromNodeLabel
 	
-	public EID getEidFromEdgeLabel(NID sourceNID, NID destinationNID, String edgeLabel, EdgeHeapFile ehf) throws Exception{
+	public EID getEidFromEdgeLabel(NID sourceNID, NID destinationNID, String edgeLabel, EdgeHeapFile ehf, BTreeFile btf_edgelabel) throws Exception{
 		try{
 			EID newEid = new EID();
 			EScan newEscan = ehf.openScan();
@@ -55,6 +66,35 @@ public class BatchInsert {
 				}
 			}
 			return newEid;
+			//RID newRid = new RID();	
+			//EID newEid = null;
+			/*EID currentEID = new EID();
+			EScan newEscan = ehf.openScan();
+			
+			KeyClass key = new StringKey(edgeLabel);
+			BTFileScan newScan = btf_edgelabel.new_scan(key, key);	
+			//KeyDataEntry newEntry = new KeyDataEntry();
+			//boolean done = false;
+			KeyDataEntry newEntry = null;		
+			while((newEntry = newScan.get_next()) != null){
+				/*KeyDataEntry newEntry = newScan.get_next();
+				if (newEntry == null) {
+					break;
+				}
+				LeafData newData = (LeafData)newEntry.data;
+				RID newRid = newData.getData();
+				EID newEid = new EID(newRid.pageNo, newRid.slotNo);
+				Edge newEdge = newEscan.getNext(newEid);	
+				newEdge.setHdr();
+				if(newEdge.getLabel().equalsIgnoreCase(edgeLabel) &&
+						newEdge.getSource().equals(sourceNID) &&
+						newEdge.getDestination().equals(destinationNID)){
+					currentEID.copyEID(newEid);
+					//done = true;			
+				}
+			}
+			return currentEID;
+			*/
 		}
 		catch(Exception e){
 			e.printStackTrace();

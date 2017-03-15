@@ -12,7 +12,7 @@ import global.*;
 
 public class BatchEdgeDelete {
 
-	public void deleteBatchEdge(EdgeHeapFile ehf, NodeHeapfile nhf,BTreeFile btfEdgeLabl,
+	public void deleteBatchEdge(EdgeHeapFile ehf, NodeHeapfile nhf, BTreeFile btf_node, BTreeFile btfEdgeLabl,
 			BTreeFile btfEdgeWt, String filePath) throws Exception{
 		try{
 			BufferedReader br = new BufferedReader(new FileReader(filePath));
@@ -26,9 +26,9 @@ public class BatchEdgeDelete {
 				
 				
 				BatchInsert batchinsert = new BatchInsert();
-				NID sourceNID = batchinsert.getNidFromNodeLabel(sourceLabel, nhf);
-				NID destinationNID = batchinsert.getNidFromNodeLabel(destinationLabel, nhf);
-				EID newEid = batchinsert.getEidFromEdgeLabel(sourceNID, destinationNID, edgeLabel, ehf);
+				NID sourceNID = batchinsert.getNidFromNodeLabel(sourceLabel, btf_node);
+				NID destinationNID = batchinsert.getNidFromNodeLabel(destinationLabel, btf_node);
+				EID newEid = batchinsert.getEidFromEdgeLabel(sourceNID, destinationNID, edgeLabel, ehf, btfEdgeLabl);
 				
 				EID currentEid = new EID();
 				currentEid.copyEID(newEid);

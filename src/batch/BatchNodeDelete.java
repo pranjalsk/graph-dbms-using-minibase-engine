@@ -41,7 +41,7 @@ public class BatchNodeDelete {
 				NID currentNid = new NID(); // To store a copy of the nid
 
 				// Delete the node
-				NID newNid = batchinsert.getNidFromNodeLabel(nodeLabel, nhf);
+				NID newNid = batchinsert.getNidFromNodeLabel(nodeLabel, btfNodeLbl);
 				currentNid.copyNid(newNid);
 				
 				Node deletedNode =  nhf.getRecord(currentNid);	
