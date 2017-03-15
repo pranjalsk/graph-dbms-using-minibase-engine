@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashSet;
 
+import zindex.ZTreeFile;
+import btree.BTreeFile;
+
 import Test_Phase2.QueryTest;
 
 import diskmgr.GraphDB;
@@ -38,16 +41,16 @@ public class BatchOperations {
 	private static Descriptor targetDescriptor = null;
 	private static double distance = 0;
 	private static short nodeLabelLength = 32;
-	static GraphDB newGDB;
+	static GraphDB gdb;
 
 	public static void main(String[] args) throws Exception {
 
-//		HashSet<String> hs = new HashSet<String>();
-//		if (!hs.contains(graphDBName)) {
-//			hs.add(graphDBName);
-			GraphDB.initGraphDB("MyDBDefault");
-//		}
-		newGDB = new GraphDB(0);
+		// HashSet<String> hs = new HashSet<String>();
+		// if (!hs.contains(graphDBName)) {
+		// hs.add(graphDBName);
+		GraphDB.initGraphDB("MyDBDefault");
+		// }
+		gdb = new GraphDB(0);
 
 		/*
 		 * Menu Driven Program (CUI for Batch operations) Enter the task name of
@@ -55,7 +58,8 @@ public class BatchOperations {
 		 * appropriate class methods according to the task number
 		 */
 		do {
-			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+			BufferedReader br = new BufferedReader(new InputStreamReader(
+					System.in));
 			System.out.println("\n\nList of Batch Operations");
 			System.out.println("1) batchnodeinsert");
 			System.out.println("2) batchedgeinsert");
@@ -141,9 +145,7 @@ public class BatchOperations {
 						label = inputArguments[5];
 					}
 				}
-				
-						
-				
+
 				switch (taskNumber) {
 
 				// Task : Batch node insert
@@ -155,18 +157,15 @@ public class BatchOperations {
 						while ((sCurrentLine = br.readLine()) != null) {
 
 							BatchNodeInsert newNodeInsert = new BatchNodeInsert();
-							newNodeInsert.insertBatchNode(newGDB.nhf,
-									sCurrentLine);
+							newNodeInsert
+									.insertBatchNode(gdb.nhf, sCurrentLine);
 						}
-						System.out.println("Nodes insertion done");
-						System.out.println("Node count-->"+ newGDB.nhf.getNodeCnt());
-						//scanNodeHeapFile();
-						printStatistics(newGDB);
-						newGDB.createBTNodeLabel();
+						System.out.println("Batch Nodes insertion done");
+						printStatistics(gdb);
+						gdb.createBTNodeLabel();
 						System.out.println("Node label BT craeted");
-						newGDB.createZTFNodeDesc();
-						System.out.println("Node desc BT created");
-
+						gdb.createZTFNodeDesc();
+						System.out.println("Node descriptor BT created");
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -176,11 +175,14 @@ public class BatchOperations {
 				case 11:
 					try {
 						BatchEdgeInsert newEdgeInsert = new BatchEdgeInsert();
-						newEdgeInsert.insertBatchEdge(newGDB.ehf, newGDB.nhf,
+						newEdgeInsert.insertBatchEdge(gdb.ehf, gdb.nhf,
 								filePath);
-						System.out.println("Batch edge inserted");
-						printStatistics(newGDB);
-						System.out.println("EdgeCount-->"+newGDB.getEdgeCnt());
+						System.out.println("Batch edge insertion done");
+						gdb.createBTEdgeLabel();
+						System.out.println("BTree on Edge Label Created");
+						gdb.createBTEdgeWeight();
+						System.out.println("BTree on Edge Weight Created");
+						printStatistics(gdb);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -190,12 +192,11 @@ public class BatchOperations {
 				case 12:
 					try {
 						BatchNodeDelete newNodeDelete = new BatchNodeDelete();
-						newNodeDelete.deleteBatchNode(newGDB.nhf, newGDB.ehf,
+						newNodeDelete.deleteBatchNode(gdb.nhf, gdb.ehf,
+								gdb.btf_node, gdb.ztf_node_desc,
+								gdb.btf_edge_label, gdb.btf_edge_weight,
 								filePath);
-						printStatistics(newGDB);
-						System.out.println(newGDB.nhf.getNodeCnt());
-						System.out.println(newGDB.ehf.getEdgeCnt());
-						//scanNodeHeapFile();
+						printStatistics(gdb);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -205,10 +206,11 @@ public class BatchOperations {
 				case 13:
 					try {
 						BatchEdgeDelete newEdgeDelete = new BatchEdgeDelete();
-						newEdgeDelete.deleteBatchEdge(newGDB.ehf, newGDB.nhf,
+						newEdgeDelete.deleteBatchEdge(gdb.ehf, gdb.nhf,
+								gdb.btf_edge_label, gdb.btf_edge_weight,
 								filePath);
-						printStatistics(newGDB);
-						System.out.println(newGDB.getEdgeCnt());
+						printStatistics(gdb);
+						System.out.println(gdb.getEdgeCnt());
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -223,7 +225,7 @@ public class BatchOperations {
 
 							if (qtype == 0) {
 								System.out.println("qtype0");
-								NodeHeapfile nhf = newGDB.nhf;
+								NodeHeapfile nhf = gdb.nhf;
 								nq.query0(nhf);
 							} else if (qtype == 1) {
 
@@ -268,40 +270,40 @@ public class BatchOperations {
 	}// main
 
 	public static void printStatistics(GraphDB newGDB) throws Exception {
-		// int n = newGDB.getNodeCnt();
-		// System.out.println("NodeCount " + n);
-		// int n1 = newGDB.getEdgeCnt();
-		// System.out.println("EdgeCount " + n1);
+		int n = newGDB.getNodeCnt();
+		System.out.println("NodeCount " + n);
+		int n1 = newGDB.getEdgeCnt();
+		System.out.println("EdgeCount " + n1);
 		PCounter pCount = new PCounter();
 		System.out.println("Number of pages read :" + pCount.getRCounter());
 		System.out.println("Number of pages written :" + pCount.getWCounter());
 
 	}
-	
-	public static void scanNodeHeapFile() throws InvalidTupleSizeException, IOException, InvalidTypeException, FieldNumberOutOfBoundException{
-		//scanning of records
-				NID newNid = new NID();
-				NScan newNscan = newGDB.nhf.openScan();
-				Node newNode = new Node();
-				boolean done = false;
-				
-				while(!done){
-					newNode = newNscan.getNext(newNid);
-					if (newNode == null) {
-						done = true;
-						break;
-					}
-					newNode.setHdr();
-					String nodeLabel = newNode.getLabel();
-					System.out.println(nodeLabel);
-					for (int j = 0; j < 5; j++) {
-						System.out.print(newNode.getDesc().get(j));
-							
-					}
-				}
-				newNscan.closescan();
-				System.out.println("test done");
-	} 
-	
-	
+
+	public static void scanNodeHeapFile() throws InvalidTupleSizeException,
+			IOException, InvalidTypeException, FieldNumberOutOfBoundException {
+		// scanning of records
+		NID newNid = new NID();
+		NScan newNscan = gdb.nhf.openScan();
+		Node newNode = new Node();
+		boolean done = false;
+
+		while (!done) {
+			newNode = newNscan.getNext(newNid);
+			if (newNode == null) {
+				done = true;
+				break;
+			}
+			newNode.setHdr();
+			String nodeLabel = newNode.getLabel();
+			System.out.println(nodeLabel);
+			for (int j = 0; j < 5; j++) {
+				System.out.print(newNode.getDesc().get(j));
+
+			}
+		}
+		newNscan.closescan();
+		System.out.println("test done");
+	}
+
 }
