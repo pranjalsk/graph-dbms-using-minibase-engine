@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+
+import btree.BTreeFile;
 import edgeheap.EScan;
 import edgeheap.Edge;
 import edgeheap.EdgeHeapFile;
@@ -218,7 +220,7 @@ public class NodeQuery {
 	 * @param numBuf Number of Buffers
 	 * @param label Node Label
 	 */
-	public void query4(NodeHeapfile nhf, EdgeHeapFile ehf, short nodeLabelLength, short numBuf, String label){
+	public void query4(NodeHeapfile nhf, EdgeHeapFile ehf, BTreeFile btf_node_label,short nodeLabelLength, short numBuf, String label){
 		
 		String nodeHeapFileName = nhf.get_fileName();
 		AttrType[] attrType = new AttrType[2];
@@ -257,7 +259,7 @@ public class NodeQuery {
 				
 				
 				BatchInsert bInsert = new BatchInsert();
-				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, nhf);
+				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, btf_node_label);
 				
 				List<String> outgoingEdges = new ArrayList<String>();
 				List<String> incomingEdges = new ArrayList<String>();
@@ -321,7 +323,7 @@ public class NodeQuery {
 	 * @param targetDescriptor Target Descriptor
 	 * @param distance Target Distance
 	 */
-	public void query5(NodeHeapfile nhf, EdgeHeapFile ehf, short nodeLabelLength, short numBuf, Descriptor targetDescriptor, double distance){
+	public void query5(NodeHeapfile nhf, EdgeHeapFile ehf, BTreeFile btf_node_label,short nodeLabelLength, short numBuf, Descriptor targetDescriptor, double distance){
 		
 		String nodeHeapFileName = nhf.get_fileName();
 		AttrType[] attrType = new AttrType[2];
@@ -361,7 +363,7 @@ public class NodeQuery {
 				
 				
 				BatchInsert bInsert = new BatchInsert();
-				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, nhf);
+				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, btf_node_label);
 				
 				List<String> outgoingEdges = new ArrayList<String>();
 				List<String> incomingEdges = new ArrayList<String>();

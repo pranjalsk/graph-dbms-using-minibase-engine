@@ -10,6 +10,7 @@ import zindex.ZTreeFile;
 import edgeheap.EScan;
 import edgeheap.Edge;
 import edgeheap.EdgeHeapFile;
+import btree.BTFileScan;
 import btree.BTreeFile;
 import global.AttrOperator;
 import global.AttrType;
@@ -361,7 +362,7 @@ public class NodeQueryWithIndex {
 						+ nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4)
 						+ "]");
 				BatchInsert bInsert = new BatchInsert();
-				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, nhf);
+				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, btf_node_label);
 
 				List<String> outgoingEdges = new ArrayList<String>();
 				List<String> incomingEdges = new ArrayList<String>();
@@ -429,7 +430,7 @@ public class NodeQueryWithIndex {
 	 * @param distance
 	 *            Target Distance
 	 */
-	public void query5(NodeHeapfile nhf, ZTreeFile ztf_Descriptor,
+	public void query5(NodeHeapfile nhf, ZTreeFile ztf_Descriptor, BTreeFile btf_node_label,
 			EdgeHeapFile ehf, short nodeLabelLength, short numBuf,
 			Descriptor targetDescriptor, double distance) {
 
@@ -475,7 +476,7 @@ public class NodeQueryWithIndex {
 						+ nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4)
 						+ "]");
 				BatchInsert bInsert = new BatchInsert();
-				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, nhf);
+				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, btf_node_label);
 
 				List<String> outgoingEdges = new ArrayList<String>();
 				List<String> incomingEdges = new ArrayList<String>();

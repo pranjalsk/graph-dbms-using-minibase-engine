@@ -190,7 +190,7 @@ public class BatchOperations {
 				case 11:
 					try {
 						BatchEdgeInsert newEdgeInsert = new BatchEdgeInsert();
-						newEdgeInsert.insertBatchEdge(gdb.ehf, gdb.nhf,
+						newEdgeInsert.insertBatchEdge(gdb.ehf, gdb.btf_node,
 								filePath);
 						System.out.println("Batch edge insertion done");
 						gdb.createBTEdgeLabel();
@@ -222,7 +222,7 @@ public class BatchOperations {
 					try {
 						BatchEdgeDelete newEdgeDelete = new BatchEdgeDelete();
 						newEdgeDelete.deleteBatchEdge(gdb.ehf, gdb.nhf,
-								gdb.btf_edge_label, gdb.btf_edge_weight,
+								gdb.btf_node,gdb.btf_edge_label, gdb.btf_edge_weight,
 								filePath);
 						printStatistics(gdb);
 						System.out.println(gdb.getEdgeCnt());
@@ -248,9 +248,9 @@ public class BatchOperations {
 							} else if (qtype == 3) {
 								nq.query3(gdb.nhf, nodeLabelLength, (short)numBuf, targetDescriptor, distance);
 							} else if (qtype == 4) {
-								nq.query4(gdb.nhf, gdb.ehf, nodeLabelLength, (short)numBuf, targetLabel);
+								nq.query4(gdb.nhf, gdb.ehf, gdb.btf_node,nodeLabelLength, (short)numBuf, targetLabel);
 							} else if (qtype == 5) {
-								nq.query5(gdb.nhf, gdb.ehf, nodeLabelLength, (short)numBuf, targetDescriptor, distance);
+								nq.query5(gdb.nhf, gdb.ehf, gdb.btf_node,nodeLabelLength, (short)numBuf, targetDescriptor, distance);
 							}
 
 						}
@@ -268,7 +268,7 @@ public class BatchOperations {
 							} else if (qtype == 4) {
 								nqi.query4(gdb.nhf, gdb.btf_node, gdb.ehf, nodeLabelLength, (short)numBuf, targetLabel);
 							} else if (qtype == 5) {
-								nqi.query5(gdb.nhf, gdb.ztf_node_desc, gdb.ehf, nodeLabelLength, (short)numBuf, targetDescriptor, distance);
+								nqi.query5(gdb.nhf, gdb.ztf_node_desc, gdb.btf_node,gdb.ehf, nodeLabelLength, (short)numBuf, targetDescriptor, distance);
 							}
 						}
 
