@@ -224,8 +224,8 @@ public class PredEval {
 						break;
 					}
 				}
-
 				row_res = row_res || op_res;
+
 				if (row_res == true)
 					break; // OR predicates satisfied.
 				temp_ptr = temp_ptr.next;

@@ -31,9 +31,15 @@ import nodeheap.NodeHeapfile;
 
 public class NodeQueryWithIndex {
 
+	/**
+	 * Prints Node data in the order of occurrence/storage in Node Heap File
+	 * @param nhf Node Heap File 
+	 * @param btf BTree File
+	 * @param nodeLabelLength Length of the Node Label
+	 * @param numBuf Number of Buffers
+	 */
 	public void query0(NodeHeapfile nhf, BTreeFile btf, short nodeLabelLength,
 			short numBuf) {
-		System.out.println("query0");
 		NID nid = new NID();
 		Node node;
 		String nodeHeapFileName = nhf.get_fileName();
@@ -74,10 +80,8 @@ public class NodeQueryWithIndex {
 				if(node!=null){
 					nodeLabel = node.getLabel();
 					nodeDescriptor = node.getDesc();
-					System.out.println(nodeLabel + " " + nodeDescriptor.get(0)
-							+ " " + nodeDescriptor.get(1) + " "
-							+ nodeDescriptor.get(2) + " " + nodeDescriptor.get(3)
-							+ " " + nodeDescriptor.get(4));
+					System.out.println("Label: "+nodeLabel + " , Descriptor: [" + nodeDescriptor.get(0) + " , " + nodeDescriptor.get(1) + " , "
+							+ nodeDescriptor.get(2) + " , " + nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4)+"]");
 				}
 				node = nscan.getNext(nid);
 			}
@@ -87,6 +91,13 @@ public class NodeQueryWithIndex {
 		}
 	}
 
+	/**
+	 * Prints Node data based on increasing alpha-numerical order of Node Label
+	 * @param nhf Node Heap File
+	 * @param btf BTree File
+	 * @param nodeLabelLength Length of the Node Label
+	 * @param numBuf Number of Buffers
+	 */
 	public void query1(NodeHeapfile nhf, BTreeFile btf, short nodeLabelLength,
 			short numBuf) {
 		System.out.println("query1");
@@ -118,10 +129,8 @@ public class NodeQueryWithIndex {
 				node.setHdr();
 				nodeLabel = node.getLabel();
 				nodeDescriptor = node.getDesc();
-				System.out.println(nodeLabel + " " + nodeDescriptor.get(0)
-						+ " " + nodeDescriptor.get(1) + " "
-						+ nodeDescriptor.get(2) + " " + nodeDescriptor.get(3)
-						+ " " + nodeDescriptor.get(4));
+				System.out.println("Label: "+nodeLabel + " , Descriptor: [" + nodeDescriptor.get(0) + " , " + nodeDescriptor.get(1) + " , "
+						+ nodeDescriptor.get(2) + " , " + nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4)+"]");
 				node = nIscan.get_next();
 			}
 
@@ -130,6 +139,15 @@ public class NodeQueryWithIndex {
 		}
 	}
 
+	/**
+	 * Prints Node data based on increasing order of distance of Node's Descriptor from the Target Descriptor
+	 * @param nhf Node Heap File
+	 * @param ztf ZTree File
+	 * @param nodeLabelLength Length of the Node Label
+	 * @param numBuf Number of Buffers
+	 * @param targetDescriptor Target Descriptor
+	 * @param distance Target Distance
+	 */
 	public void query2(NodeHeapfile nhf, ZTreeFile ztf, short nodeLabelLength,
 			short numBuf, Descriptor targetDescriptor, double distance) {
 
@@ -171,10 +189,8 @@ public class NodeQueryWithIndex {
 				node = distanceToNodeMap.get(dist);
 				nodeLabel = node.getLabel();
 				nodeDescriptor = node.getDesc();
-				System.out.println(nodeLabel + " " + nodeDescriptor.get(0)
-						+ " " + nodeDescriptor.get(1) + " "
-						+ nodeDescriptor.get(2) + " " + nodeDescriptor.get(3)
-						+ " " + nodeDescriptor.get(4)+ " " +dist);
+				System.out.println("Label: "+nodeLabel + " , Descriptor: [" + nodeDescriptor.get(0) + " , " + nodeDescriptor.get(1) + " , "
+						+ nodeDescriptor.get(2) + " , " + nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4)+"]");
 			}
 
 		} catch (Exception e) {
@@ -182,6 +198,15 @@ public class NodeQueryWithIndex {
 		}
 	}
 
+	/**
+	 * Prints Node Labels that are at a given Distance from the Target Descriptor
+	 * @param nhf Node Heap File
+	 * @param ztf ZTree File
+	 * @param nodeLabelLength Length of the Node Label
+	 * @param numBuf Number of Buffers
+	 * @param targetDescriptor Target Descriptor
+	 * @param distance Target Distance
+	 */
 	public void query3(NodeHeapfile nhf, ZTreeFile ztf, short nodeLabelLength,
 			short numBuf, Descriptor targetDescriptor, double distance) {
 
@@ -221,10 +246,8 @@ public class NodeQueryWithIndex {
 				node.setHdr();
 				nodeLabel = node.getLabel();
 				nodeDescriptor = node.getDesc();
-				System.out.println(nodeLabel + " " + nodeDescriptor.get(0)
-						+ " " + nodeDescriptor.get(1) + " "
-						+ nodeDescriptor.get(2) + " " + nodeDescriptor.get(3)
-						+ " " + nodeDescriptor.get(4));
+				System.out.println("Label: "+nodeLabel + " , Descriptor: [" + nodeDescriptor.get(0) + " , " + nodeDescriptor.get(1) + " , "
+						+ nodeDescriptor.get(2) + " , " + nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4)+"]");
 				node = nIscan.get_next();
 			}
 
@@ -232,6 +255,16 @@ public class NodeQueryWithIndex {
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * Prints the Node Label, Incoming and Outgoing Edges based on the Node Label's match with the given Label
+	 * @param nhf Node Heap File
+	 * @param btf BTree File
+	 * @param ehf Edge Heap File
+	 * @param nodeLabelLength Length of the Node Label
+	 * @param numBuf Number of Buffers
+	 * @param targetLabelNode Node Label
+	 */
 	public void query4(NodeHeapfile nhf, BTreeFile btf, EdgeHeapFile ehf,short nodeLabelLength,
 			short numBuf, String targetLabelNode) {
 		System.out.println("query1");
@@ -270,11 +303,8 @@ public class NodeQueryWithIndex {
 				node.setHdr();
 				nodeLabel = node.getLabel();
 				nodeDescriptor = node.getDesc();
-				System.out.println(nodeLabel + " " + nodeDescriptor.get(0)
-						+ " " + nodeDescriptor.get(1) + " "
-						+ nodeDescriptor.get(2) + " " + nodeDescriptor.get(3)
-						+ " " + nodeDescriptor.get(4));
-
+				System.out.println("Label: "+nodeLabel + " , Descriptor: [" + nodeDescriptor.get(0) + " , " + nodeDescriptor.get(1) + " , "
+						+ nodeDescriptor.get(2) + " , " + nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4)+"]");
 				BatchInsert bInsert = new BatchInsert();
 				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, nhf);
 				
@@ -327,6 +357,16 @@ public class NodeQueryWithIndex {
 		}
 	}
 	
+	/**
+	 * Prints the Node Label, Incoming and Outgoing Edges based on the Node's Descriptor's distance from the Target Descriptor
+	 * @param nhf Node Heap File
+	 * @param ztf ZTRee File
+	 * @param ehf Edge Heap File
+	 * @param nodeLabelLength Length of the Node Label
+	 * @param numBuf Number of Buffers
+	 * @param targetDescriptor Target Descriptor
+	 * @param distance Target Distance
+	 */
 	public void query5(NodeHeapfile nhf, ZTreeFile ztf, EdgeHeapFile ehf, short nodeLabelLength,
 			short numBuf, Descriptor targetDescriptor, double distance) {
 
@@ -366,11 +406,8 @@ public class NodeQueryWithIndex {
 				node.setHdr();
 				nodeLabel = node.getLabel();
 				nodeDescriptor = node.getDesc();
-				System.out.println(nodeLabel + " " + nodeDescriptor.get(0)
-						+ " " + nodeDescriptor.get(1) + " "
-						+ nodeDescriptor.get(2) + " " + nodeDescriptor.get(3)
-						+ " " + nodeDescriptor.get(4));
-				
+				System.out.println("Label: "+nodeLabel + " , Descriptor: [" + nodeDescriptor.get(0) + " , " + nodeDescriptor.get(1) + " , "
+						+ nodeDescriptor.get(2) + " , " + nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4)+"]");
 				BatchInsert bInsert = new BatchInsert();
 				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, nhf);
 				

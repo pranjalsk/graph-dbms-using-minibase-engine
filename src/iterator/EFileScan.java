@@ -125,7 +125,6 @@ public class EFileScan extends Iterator {
 			if ((edge1 = escan.getNext(eid)) == null) {
 				return null;
 			}
-
 			edge1.setHdr(in1_len, _in1, s_sizes);
 			if (PredEval.Eval(OutputFilter, edge1, null, _in1, null) == true) {
 				Projection.Project(edge1, _in1, Jedge, perm_mat, nOutFlds);
