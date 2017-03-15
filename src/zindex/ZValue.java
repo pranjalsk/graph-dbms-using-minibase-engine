@@ -1,17 +1,23 @@
 package zindex;
 
-import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 
 import global.Descriptor;
-
-import btree.KeyClass;
 import btree.KeyNotMatchException;
 
+/**
+ * manages the interleaving and de-interleaving of descriptor key
+ */
 public class ZValue {
 
+	/**
+	 * returns the interleaved zvalue of given descriptor
+	 * @param desc
+	 * @return string zvalue
+	 * @throws KeyNotMatchException
+	 * @throws UnsupportedEncodingException
+	 */
 	public static String getZValue(Descriptor desc)
 			throws KeyNotMatchException, UnsupportedEncodingException {
 
@@ -54,83 +60,30 @@ public class ZValue {
 			zVal_high_bit |= (val4_high_masked_i << ((4 * i)));
 		}
 
-//		for (int i = 0; i < val.length; i++) {
-//			System.out.println(Long.toBinaryString(val_low_bit[i]));
-//			System.out.println(Long.toBinaryString(val_high_bit[i]));
-//			System.out.println("---");
-//		}
-
-//		System.out.println(Long.toBinaryString(zVal_high_bit) + ":"
-//				+ Long.toBinaryString(zVal_high_bit).length());
-//		System.out.println(Long.toBinaryString(zVal_low_bit) + ":"
-//				+ Long.toBinaryString(zVal_low_bit).length());
-		//
-		//
-
-//		System.out.println(zVal_low_bit+":"+zVal_high_bit);
-		//
-		// System.out.println(String.valueOf(zVal_high_bit)+String.valueOf(zVal_low_bit));
-
 		byte[] zVal_high_End = longToBytes(zVal_high_bit);
 		byte[] zVal_low_End = longToBytes(zVal_low_bit);
-//		byte[] finalArr = new byte[10];
 		char[] zValArr = new char[10];
 		int ind = 0;
 		for (int i = 3; i < zVal_high_End.length; i++) {
-			// System.out.print(zVal_MSByte_Arr[i]);
-			// System.out.print(" ");
 			char tempChar = (char) (zVal_high_End[i] & 0x00FF);
 
-//			int tempInt = (int) (zVal_high_End[i] & 0x00FF);
-//			System.out.print(tempChar + ":" + tempInt);
-//			finalArr[ind] = zVal_high_End[i];
 			zValArr[ind++] = tempChar;
 		}
-//		System.out.println();
 
 		for (int i = 3; i < zVal_low_End.length; i++) {
-			// System.out.print(zVal_LSByte_Arr[i]);
-			// System.out.print(" ");
 			char tempChar = (char) (zVal_low_End[i] & 0x00FF);
-//			int tempInt = (int) (zVal_low_End[i] & 0x00FF);
-//			System.out.print(tempChar + ":" + tempInt);
-//			finalArr[ind] = zVal_low_End[i];
 			zValArr[ind++] = tempChar;
 		}
-//		String s = new String(zValArr);
-//		ByteArrayInputStream byteArr = new ByteArrayInputStream(s.getBytes());
-//		int c = 0;
-//		
-//		while((c = byteArr.read())!=-1){
-//			char ch = (char)c;
-//			System.out.println(ch);
-//		}
-		
-//		zValArr[0] = '2';
-//		zValArr[1] = '1';
-//		zValArr[2] = 'f';
-//		zValArr[3] = 'y';
-//		zValArr[4] = '7';
-//		zValArr[5] = '9';
-//		zValArr[6] = 'h';
-//		zValArr[7] = 's';
-//		zValArr[8] = 'h';
-//		zValArr[9] = 'j';
-//		String s = new String("2lfy79hshj");
-//		String an = new String(zValArr);
-//		if(an.compareTo(s) > 0){
-//			System.out.println(true);
-//			System.out.println(an);
-//		}else if(an.compareTo(s) < 0){
-//			System.out.println(false);
-//			System.out.println(s);
-//		}else{
-//			System.out.println("equal");
-//		}
+
 		return new String(zValArr);
 
 	}
 
+	/**
+	 * converts the given long to byte array
+	 * @param x
+	 * @return
+	 */
 	private static byte[] longToBytes(long x) {
 
 		ByteBuffer buffer = ByteBuffer.allocate(0x8);
@@ -139,6 +92,11 @@ public class ZValue {
 		return buffer.array();
 	}
 	
+	/**
+	 * de-interleaves the zValue and returns a descriptor
+	 * @param zVal
+	 * @return descriptor
+	 */
 	public static Descriptor getDescriptor(String zVal){
 		
 		byte[] zValByteArr = new byte[zVal.length()];
@@ -163,7 +121,6 @@ public class ZValue {
 		long zVal_low_bit = bytesToLong(zVal_low_End);
 		long zVal_high_bit = bytesToLong(zVal_high_End);
 		
-//		System.out.println(zVal_low_bit+":"+zVal_high_bit);
 		long[] val_low_bit = new long[5];
 		long[] val_high_bit = new long[5];
 		
@@ -196,12 +153,6 @@ public class ZValue {
 			
 		}
 		
-//		for (int i = 0; i < val_low_bit.length; i++) {
-//			 System.out.println(Long.toBinaryString(val_low_bit[i]));
-//			 System.out.println(Long.toBinaryString(val_high_bit[i]));
-//			 System.out.println("---");
-//		}
-		
 		long[] val = new long[5];
 
 		for (int i = 0; i < val.length; i++) {
@@ -213,6 +164,11 @@ public class ZValue {
 		return desc;
 	}
 	
+	/**
+	 * converts the given bytes to long 
+	 * @param bytes
+	 * @return long 
+	 */
 	private static long bytesToLong(byte[] bytes){
 		long value = 0;
 		for (int i = 0; i < bytes.length; i++)

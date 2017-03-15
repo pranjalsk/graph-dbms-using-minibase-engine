@@ -328,11 +328,11 @@ public class NHFPage extends Page implements ConstSlot, GlobalConst {
 	}
 
 	/**
-	 * inserts a new record onto the page, returns RID of this record
+	 * inserts a new record onto the page, returns NID of this record
 	 * 
 	 * @param record
 	 *            a record to be inserted
-	 * @return RID of record, null if sufficient space does not exist
+	 * @return NID of record, null if sufficient space does not exist
 	 * @exception IOException
 	 *                I/O errors in C++ Status insertRecord(char *recPtr, int
 	 *                recLen, RID& rid)
@@ -402,7 +402,7 @@ public class NHFPage extends Page implements ConstSlot, GlobalConst {
 	 * @exception InvalidSlotNumberException
 	 *                Invalid slot number
 	 * @exception IOException
-	 *                I/O errors in C++ Status deleteRecord(const RID& rid)
+	 *                I/O errors in C++ Status deleteRecord(const NID& nid)
 	 */
 	public void deleteRecord(NID nid) throws IOException,
 			InvalidSlotNumberException {
@@ -457,9 +457,9 @@ public class NHFPage extends Page implements ConstSlot, GlobalConst {
 	}
 
 	/**
-	 * @return RID of first record on page, null if page contains no records.
+	 * @return NID of first record on page, null if page contains no records.
 	 * @exception IOException
-	 *                I/O errors in C++ Status firstRecord(RID& firstRid)
+	 *                I/O errors in C++ Status firstRecord(NID& firstnid)
 	 * 
 	 */
 	public NID firstRecord() throws IOException {
@@ -489,13 +489,13 @@ public class NHFPage extends Page implements ConstSlot, GlobalConst {
 	}
 
 	/**
-	 * @return RID of next record on the page, null if no more records exist on
+	 * @return NID of next record on the page, null if no more records exist on
 	 *         the page
 	 * @param curNid
 	 *            current record ID
 	 * @exception IOException
-	 *                I/O errors in C++ Status nextRecord (RID curRid, RID&
-	 *                nextRid)
+	 *                I/O errors in C++ Status nextRecord (NID curRid, NID&
+	 *                nextNid)
 	 */
 	public NID nextRecord(NID curNid) throws IOException {
 		NID nid = new NID();
@@ -524,8 +524,8 @@ public class NHFPage extends Page implements ConstSlot, GlobalConst {
 	}
 
 	/**
-	 * copies out record with RID rid into record pointer. <br>
-	 * Status getRecord(RID rid, char *recPtr, int& recLen)
+	 * copies out record with NID nid into record pointer. <br>
+	 * Status getRecord(NID nid, char *recPtr, int& recLen)
 	 * 
 	 * @param nid
 	 *            the record ID
@@ -643,7 +643,7 @@ public class NHFPage extends Page implements ConstSlot, GlobalConst {
 
 	/**
 	 * Compacts the slot directory on an HFPage. WARNING -- this will probably
-	 * lead to a change in the RIDs of records on the page. You CAN'T DO THIS on
+	 * lead to a change in the NIDs of records on the page. You CAN'T DO THIS on
 	 * most kinds of pages.
 	 * 
 	 * @exception IOException
