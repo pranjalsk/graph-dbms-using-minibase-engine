@@ -1,10 +1,10 @@
 package batch;
 
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
 import edgeheap.EScan;
 import edgeheap.Edge;
 import edgeheap.EdgeHeapFile;
@@ -24,11 +24,15 @@ import nodeheap.NScan;
 import nodeheap.Node;
 import nodeheap.NodeHeapfile;
 
-//Node Query on Heap Files
+
 public class NodeQuery {
 
+	/**
+	 * Prints Node data in the order of occurrence/storage in Node Heap File
+	 * @param nhf Node Heap File
+	 */
 	public void query0(NodeHeapfile nhf) {
-		System.out.println("nodequery 0");
+		
 		NID nid = new NID();
 		Node node;
 		
@@ -42,8 +46,8 @@ public class NodeQuery {
 				node.setHdr();
 				nodeLabel = node.getLabel();
 				nodeDescriptor = node.getDesc();
-				System.out.println(nodeLabel + " " + nodeDescriptor.get(0) + " " + nodeDescriptor.get(1) + " "
-						+ nodeDescriptor.get(2) + " " + nodeDescriptor.get(3) + " " + nodeDescriptor.get(4));
+				System.out.println("Label: "+nodeLabel + " , Descriptor: [" + nodeDescriptor.get(0) + " , " + nodeDescriptor.get(1) + " , "
+						+ nodeDescriptor.get(2) + " , " + nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4)+"]");
 				node = nscan.getNext(nid);
 			}
 
@@ -52,8 +56,14 @@ public class NodeQuery {
 		}
 	}
 
+	/**
+	 * Prints Node data based on increasing alpha-numerical order of Node Label
+	 * @param nhf Node Heap File
+	 * @param nodeLabelLength Length of the Node Label
+	 * @param numBuf Number of Buffers
+	 */
 	public void query1(NodeHeapfile nhf, short nodeLabelLength, short numBuf) {
-		System.out.println("nodequery 1");
+		
 
 		String nodeHeapFileName = nhf.get_fileName();
 		AttrType[] attrType = new AttrType[2];
@@ -85,8 +95,8 @@ public class NodeQuery {
 				node.setHdr();
 				nodeLabel = node.getLabel();
 				nodeDescriptor = node.getDesc();
-				System.out.println(nodeLabel + " " + nodeDescriptor.get(0) + " " + nodeDescriptor.get(1) + " "
-						+ nodeDescriptor.get(2) + " " + nodeDescriptor.get(3) + " " + nodeDescriptor.get(4));
+				System.out.println("Label: "+nodeLabel + " , Descriptor: [" + nodeDescriptor.get(0) + " , " + nodeDescriptor.get(1) + " , "
+						+ nodeDescriptor.get(2) + " , " + nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4)+"]");
 				t = sort.get_next();
 			}
 		} catch (Exception e) {
@@ -95,8 +105,16 @@ public class NodeQuery {
 		}
 	}
 
+	/**
+	 * Prints Node data based on increasing order of distance of Node's Descriptor from the Target Descriptor
+	 * @param nhf Node Heap File
+	 * @param nodeLabelLength Length of the Node Label
+	 * @param numBuf Number of Buffers
+	 * @param targetDescriptor Target Descriptor
+	 * @param distance Target Distance
+	 */
 	public void query2(NodeHeapfile nhf, short nodeLabelLength, short numBuf, Descriptor targetDescriptor, double distance){
-		System.out.println("nodequery 3");
+		
 		String nodeHeapFileName = nhf.get_fileName();
 		AttrType[] attrType = new AttrType[2];
 		short[] stringSize = new short[1];
@@ -130,10 +148,8 @@ public class NodeQuery {
 				node = distanceToNodeMap.get(dist);
 				nodeLabel = node.getLabel();
 				nodeDescriptor = node.getDesc();
-				System.out.println(nodeLabel + " " + nodeDescriptor.get(0)
-						+ " " + nodeDescriptor.get(1) + " "
-						+ nodeDescriptor.get(2) + " " + nodeDescriptor.get(3)
-						+ " " + nodeDescriptor.get(4)+ " " +dist);
+				System.out.println("Label: "+nodeLabel + " , Descriptor: [" + nodeDescriptor.get(0) + " , " + nodeDescriptor.get(1) + " , "
+						+ nodeDescriptor.get(2) + " , " + nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4)+"]");
 			}
 		}
 		catch(Exception e){
@@ -141,8 +157,16 @@ public class NodeQuery {
 		}
 	}
 	
+	/**
+	 * Prints Node Labels that are at a given Distance from the Target Descriptor
+	 * @param nhf Node Heap File
+	 * @param nodeLabelLength Length of the Node Label
+	 * @param numBuf Number of Buffers
+	 * @param targetDescriptor Target Descriptor
+	 * @param distance Target Distance
+	 */
 	public void query3(NodeHeapfile nhf, short nodeLabelLength, short numBuf, Descriptor targetDescriptor, double distance){
-		System.out.println("nodequery 3");
+		
 		String nodeHeapFileName = nhf.get_fileName();
 		AttrType[] attrType = new AttrType[2];
 		short[] stringSize = new short[1];
@@ -175,8 +199,8 @@ public class NodeQuery {
 				node.setHdr();
 				nodeLabel = node.getLabel();
 				nodeDescriptor = node.getDesc();
-				System.out.println(nodeLabel + " " + nodeDescriptor.get(0) + " " + nodeDescriptor.get(1) + " "
-						+ nodeDescriptor.get(2) + " " + nodeDescriptor.get(3) + " " + nodeDescriptor.get(4));
+				System.out.println("Label: "+nodeLabel + " , Descriptor: [" + nodeDescriptor.get(0) + " , " + nodeDescriptor.get(1) + " , "
+						+ nodeDescriptor.get(2) + " , " + nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4)+"]");
 				t = nfscan.get_next();
 			}
 
@@ -186,9 +210,16 @@ public class NodeQuery {
 		}
 	}
 	
-	
+	/**
+	 * Prints the Node Label, Incoming and Outgoing Edges based on the Node Label's match with the given Label
+	 * @param nhf Node Heap File
+	 * @param ehf Edge Heap File
+	 * @param nodeLabelLength Length of the Node Label
+	 * @param numBuf Number of Buffers
+	 * @param label Node Label
+	 */
 	public void query4(NodeHeapfile nhf, EdgeHeapFile ehf, short nodeLabelLength, short numBuf, String label){
-		System.out.println("nodequery 4");
+		
 		String nodeHeapFileName = nhf.get_fileName();
 		AttrType[] attrType = new AttrType[2];
 		short[] stringSize = new short[1];
@@ -221,9 +252,8 @@ public class NodeQuery {
 				node.setHdr();
 				nodeLabel = node.getLabel();
 				nodeDescriptor = node.getDesc();
-				System.out.println("Node Label: "+nodeLabel + " , Node Descriptor: [" + nodeDescriptor.get(0) + " , " + nodeDescriptor.get(1) + " , "
+				System.out.println("Label: "+nodeLabel + " , Descriptor: [" + nodeDescriptor.get(0) + " , " + nodeDescriptor.get(1) + " , "
 						+ nodeDescriptor.get(2) + " , " + nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4)+"]");
-				
 				
 				
 				BatchInsert bInsert = new BatchInsert();
@@ -282,9 +312,17 @@ public class NodeQuery {
 	
 	
 	
-	
+	/**
+	 * Prints the Node Label, Incoming and Outgoing Edges based on the Node's Descriptor's distance from the Target Descriptor
+	 * @param nhf Node Heap File
+	 * @param ehf Edge Heap File
+	 * @param nodeLabelLength Length of the Node Label
+	 * @param numBuf Number of Buffers
+	 * @param targetDescriptor Target Descriptor
+	 * @param distance Target Distance
+	 */
 	public void query5(NodeHeapfile nhf, EdgeHeapFile ehf, short nodeLabelLength, short numBuf, Descriptor targetDescriptor, double distance){
-		System.out.println("nodequery 5");
+		
 		String nodeHeapFileName = nhf.get_fileName();
 		AttrType[] attrType = new AttrType[2];
 		short[] stringSize = new short[1];
@@ -376,4 +414,5 @@ public class NodeQuery {
 		}
 		
 	}
+	
 }

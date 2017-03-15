@@ -84,14 +84,8 @@ public class BatchOperations {
 			taskName = inputArguments[0];
 			int taskNumber = 0;
 
-			if (inputArguments.length != 3) {
-				if (taskName.equalsIgnoreCase("exit")) {
-					System.out.println("Exiting out of the program");
+			if (taskName.equalsIgnoreCase("exit")) {
 					System.exit(0);
-
-				} else
-					System.out
-							.println("Error: Invalid input,please add all the input parameters");
 			} else {
 
 				System.out.println("Task Name: " + taskName);

@@ -31,9 +31,20 @@ import nodeheap.NodeHeapfile;
 
 public class NodeQueryWithIndex {
 
-	public void query0(NodeHeapfile nhf, BTreeFile btf_node_label, short nodeLabelLength,
-			short numBuf) {
-		System.out.println("query0");
+	/**
+	 * Prints Node data in the order of occurrence/storage in Node Heap File
+	 * 
+	 * @param nhf
+	 *            Node Heap File
+	 * @param btf
+	 *            BTree File
+	 * @param nodeLabelLength
+	 *            Length of the Node Label
+	 * @param numBuf
+	 *            Number of Buffers
+	 */
+	public void query0(NodeHeapfile nhf, BTreeFile btf_node_label,
+			short nodeLabelLength, short numBuf) {
 		NID nid = new NID();
 		Node node;
 		String nodeHeapFileName = nhf.get_fileName();
@@ -62,22 +73,25 @@ public class NodeQueryWithIndex {
 				expr[0].op = new AttrOperator(AttrOperator.aopEQ);
 				expr[0].type2 = new AttrType(AttrType.attrSymbol);
 				expr[0].type1 = new AttrType(AttrType.attrString);
-				expr[0].operand2.symbol = new FldSpec(new RelSpec(RelSpec.outer), 1);
+				expr[0].operand2.symbol = new FldSpec(
+						new RelSpec(RelSpec.outer), 1);
 				expr[0].operand1.string = targetnodeLabel;
 				expr[1] = null;
-				NodeIndexScan nIscan = new NodeIndexScan(indType, nodeHeapFileName,
-						nodeIndexFileName, attrType, stringSize, 2, 2, projlist,
-						expr, 1, false);
+				NodeIndexScan nIscan = new NodeIndexScan(indType,
+						nodeHeapFileName, nodeIndexFileName, attrType,
+						stringSize, 2, 2, projlist, expr, 1, false);
 				node = nIscan.get_next();
 				String nodeLabel;
 				Descriptor nodeDescriptor;
-				if(node!=null){
+				if (node != null) {
 					nodeLabel = node.getLabel();
 					nodeDescriptor = node.getDesc();
-					System.out.println(nodeLabel + " " + nodeDescriptor.get(0)
-							+ " " + nodeDescriptor.get(1) + " "
-							+ nodeDescriptor.get(2) + " " + nodeDescriptor.get(3)
-							+ " " + nodeDescriptor.get(4));
+					System.out.println("Label: " + nodeLabel
+							+ " , Descriptor: [" + nodeDescriptor.get(0)
+							+ " , " + nodeDescriptor.get(1) + " , "
+							+ nodeDescriptor.get(2) + " , "
+							+ nodeDescriptor.get(3) + " , "
+							+ nodeDescriptor.get(4) + "]");
 				}
 				node = nscan.getNext(nid);
 			}
@@ -87,8 +101,20 @@ public class NodeQueryWithIndex {
 		}
 	}
 
-	public void query1(NodeHeapfile nhf, BTreeFile btf_node_label, short nodeLabelLength,
-			short numBuf) {
+	/**
+	 * Prints Node data based on increasing alpha-numerical order of Node Label
+	 * 
+	 * @param nhf
+	 *            Node Heap File
+	 * @param btf
+	 *            BTree File
+	 * @param nodeLabelLength
+	 *            Length of the Node Label
+	 * @param numBuf
+	 *            Number of Buffers
+	 */
+	public void query1(NodeHeapfile nhf, BTreeFile btf_node_label,
+			short nodeLabelLength, short numBuf) {
 		System.out.println("query1");
 
 		String nodeHeapFileName = nhf.get_fileName();
@@ -118,10 +144,11 @@ public class NodeQueryWithIndex {
 				node.setHdr();
 				nodeLabel = node.getLabel();
 				nodeDescriptor = node.getDesc();
-				System.out.println(nodeLabel + " " + nodeDescriptor.get(0)
-						+ " " + nodeDescriptor.get(1) + " "
-						+ nodeDescriptor.get(2) + " " + nodeDescriptor.get(3)
-						+ " " + nodeDescriptor.get(4));
+				System.out.println("Label: " + nodeLabel + " , Descriptor: ["
+						+ nodeDescriptor.get(0) + " , " + nodeDescriptor.get(1)
+						+ " , " + nodeDescriptor.get(2) + " , "
+						+ nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4)
+						+ "]");
 				node = nIscan.get_next();
 			}
 
@@ -130,8 +157,26 @@ public class NodeQueryWithIndex {
 		}
 	}
 
-	public void query2(NodeHeapfile nhf, ZTreeFile ztf_Descriptor, short nodeLabelLength,
-			short numBuf, Descriptor targetDescriptor, double distance) {
+	/**
+	 * Prints Node data based on increasing order of distance of Node's
+	 * Descriptor from the Target Descriptor
+	 * 
+	 * @param nhf
+	 *            Node Heap File
+	 * @param ztf
+	 *            ZTree File
+	 * @param nodeLabelLength
+	 *            Length of the Node Label
+	 * @param numBuf
+	 *            Number of Buffers
+	 * @param targetDescriptor
+	 *            Target Descriptor
+	 * @param distance
+	 *            Target Distance
+	 */
+	public void query2(NodeHeapfile nhf, ZTreeFile ztf_Descriptor,
+			short nodeLabelLength, short numBuf, Descriptor targetDescriptor,
+			double distance) {
 
 		String nodeHeapFileName = nhf.get_fileName();
 		String nodeIndexFileName = "";
@@ -146,7 +191,7 @@ public class NodeQueryWithIndex {
 		projlist[1] = new FldSpec(rel, 2);
 
 		CondExpr[] expr = null;
-		
+
 		IndexType indType = new IndexType(3);
 		Node node = new Node();
 		Map<Double, Node> distanceToNodeMap = new TreeMap<Double, Node>();
@@ -162,19 +207,21 @@ public class NodeQueryWithIndex {
 				node.setHdr();
 				nodeLabel = node.getLabel();
 				nodeDescriptor = node.getDesc();
-				double distanceFromTar = nodeDescriptor.distance(targetDescriptor);
-				distanceToNodeMap.put(distanceFromTar,new Node( node));
+				double distanceFromTar = nodeDescriptor
+						.distance(targetDescriptor);
+				distanceToNodeMap.put(distanceFromTar, new Node(node));
 				node = nIscan.get_next();
 			}
-			
-			for(double dist: distanceToNodeMap.keySet()){
+
+			for (double dist : distanceToNodeMap.keySet()) {
 				node = distanceToNodeMap.get(dist);
 				nodeLabel = node.getLabel();
 				nodeDescriptor = node.getDesc();
-				System.out.println(nodeLabel + " " + nodeDescriptor.get(0)
-						+ " " + nodeDescriptor.get(1) + " "
-						+ nodeDescriptor.get(2) + " " + nodeDescriptor.get(3)
-						+ " " + nodeDescriptor.get(4)+ " " +dist);
+				System.out.println("Label: " + nodeLabel + " , Descriptor: ["
+						+ nodeDescriptor.get(0) + " , " + nodeDescriptor.get(1)
+						+ " , " + nodeDescriptor.get(2) + " , "
+						+ nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4)
+						+ "]");
 			}
 
 		} catch (Exception e) {
@@ -182,8 +229,26 @@ public class NodeQueryWithIndex {
 		}
 	}
 
-	public void query3(NodeHeapfile nhf, ZTreeFile ztf_Descriptor, short nodeLabelLength,
-			short numBuf, Descriptor targetDescriptor, double distance) {
+	/**
+	 * Prints Node Labels that are at a given Distance from the Target
+	 * Descriptor
+	 * 
+	 * @param nhf
+	 *            Node Heap File
+	 * @param ztf
+	 *            ZTree File
+	 * @param nodeLabelLength
+	 *            Length of the Node Label
+	 * @param numBuf
+	 *            Number of Buffers
+	 * @param targetDescriptor
+	 *            Target Descriptor
+	 * @param distance
+	 *            Target Distance
+	 */
+	public void query3(NodeHeapfile nhf, ZTreeFile ztf_Descriptor,
+			short nodeLabelLength, short numBuf, Descriptor targetDescriptor,
+			double distance) {
 
 		String nodeHeapFileName = nhf.get_fileName();
 		String nodeIndexFileName = "";
@@ -206,7 +271,7 @@ public class NodeQueryWithIndex {
 		expr[0].operand2.symbol = new FldSpec(new RelSpec(RelSpec.outer), 2);
 		expr[0].operand1.attrDesc = targetDescriptor;
 		expr[1] = null;
-		
+
 		IndexType indType = new IndexType(3);
 		Node node = new Node();
 		try {
@@ -221,10 +286,11 @@ public class NodeQueryWithIndex {
 				node.setHdr();
 				nodeLabel = node.getLabel();
 				nodeDescriptor = node.getDesc();
-				System.out.println(nodeLabel + " " + nodeDescriptor.get(0)
-						+ " " + nodeDescriptor.get(1) + " "
-						+ nodeDescriptor.get(2) + " " + nodeDescriptor.get(3)
-						+ " " + nodeDescriptor.get(4));
+				System.out.println("Label: " + nodeLabel + " , Descriptor: ["
+						+ nodeDescriptor.get(0) + " , " + nodeDescriptor.get(1)
+						+ " , " + nodeDescriptor.get(2) + " , "
+						+ nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4)
+						+ "]");
 				node = nIscan.get_next();
 			}
 
@@ -232,8 +298,27 @@ public class NodeQueryWithIndex {
 			e.printStackTrace();
 		}
 	}
-	public void query4(NodeHeapfile nhf, BTreeFile btf_node_label, EdgeHeapFile ehf,short nodeLabelLength,
-			short numBuf, String targetLabelNode) {
+
+	/**
+	 * Prints the Node Label, Incoming and Outgoing Edges based on the Node
+	 * Label's match with the given Label
+	 * 
+	 * @param nhf
+	 *            Node Heap File
+	 * @param btf
+	 *            BTree File
+	 * @param ehf
+	 *            Edge Heap File
+	 * @param nodeLabelLength
+	 *            Length of the Node Label
+	 * @param numBuf
+	 *            Number of Buffers
+	 * @param targetLabelNode
+	 *            Node Label
+	 */
+	public void query4(NodeHeapfile nhf, BTreeFile btf_node_label,
+			EdgeHeapFile ehf, short nodeLabelLength, short numBuf,
+			String targetLabelNode) {
 		System.out.println("query1");
 
 		String nodeHeapFileName = nhf.get_fileName();
@@ -265,22 +350,22 @@ public class NodeQueryWithIndex {
 			node = nIscan.get_next();
 			String nodeLabel;
 			Descriptor nodeDescriptor;
-			
+
 			while (node != null) {
 				node.setHdr();
 				nodeLabel = node.getLabel();
 				nodeDescriptor = node.getDesc();
-				System.out.println(nodeLabel + " " + nodeDescriptor.get(0)
-						+ " " + nodeDescriptor.get(1) + " "
-						+ nodeDescriptor.get(2) + " " + nodeDescriptor.get(3)
-						+ " " + nodeDescriptor.get(4));
-
+				System.out.println("Label: " + nodeLabel + " , Descriptor: ["
+						+ nodeDescriptor.get(0) + " , " + nodeDescriptor.get(1)
+						+ " , " + nodeDescriptor.get(2) + " , "
+						+ nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4)
+						+ "]");
 				BatchInsert bInsert = new BatchInsert();
 				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, nhf);
-				
+
 				List<String> outgoingEdges = new ArrayList<String>();
 				List<String> incomingEdges = new ArrayList<String>();
-				
+
 				EID eid = new EID();
 				Edge edge;
 				try {
@@ -289,32 +374,30 @@ public class NodeQueryWithIndex {
 					EScan escan = ehf.openScan();
 					edge = escan.getNext(eid);
 					String edgeLabel;
-					
+
 					while (edge != null) {
 						edge.setHdr();
 						edgeLabel = edge.getLabel();
 						sourceNID = edge.getSource();
 						destinationNID = edge.getDestination();
-						
-						if(nodeNID.equals(sourceNID)){
+
+						if (nodeNID.equals(sourceNID)) {
 							outgoingEdges.add(edgeLabel);
-						}
-						else if(nodeNID.equals(destinationNID)){
+						} else if (nodeNID.equals(destinationNID)) {
 							incomingEdges.add(edgeLabel);
 						}
-							
+
 						edge = escan.getNext(eid);
 					}
-					
+
 					System.out.println("Incoming Edges:");
-					for(String labelEdge: incomingEdges){
+					for (String labelEdge : incomingEdges) {
 						System.out.println(labelEdge);
 					}
 					System.out.println("Outgoing Edges:");
-					for(String labelEdge: outgoingEdges){
+					for (String labelEdge : outgoingEdges) {
 						System.out.println(labelEdge);
 					}
-					
 
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -326,9 +409,29 @@ public class NodeQueryWithIndex {
 			e.printStackTrace();
 		}
 	}
-	
-	public void query5(NodeHeapfile nhf, ZTreeFile ztf_Descriptor, EdgeHeapFile ehf, short nodeLabelLength,
-			short numBuf, Descriptor targetDescriptor, double distance) {
+
+	/**
+	 * Prints the Node Label, Incoming and Outgoing Edges based on the Node's
+	 * Descriptor's distance from the Target Descriptor
+	 * 
+	 * @param nhf
+	 *            Node Heap File
+	 * @param ztf
+	 *            ZTRee File
+	 * @param ehf
+	 *            Edge Heap File
+	 * @param nodeLabelLength
+	 *            Length of the Node Label
+	 * @param numBuf
+	 *            Number of Buffers
+	 * @param targetDescriptor
+	 *            Target Descriptor
+	 * @param distance
+	 *            Target Distance
+	 */
+	public void query5(NodeHeapfile nhf, ZTreeFile ztf_Descriptor,
+			EdgeHeapFile ehf, short nodeLabelLength, short numBuf,
+			Descriptor targetDescriptor, double distance) {
 
 		String nodeHeapFileName = nhf.get_fileName();
 		String nodeIndexFileName = "";
@@ -351,7 +454,7 @@ public class NodeQueryWithIndex {
 		expr[0].operand2.symbol = new FldSpec(new RelSpec(RelSpec.outer), 2);
 		expr[0].operand1.attrDesc = targetDescriptor;
 		expr[1] = null;
-		
+
 		IndexType indType = new IndexType(3);
 		Node node = new Node();
 		try {
@@ -366,17 +469,17 @@ public class NodeQueryWithIndex {
 				node.setHdr();
 				nodeLabel = node.getLabel();
 				nodeDescriptor = node.getDesc();
-				System.out.println(nodeLabel + " " + nodeDescriptor.get(0)
-						+ " " + nodeDescriptor.get(1) + " "
-						+ nodeDescriptor.get(2) + " " + nodeDescriptor.get(3)
-						+ " " + nodeDescriptor.get(4));
-				
+				System.out.println("Label: " + nodeLabel + " , Descriptor: ["
+						+ nodeDescriptor.get(0) + " , " + nodeDescriptor.get(1)
+						+ " , " + nodeDescriptor.get(2) + " , "
+						+ nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4)
+						+ "]");
 				BatchInsert bInsert = new BatchInsert();
 				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, nhf);
-				
+
 				List<String> outgoingEdges = new ArrayList<String>();
 				List<String> incomingEdges = new ArrayList<String>();
-				
+
 				EID eid = new EID();
 				Edge edge;
 				try {
@@ -385,32 +488,30 @@ public class NodeQueryWithIndex {
 					EScan escan = ehf.openScan();
 					edge = escan.getNext(eid);
 					String edgeLabel;
-					
+
 					while (edge != null) {
 						edge.setHdr();
 						edgeLabel = edge.getLabel();
 						sourceNID = edge.getSource();
 						destinationNID = edge.getDestination();
-						
-						if(nodeNID.equals(sourceNID)){
+
+						if (nodeNID.equals(sourceNID)) {
 							outgoingEdges.add(edgeLabel);
-						}
-						else if(nodeNID.equals(destinationNID)){
+						} else if (nodeNID.equals(destinationNID)) {
 							incomingEdges.add(edgeLabel);
 						}
-							
+
 						edge = escan.getNext(eid);
 					}
-					
+
 					System.out.println("Incoming Edges:");
-					for(String labelEdge: incomingEdges){
+					for (String labelEdge : incomingEdges) {
 						System.out.println(labelEdge);
 					}
 					System.out.println("Outgoing Edges:");
-					for(String labelEdge: outgoingEdges){
+					for (String labelEdge : outgoingEdges) {
 						System.out.println(labelEdge);
 					}
-					
 
 				} catch (Exception e) {
 					e.printStackTrace();
