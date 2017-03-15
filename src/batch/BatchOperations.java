@@ -148,6 +148,10 @@ public class BatchOperations {
 						targetLabel = inputArguments[5];
 					}
 				} else if(taskNumber == 15){
+					graphDBName = inputArguments[1];
+					numBuf = Integer.parseInt(inputArguments[2]);
+					qtype = Integer.parseInt(inputArguments[3]);
+					index = Integer.parseInt(inputArguments[4]);
 					if (qtype == 5) {
 						edgeWtBound1 = Integer.parseInt(inputArguments[5]);
 						edgeWtBound2 = Integer.parseInt(inputArguments[6]);
