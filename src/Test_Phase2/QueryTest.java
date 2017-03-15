@@ -118,16 +118,16 @@ public class QueryTest {
 //		GraphDB gdb = new GraphDB(0);
 //		b.insertBatchNode(gdb.nhf, "E 1 5 9 4 5");
 //		scanNodeHeapFile();
-		edgeInsertTest("A", "B", 445);
-		System.out.println("Edge AB created");
-		edgeInsertTest("B", "D", 829);
-		System.out.println("Edge BD created");
-		edgeInsertTest("C", "D", 747);
-		System.out.println("Edge CD created");
-		edgeInsertTest("A", "C", 478);
-		edgeInsertTest("B", "C", 329);
-		System.out.println("EdgeCount-->"+gdb.ehf.getEdgeCnt());
-		gdb.createBTEdgeLabel();
+//		edgeInsertTest("A", "B", 445);
+//		System.out.println("Edge AB created");
+//		edgeInsertTest("B", "D", 829);
+//		System.out.println("Edge BD created");
+//		edgeInsertTest("C", "D", 747);
+//		System.out.println("Edge CD created");
+//		edgeInsertTest("A", "C", 478);
+//		edgeInsertTest("B", "C", 329);
+//		System.out.println("EdgeCount-->"+gdb.ehf.getEdgeCnt());
+//		gdb.createBTEdgeLabel();
 
 //		scanEdgeHeapFile();
 //		
@@ -220,60 +220,60 @@ public class QueryTest {
 		
 	}
 
-	public static void edgeInsertTest(String srcLbl, String destLbl, int edgeWeight) throws Exception{
-		BatchInsert batchinsert = new BatchInsert();
-		NID src  = batchinsert.getNidFromNodeLabel(srcLbl, gdb.nhf);
-		NID dest = batchinsert.getNidFromNodeLabel(destLbl, gdb.nhf);	
-				
-		Edge newEdge = new Edge();
-		newEdge.setHdr();
-		newEdge.setSource(src);
-		newEdge.setDestination(dest);
-		newEdge.setLabel("edge"+srcLbl+destLbl);
-		newEdge.setWeight(edgeWeight);	
-		EID newEid = new EID();
-		newEid = gdb.ehf.insertEdge(newEdge.getEdgeByteArray());	
+//	public static void edgeInsertTest(String srcLbl, String destLbl, int edgeWeight) throws Exception{
+//		BatchInsert batchinsert = new BatchInsert();
+//		NID src  = batchinsert.getNidFromNodeLabel(srcLbl, gdb.nhf);
+//		NID dest = batchinsert.getNidFromNodeLabel(destLbl, gdb.nhf);	
+//				
+//		Edge newEdge = new Edge();
+//		newEdge.setHdr();
+//		newEdge.setSource(src);
+//		newEdge.setDestination(dest);
+//		newEdge.setLabel("edge"+srcLbl+destLbl);
+//		newEdge.setWeight(edgeWeight);	
+//		EID newEid = new EID();
+//		newEid = gdb.ehf.insertEdge(newEdge.getEdgeByteArray());	
+//	
+//	}
 	
-	}
 	
-	
-	public static void deleteNodeFromHF(String Label) throws Exception{
-		String nodeLabel = Label;
-		BatchInsert batchinsert = new BatchInsert();
-		boolean deleteStatus = false;
-		NID currentNid = new NID(); //To store a copy of the nid
-		
-		//Delete the node				
-		NID newNid = batchinsert.getNidFromNodeLabel(nodeLabel, gdb.nhf);
-		currentNid.copyNid(newNid);				
-		deleteStatus = gdb.nhf.deleteRecord(newNid);
-		
-		//Delete all edges associated with the node
-		EID newEid = new EID();
-		EScan newEscan = gdb.ehf.openScan();
-		Edge newEdge = new Edge();
-		//boolean done = false;
-		NID sourceNID = null;
-		NID destinationNID = null;
-		deleteStatus = false;
-		boolean done = false;
-		
-		
-		while(!done){
-			newEdge = newEscan.getNext(newEid);
-			if (newEdge == null) {
-				done = true;
-				break;
-			}
-			newEdge.setHdr();
-			sourceNID = newEdge.getSource();
-			destinationNID = newEdge.getDestination();
-			if(currentNid.equals(sourceNID) || currentNid.equals(destinationNID)){
-				deleteStatus = gdb.ehf.deleteRecord(newEid);
-			}//end-if					
-		}//end-while				
-		scanNodeHeapFile();
-	}
+//	public static void deleteNodeFromHF(String Label) throws Exception{
+//		String nodeLabel = Label;
+//		BatchInsert batchinsert = new BatchInsert();
+//		boolean deleteStatus = false;
+//		NID currentNid = new NID(); //To store a copy of the nid
+//		
+//		//Delete the node				
+//		NID newNid = batchinsert.getNidFromNodeLabel(nodeLabel, gdb.nhf);
+//		currentNid.copyNid(newNid);				
+//		deleteStatus = gdb.nhf.deleteRecord(newNid);
+//		
+//		//Delete all edges associated with the node
+//		EID newEid = new EID();
+//		EScan newEscan = gdb.ehf.openScan();
+//		Edge newEdge = new Edge();
+//		//boolean done = false;
+//		NID sourceNID = null;
+//		NID destinationNID = null;
+//		deleteStatus = false;
+//		boolean done = false;
+//		
+//		
+//		while(!done){
+//			newEdge = newEscan.getNext(newEid);
+//			if (newEdge == null) {
+//				done = true;
+//				break;
+//			}
+//			newEdge.setHdr();
+//			sourceNID = newEdge.getSource();
+//			destinationNID = newEdge.getDestination();
+//			if(currentNid.equals(sourceNID) || currentNid.equals(destinationNID)){
+//				deleteStatus = gdb.ehf.deleteRecord(newEid);
+//			}//end-if					
+//		}//end-while				
+//		scanNodeHeapFile();
+//	}
 	
 	public static void scanNodeHeapFile() throws InvalidTupleSizeException, IOException, InvalidTypeException, FieldNumberOutOfBoundException{
 		//scanning of records
