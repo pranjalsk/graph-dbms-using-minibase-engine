@@ -30,17 +30,17 @@ public class EdgeQueryWithIndex {
 	 * 
 	 * @param ehf
 	 *            EdgeHeapFile
-	 * @param btf
+	 * @param btf_edge_label
 	 *            B-Tree Index file on edge label
 	 * @param edgeLabelLength
 	 * @param numBuf
 	 */
-	public void query0(EdgeHeapFile ehf, BTreeFile btf, NodeHeapfile nhf, short edgeLabelLength,
+	public void query0(EdgeHeapFile ehf, BTreeFile btf_edge_label, NodeHeapfile nhf, short edgeLabelLength,
 			short numBuf) {
 		EID eid = new EID();
 		Edge edge;
 		String edgeHeapFileName = ehf.get_fileName();
-		String edgeIndexFileName = btf.get_fileName();
+		String edgeIndexFileName = btf_edge_label.get_fileName();
 
 		AttrType[] attrType = new AttrType[6];
 		short[] stringSize = new short[1];
@@ -119,11 +119,11 @@ public class EdgeQueryWithIndex {
 		}
 	}
 
-	public void query1(EdgeHeapFile ehf, BTreeFile btf, NodeHeapfile nhf,
+	public void query1(EdgeHeapFile ehf, BTreeFile btf_edge_label, NodeHeapfile nhf,
 			short edgeLabelLength, short numBuf) {
 		
 		String edgeHeapFileName = ehf.get_fileName();
-		String edgeIndexFileName = btf.get_fileName();
+		String edgeIndexFileName = btf_edge_label.get_fileName();
 
 		AttrType[] attrType = new AttrType[6];
 		short[] stringSize = new short[1];
@@ -186,12 +186,12 @@ public class EdgeQueryWithIndex {
 
 	}
 
-	public void query2(EdgeHeapFile ehf, BTreeFile btf, NodeHeapfile nhf,
+	public void query2(EdgeHeapFile ehf, BTreeFile btf_edge_label, NodeHeapfile nhf,
 			short edgeLabelLength, short numBuf) {
 		System.out.println("query1");
 
 		String edgeHeapFileName = ehf.get_fileName();
-		String edgeIndexFileName = btf.get_fileName();
+		String edgeIndexFileName = btf_edge_label.get_fileName();
 
 		AttrType[] attrType = new AttrType[6];
 		short[] stringSize = new short[1];
@@ -261,16 +261,16 @@ public class EdgeQueryWithIndex {
 	 * 
 	 * @param ehf
 	 *            edge heap file
-	 * @param btf
+	 * @param btf_edge_label
 	 *            b-tree index file on edge label
 	 * @param edgeLabelLength
 	 * @param numBuf
 	 */
-	public void query3(EdgeHeapFile ehf, BTreeFile btf, short edgeLabelLength,
+	public void query3(EdgeHeapFile ehf, BTreeFile btf_edge_label, short edgeLabelLength,
 			short numBuf) {
 
 		String edgeHeapFileName = ehf.get_fileName();
-		String edgeIndexFileName = btf.get_fileName();
+		String edgeIndexFileName = btf_edge_label.get_fileName();
 
 		AttrType[] attrType = new AttrType[6];
 		short[] stringSize = new short[1];
@@ -327,17 +327,17 @@ public class EdgeQueryWithIndex {
 	 * 
 	 * @param ehf
 	 *            edge heap file
-	 * @param btf
+	 * @param btf_edge_weight
 	 *            b tree index file on edge weight
 	 * @param edgeLabelLength
 	 * @param numBuf
 	 */
-	public void query4(EdgeHeapFile ehf, BTreeFile btf, short edgeLabelLength,
+	public void query4(EdgeHeapFile ehf, BTreeFile btf_edge_weight, short edgeLabelLength,
 			short numBuf) {
 		System.out.println("query4");
 
 		String edgeHeapFileName = ehf.get_fileName();
-		String edgeIndexFileName = btf.get_fileName();
+		String edgeIndexFileName = btf_edge_weight.get_fileName();
 
 		AttrType[] attrType = new AttrType[6];
 		short[] stringSize = new short[1];
@@ -395,14 +395,14 @@ public class EdgeQueryWithIndex {
 	 * 
 	 * @param ehf
 	 *            edge heap file
-	 * @param btf
+	 * @param btf_edge_weight
 	 *            B tree index file on edge weight
 	 * @param edgeLabelLength
 	 * @param numBuf
 	 * @param bound1
 	 * @param bound2
 	 */
-	public void query5(EdgeHeapFile ehf, BTreeFile btf, short edgeLabelLength,
+	public void query5(EdgeHeapFile ehf, BTreeFile btf_edge_weight, short edgeLabelLength,
 			short numBuf, int bound1, int bound2) {
 		System.out.println("query5");
 
@@ -416,7 +416,7 @@ public class EdgeQueryWithIndex {
 		}
 
 		String edgeHeapFileName = ehf.get_fileName();
-		String edgeIndexFileName = btf.get_fileName();
+		String edgeIndexFileName = btf_edge_weight.get_fileName();
 
 		AttrType[] attrType = new AttrType[6];
 		short[] stringSize = new short[1];
@@ -483,10 +483,10 @@ public class EdgeQueryWithIndex {
 
 	}
 
-	public void query6(EdgeHeapFile ehf, BTreeFile btf, NodeHeapfile nhf,
+	public void query6(EdgeHeapFile ehf, BTreeFile btf_edge_label, NodeHeapfile nhf,
 			short edgeLabelLength, short numBuf) {
 		String edgeHeapFileName = ehf.get_fileName();
-		String edgeIndexFileName = btf.get_fileName();
+		String edgeIndexFileName = btf_edge_label.get_fileName();
 		ArrayList<Edge> edgeList = new ArrayList<Edge>();
 		
 		AttrType[] attrType = new AttrType[6];

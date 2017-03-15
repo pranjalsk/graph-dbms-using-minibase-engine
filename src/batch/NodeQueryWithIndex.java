@@ -31,13 +31,13 @@ import nodeheap.NodeHeapfile;
 
 public class NodeQueryWithIndex {
 
-	public void query0(NodeHeapfile nhf, BTreeFile btf, short nodeLabelLength,
+	public void query0(NodeHeapfile nhf, BTreeFile btf_node_label, short nodeLabelLength,
 			short numBuf) {
 		System.out.println("query0");
 		NID nid = new NID();
 		Node node;
 		String nodeHeapFileName = nhf.get_fileName();
-		String nodeIndexFileName = btf.get_fileName();
+		String nodeIndexFileName = btf_node_label.get_fileName();
 		AttrType[] attrType = new AttrType[2];
 		short[] stringSize = new short[1];
 		stringSize[0] = nodeLabelLength;
@@ -87,12 +87,12 @@ public class NodeQueryWithIndex {
 		}
 	}
 
-	public void query1(NodeHeapfile nhf, BTreeFile btf, short nodeLabelLength,
+	public void query1(NodeHeapfile nhf, BTreeFile btf_node_label, short nodeLabelLength,
 			short numBuf) {
 		System.out.println("query1");
 
 		String nodeHeapFileName = nhf.get_fileName();
-		String nodeIndexFileName = btf.get_fileName();
+		String nodeIndexFileName = btf_node_label.get_fileName();
 		AttrType[] attrType = new AttrType[2];
 		short[] stringSize = new short[1];
 		stringSize[0] = nodeLabelLength;
@@ -130,7 +130,7 @@ public class NodeQueryWithIndex {
 		}
 	}
 
-	public void query2(NodeHeapfile nhf, ZTreeFile ztf, short nodeLabelLength,
+	public void query2(NodeHeapfile nhf, ZTreeFile ztf_Descriptor, short nodeLabelLength,
 			short numBuf, Descriptor targetDescriptor, double distance) {
 
 		String nodeHeapFileName = nhf.get_fileName();
@@ -182,7 +182,7 @@ public class NodeQueryWithIndex {
 		}
 	}
 
-	public void query3(NodeHeapfile nhf, ZTreeFile ztf, short nodeLabelLength,
+	public void query3(NodeHeapfile nhf, ZTreeFile ztf_Descriptor, short nodeLabelLength,
 			short numBuf, Descriptor targetDescriptor, double distance) {
 
 		String nodeHeapFileName = nhf.get_fileName();
@@ -232,12 +232,12 @@ public class NodeQueryWithIndex {
 			e.printStackTrace();
 		}
 	}
-	public void query4(NodeHeapfile nhf, BTreeFile btf, EdgeHeapFile ehf,short nodeLabelLength,
+	public void query4(NodeHeapfile nhf, BTreeFile btf_node_label, EdgeHeapFile ehf,short nodeLabelLength,
 			short numBuf, String targetLabelNode) {
 		System.out.println("query1");
 
 		String nodeHeapFileName = nhf.get_fileName();
-		String nodeIndexFileName = btf.get_fileName();
+		String nodeIndexFileName = btf_node_label.get_fileName();
 		AttrType[] attrType = new AttrType[2];
 		short[] stringSize = new short[1];
 		stringSize[0] = nodeLabelLength;
@@ -327,7 +327,7 @@ public class NodeQueryWithIndex {
 		}
 	}
 	
-	public void query5(NodeHeapfile nhf, ZTreeFile ztf, EdgeHeapFile ehf, short nodeLabelLength,
+	public void query5(NodeHeapfile nhf, ZTreeFile ztf_Descriptor, EdgeHeapFile ehf, short nodeLabelLength,
 			short numBuf, Descriptor targetDescriptor, double distance) {
 
 		String nodeHeapFileName = nhf.get_fileName();

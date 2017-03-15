@@ -41,8 +41,12 @@ public class BatchOperations {
 	private static int qtype = 0;
 	private static int index = 0;
 	private static Descriptor targetDescriptor = null;
+	private static String targetLabel;
 	private static double distance = 0;
+	private static int edgeWtBound1 = 0;
+	private static int edgeWtBound2 = 0;
 	private static short nodeLabelLength = 32;
+	private static short edgeLabelLength = 32;
 	static GraphDB gdb;
 	public static String dbpath;
 	public static String logpath;
@@ -123,8 +127,6 @@ public class BatchOperations {
 						|| taskNumber == 13) {
 					
 				} else if (taskNumber == 14) {
-					NodeQuery nq = new NodeQuery();
-					NodeQueryWithIndex nqi = new NodeQueryWithIndex();
 					graphDBName = inputArguments[1];
 					numBuf = Integer.parseInt(inputArguments[2]);
 					qtype = Integer.parseInt(inputArguments[3]);
@@ -136,17 +138,6 @@ public class BatchOperations {
 					System.out.println("Index: " + index);
 					int d1, d2, d3, d4, d5;
 					double dist;
-					String label;
-					if (qtype == 1){
-						
-						if(index == 0){
-
-						}
-						else if(index == 1){
-							nqi.query0(newGDB.nhf, newGDB.btf_node, nodeLabelLength, (short)numBuf);
-						}
-						
-					}
 					if (qtype == 2) {
 						d1 = Integer.parseInt(inputArguments[5]);
 						d2 = Integer.parseInt(inputArguments[6]);
@@ -167,7 +158,12 @@ public class BatchOperations {
 						targetDescriptor.set(d1, d2, d3, d4, d5);
 						distance = dist;
 					} else if (qtype == 4) {
-						label = inputArguments[5];
+						targetLabel = inputArguments[5];
+					}
+				} else if(taskNumber == 15){
+					if (qtype == 5) {
+						edgeWtBound1 = Integer.parseInt(inputArguments[5]);
+						edgeWtBound2 = Integer.parseInt(inputArguments[6]);
 					}
 				}
 
@@ -243,31 +239,43 @@ public class BatchOperations {
 
 				// Task : Node Query
 				case 14:
+					NodeQuery nq = new NodeQuery();
+					NodeQueryWithIndex nqi = new NodeQueryWithIndex();
 					try {
-						NodeQuery nq = new NodeQuery();
 						// heapfile scan
 						if (index == 0) {
 
 							if (qtype == 0) {
-								System.out.println("qtype0");
-								NodeHeapfile nhf = gdb.nhf;
-								nq.query0(nhf);
+								nq.query0(gdb.nhf);
 							} else if (qtype == 1) {
-
+								nq.query1(gdb.nhf, nodeLabelLength, (short)numBuf);
 							} else if (qtype == 2) {
-
+								nq.query2(gdb.nhf, nodeLabelLength, (short)numBuf, targetDescriptor, distance);
 							} else if (qtype == 3) {
-
+								nq.query3(gdb.nhf, nodeLabelLength, (short)numBuf, targetDescriptor, distance);
 							} else if (qtype == 4) {
-
+								nq.query4(gdb.nhf, gdb.ehf, nodeLabelLength, (short)numBuf, targetLabel);
 							} else if (qtype == 5) {
-
+								nq.query5(gdb.nhf, gdb.ehf, nodeLabelLength, (short)numBuf, targetDescriptor, distance);
 							}
 
 						}
 						// index scan
 						else if (index == 1) {
-
+							if (qtype == 0) {
+								System.out.println("qtype0");
+								nqi.query0(gdb.nhf, gdb.btf_node, nodeLabelLength, (short)numBuf);
+							} else if (qtype == 1) {
+								nqi.query1(gdb.nhf, gdb.btf_node, nodeLabelLength, (short)numBuf);
+							} else if (qtype == 2) {
+								nqi.query2(gdb.nhf, gdb.ztf_node_desc, nodeLabelLength, (short)numBuf, targetDescriptor, distance);
+							} else if (qtype == 3) {
+								nqi.query3(gdb.nhf, gdb.ztf_node_desc, nodeLabelLength, (short)numBuf, targetDescriptor, distance);
+							} else if (qtype == 4) {
+								nqi.query4(gdb.nhf, gdb.btf_node, gdb.ehf, nodeLabelLength, (short)numBuf, targetLabel);
+							} else if (qtype == 5) {
+								nqi.query5(gdb.nhf, gdb.ztf_node_desc, gdb.ehf, nodeLabelLength, (short)numBuf, targetDescriptor, distance);
+							}
 						}
 
 					} catch (Exception e) {
@@ -277,10 +285,51 @@ public class BatchOperations {
 
 				// Task : Edge Query
 				case 15:
+					EdgeQuery eq = new EdgeQuery();
+					EdgeQueryWithIndex eqi = new EdgeQueryWithIndex();
 					try {
+						// heapfile scan
+						if (index == 0) {
+
+							if (qtype == 0) {
+								eq.query0(gdb.ehf, gdb.nhf);
+							} else if (qtype == 1) {
+								eq.query1(gdb.ehf, gdb.nhf);
+							} else if (qtype == 2) {
+								eq.query2(gdb.ehf, gdb.nhf);
+							} else if (qtype == 3) {
+								eq.query3(gdb.ehf, edgeLabelLength, (short)numBuf);
+							} else if (qtype == 4) {
+								eq.query4(gdb.ehf, edgeLabelLength, (short)numBuf);
+							} else if (qtype == 5) {
+								eq.query5(gdb.ehf, edgeLabelLength, (short)numBuf, edgeWtBound1, edgeWtBound2);
+							}else if(qtype == 6){
+								eq.query6(gdb.ehf, gdb.nhf);
+							}
+
+						}
+						// index scan
+						else if (index == 1) {
+							if (qtype == 0) {
+								System.out.println("qtype0");
+								eqi.query0(gdb.ehf, gdb.btf_edge_label, gdb.nhf, edgeLabelLength, (short)numBuf);
+							} else if (qtype == 1) {
+								eqi.query1(gdb.ehf, gdb.btf_edge_label, gdb.nhf, edgeLabelLength, (short)numBuf);
+							} else if (qtype == 2) {
+								eqi.query2(gdb.ehf, gdb.btf_edge_label, gdb.nhf, edgeLabelLength, (short)numBuf);
+							} else if (qtype == 3) {
+								eqi.query3(gdb.ehf, gdb.btf_edge_label, edgeLabelLength, (short)numBuf);
+							} else if (qtype == 4) {
+								eqi.query4(gdb.ehf, gdb.btf_edge_weight, edgeLabelLength, (short)numBuf);
+							} else if (qtype == 5) {
+								eqi.query5(gdb.ehf, gdb.btf_edge_weight, edgeLabelLength, (short)numBuf, edgeWtBound1, edgeWtBound1);
+							}else if(qtype == 6){
+								eqi.query6(gdb.ehf, gdb.btf_edge_label, gdb.nhf, edgeLabelLength, (short)numBuf);
+							}
+						}
 
 					} catch (Exception e) {
-
+						e.printStackTrace();
 					}
 					break;
 				default:
