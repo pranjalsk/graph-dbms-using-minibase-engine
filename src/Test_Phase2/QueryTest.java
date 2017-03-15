@@ -38,6 +38,7 @@ import btree.UnpinPageException;
 import diskmgr.GraphDB;
 import edgeheap.EScan;
 import edgeheap.Edge;
+import edgeheap.EdgeHeapFile;
 
 import global.Descriptor;
 import global.EID;
@@ -136,14 +137,13 @@ public class QueryTest {
 //		scanNodeHeapFile();
 //		scanEdgeHeapFile();
 
-	
-		EdgeQuery eq = new EdgeQuery();
-		EdgeQueryWithIndex eqi = new EdgeQueryWithIndex();
 		
+		EdgeQueryWithIndex eqi = new EdgeQueryWithIndex();
+		eqi.query6(gdb.ehf, gdb.btf_edge_label, gdb.nhf, edgeLabelLength, numBuf);
 //		eq.query1(gdb.ehf, gdb.nhf);
 //		System.out.println("query 1 without index completed");
-		eq.query2(gdb.ehf, gdb.nhf);
-		System.out.println("query 2 without index completed");
+//		eq.query2(gdb.ehf, gdb.nhf);
+//		System.out.println("query 2 without index completed");
 //		eqi.query3(gdb.ehf, gdb.btf_edge_label, edgeLabelLength, numBuf);
 //        System.out.println("query 3 with index completed.");
         
@@ -154,8 +154,8 @@ public class QueryTest {
 //		System.out.println("query 0 with index completed");
 //		eqi.query1(gdb.ehf, gdb.btf_edge_label, gdb.nhf,edgeLabelLength, numBuf);
 //		System.out.println("query 1 with index completed");
-		eqi.query2(gdb.ehf, gdb.btf_edge_label, gdb.nhf,edgeLabelLength, numBuf);
-		System.out.println("query 2 with index completed");
+//		eqi.query2(gdb.ehf, gdb.btf_edge_label, gdb.nhf,edgeLabelLength, numBuf);
+//		System.out.println("query 2 with index completed");
 //		eqi.query5(gdb.ehf, gdb.btf_edge_weight, edgeLabelLength, numBuf, 800, 445);
 //		System.out.println("query 5 with index completed");
 		
