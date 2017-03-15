@@ -47,7 +47,7 @@ public class GraphDB extends DB {
 		logpath = "/tmp/" + db_name + System.getProperty("user.name") + ".minibase-log";
 		
 		@SuppressWarnings("unused")
-		SystemDefs sysdef = new SystemDefs(dbpath, 3000, 100, "Clock"); //Number of pages=300, Buffer pool=100 pages
+		SystemDefs sysdef = new SystemDefs(dbpath, 300, 100, "Clock"); //Number of pages=300, Buffer pool=100 pages
 		
 		// Kill anything that might be hanging around
 		String newdbpath;
@@ -118,9 +118,9 @@ public class GraphDB extends DB {
 		int keyTypeString = AttrType.attrString;
 		int keyTypeInt = AttrType.attrInteger;
 		
-		nhf = new NodeHeapfile("NodeHeapFile");
+		nhf = new NodeHeapfile("NodeHeapFile_"+graphDBName);
 		//System.out.println("heap file created");
-		ehf = new EdgeHeapFile("EdgeHeapFile");
+		ehf = new EdgeHeapFile("EdgeHeapFile_"+graphDBName);
 		//System.out.println("edge heap file created");
 		
 		btf_node = new BTreeFile("IndexNodeLabel", keyTypeString, 32, 1);
