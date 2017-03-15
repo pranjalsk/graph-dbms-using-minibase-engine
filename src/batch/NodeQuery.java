@@ -43,7 +43,6 @@ public class NodeQuery {
 			node = nscan.getNext(nid);
 			String nodeLabel;
 			Descriptor nodeDescriptor;
-
 			while (node != null) {
 				node.setHdr();
 				nodeLabel = node.getLabel();
