@@ -51,7 +51,7 @@ public class NodeQuery {
 						+ nodeDescriptor.get(2) + " , " + nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4)+"]");
 				node = nscan.getNext(nid);
 			}
-
+			nscan.closescan();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -100,6 +100,9 @@ public class NodeQuery {
 						+ nodeDescriptor.get(2) + " , " + nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4)+"]");
 				t = sort.get_next();
 			}
+			sort.close();
+			nfscan.close();
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 
@@ -152,6 +155,8 @@ public class NodeQuery {
 				System.out.println("Label: "+nodeLabel + " , Descriptor: [" + nodeDescriptor.get(0) + " , " + nodeDescriptor.get(1) + " , "
 						+ nodeDescriptor.get(2) + " , " + nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4)+"]");
 			}
+			nfscan.close();
+			
 		}
 		catch(Exception e){
 			e.printStackTrace();
@@ -204,8 +209,9 @@ public class NodeQuery {
 						+ nodeDescriptor.get(2) + " , " + nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4)+"]");
 				t = nfscan.get_next();
 			}
-
+			nfscan.close();
 		}
+		
 		catch(Exception e){
 			e.printStackTrace();
 		}
@@ -258,7 +264,7 @@ public class NodeQuery {
 				
 				
 				BatchInsert bInsert = new BatchInsert();
-				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, btf_node_label);
+				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, nhf);
 				
 				List<String> outgoingEdges = new ArrayList<String>();
 				List<String> incomingEdges = new ArrayList<String>();
@@ -304,7 +310,7 @@ public class NodeQuery {
 				
 				t = nfscan.get_next();
 			}
-
+			nfscan.close();
 		}
 		catch(Exception e){
 			e.printStackTrace();
@@ -362,7 +368,7 @@ public class NodeQuery {
 				
 				
 				BatchInsert bInsert = new BatchInsert();
-				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, btf_node_label);
+				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, nhf);
 				
 				List<String> outgoingEdges = new ArrayList<String>();
 				List<String> incomingEdges = new ArrayList<String>();
@@ -408,7 +414,7 @@ public class NodeQuery {
 				
 				t = nfscan.get_next();
 			}
-
+			nfscan.close();
 		}
 		catch(Exception e){
 			e.printStackTrace();

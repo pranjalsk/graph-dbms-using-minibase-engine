@@ -47,7 +47,7 @@ public class GraphDB extends DB {
 		logpath = "/tmp/" + db_name + System.getProperty("user.name") + ".minibase-log";
 		
 		@SuppressWarnings("unused")
-		SystemDefs sysdef = new SystemDefs(dbpath, 1000, 500, "Clock"); //Number of pages=300, Buffer pool=100 pages
+		SystemDefs sysdef = new SystemDefs(dbpath, 10000, 500, "Clock"); //Number of pages=300, Buffer pool=100 pages
 		
 		// Kill anything that might be hanging around
 		String newdbpath;

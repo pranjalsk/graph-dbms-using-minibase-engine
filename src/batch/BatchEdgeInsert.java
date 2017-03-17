@@ -11,7 +11,7 @@ import diskmgr.*;
 
 public class BatchEdgeInsert {
 	
-	public void insertBatchEdge(EdgeHeapFile ehf, BTreeFile btf_node, String filePath) throws Exception{
+	public void insertBatchEdge(EdgeHeapFile ehf, NodeHeapfile nhf, String filePath) throws Exception{
 		try{
 			BufferedReader br = new BufferedReader(new FileReader(filePath));
 			String newInput = "";
@@ -19,12 +19,12 @@ public class BatchEdgeInsert {
 				String inputAttributes[] = newInput.trim().split(" ");
 				String sourceLabel = inputAttributes[0];
 				String destinationLabel = inputAttributes[1];
-				String edgeLabel = inputAttributes[3];
+				String edgeLabel = inputAttributes[2];
 				int edgeWeight = Integer.parseInt(inputAttributes[3]);
 				
 				BatchInsert batchinsert = new BatchInsert();
-				NID sourceNID = batchinsert.getNidFromNodeLabel(sourceLabel, btf_node);
-				NID destinationNID = batchinsert.getNidFromNodeLabel(destinationLabel, btf_node);
+				NID sourceNID = batchinsert.getNidFromNodeLabel(sourceLabel, nhf);
+				NID destinationNID = batchinsert.getNidFromNodeLabel(destinationLabel, nhf);
 				
 				Edge newEdge = new Edge();
 				newEdge.setHdr();

@@ -26,8 +26,8 @@ public class BatchEdgeDelete {
 				
 				
 				BatchInsert batchinsert = new BatchInsert();
-				NID sourceNID = batchinsert.getNidFromNodeLabel(sourceLabel, btf_node);
-				NID destinationNID = batchinsert.getNidFromNodeLabel(destinationLabel, btf_node);
+				NID sourceNID = batchinsert.getNidFromNodeLabel(sourceLabel, nhf);
+				NID destinationNID = batchinsert.getNidFromNodeLabel(destinationLabel, nhf);
 				EID newEid = batchinsert.getEidFromEdgeLabel(sourceNID, destinationNID, edgeLabel, ehf, btfEdgeLabl);
 				
 				EID currentEid = new EID();
@@ -37,10 +37,18 @@ public class BatchEdgeDelete {
 				deletedEdge.setHdr();
 				String edgelbl = deletedEdge.getLabel();
 				int edgeWt = deletedEdge.getWeight();
+				
 				KeyClass edgelblKey = new StringKey(edgelbl);
 				KeyClass edgeWtKey = new IntegerKey(edgeWt);			
-								
-				boolean deleteStatus = ehf.deleteRecord(newEid);
+					
+				
+				try {
+					boolean deleteStatus = ehf.deleteRecord(newEid);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
 				btfEdgeLabl.Delete(edgelblKey, currentEid);
 				btfEdgeWt.Delete(edgeWtKey, currentEid);	
 			}

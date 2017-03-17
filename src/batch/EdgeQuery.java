@@ -64,7 +64,7 @@ public class EdgeQuery {
 				
 				edge = escan.getNext(eid);
 			}
-
+			escan.closescan();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -111,7 +111,7 @@ public class EdgeQuery {
 					System.out.println("Label: "+edgeToPrint.getLabel() + " , Weight: " + edgeToPrint.getWeight() + " , Source Node Label: " + sourceNodeLab);
 				}
 			}
-
+			escan.closescan();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -156,7 +156,7 @@ public class EdgeQuery {
 					System.out.println("Label: "+edgeToPrint.getLabel() + " , Weight: " + edgeToPrint.getWeight() + " , Destination Node Label: " + destNodeLab);
 				}
 			}
-
+			escan.closescan();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -221,6 +221,8 @@ public class EdgeQuery {
 						+ destinationNodeSlotID );
 				t = sort.get_next();
 			}
+			efscan.close();
+			sort.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 
@@ -284,6 +286,9 @@ public class EdgeQuery {
 						+ destinationNodeSlotID );
 				t = sort.get_next();
 			}
+			efscan.close();
+			sort.close();
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 
@@ -368,6 +373,9 @@ public class EdgeQuery {
 						+ destinationNodeSlotID );
 				e = efscan.get_next();
 			}
+			efscan.close();
+			
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 
@@ -395,12 +403,12 @@ public class EdgeQuery {
 				edgeList.add(edgeObj);
 				edge = escan.getNext(eid);
 			}
-
+			escan.closescan();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		int totalEdges = edgeList.size();
-		int i, j;
+		int i, j, count =0;
 		Edge firstEdge, secondEdge;
 		NID firstEdgeDestination, secondEdgeSource;
 		Node incidentNode = new Node();
@@ -426,8 +434,10 @@ public class EdgeQuery {
 							}
 							System.out.println("Edges " + firstEdge.getLabel() + " and " + secondEdge.getLabel()
 									+ " are incident on Node " + incidentNode.getLabel());
+							count++;
 						}
 					}
+					System.out.println("No. of incident edge pairs "+count);
 				} catch (FieldNumberOutOfBoundException  e) {
 
 					e.printStackTrace();

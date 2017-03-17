@@ -12,32 +12,36 @@ public class BatchInsert {
 	/* Function to find the NID for a given Node label
 	 * We get the node heap file from the GraphDB instance; this is passed as argument
 	 */
-	public NID getNidFromNodeLabel(String nodeLabel, BTreeFile btf_node) throws Exception{
+	public NID getNidFromNodeLabel(String nodeLabel, NodeHeapfile nhf) throws Exception{
 		try{
-			/*NID newNid = new NID();
+			NID newNid = new NID();
 			NScan newNscan = nhf.openScan();
 			Node newNode = new Node();
 			boolean done = false;
 			
 			while(!done){
 				newNode = newNscan.getNext(newNid);
+				if (newNode == null) {
+					break;
+				}
 				newNode.setHdr();
-				String nodeLabel = newNode.getLabel();
+				String label = newNode.getLabel();
 				if(nodeLabel.equalsIgnoreCase(label)){
 					done = true;			
 				}
 			}
-			return newNid;*/
+			newNscan.closescan();
+			return newNid;
 			
-			RID newRid = new RID();
-			KeyClass key = new StringKey(nodeLabel);
-			BTFileScan newScan = btf_node.new_scan(key, key);	
-			KeyDataEntry newEntry = newScan.get_next();
-			LeafData newData = (LeafData)newEntry.data;
-			newRid = newData.getData();
-			NID newnid = new NID(newRid.pageNo, newRid.slotNo);
-			
-			return newnid;
+//			RID newRid = new RID();
+//			KeyClass key = new StringKey(nodeLabel);
+//			BTFileScan newScan = btf_node.new_scan(key, key);	
+//			KeyDataEntry newEntry = newScan.get_next();
+//			LeafData newData = (LeafData)newEntry.data;
+//			newRid = newData.getData();
+//			NID newnid = new NID(newRid.pageNo, newRid.slotNo);
+//			
+//			return newnid;
 		}
 		catch(Exception e){
 			e.printStackTrace();
@@ -65,6 +69,7 @@ public class BatchInsert {
 					done = true;			
 				}
 			}
+			newEscan.closescan();
 			return newEid;
 			//RID newRid = new RID();	
 			//EID newEid = null;

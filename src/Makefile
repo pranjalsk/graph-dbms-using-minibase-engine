@@ -33,7 +33,7 @@ db:
 	make -C chainexception
 	make -C btree
 	make -C bufmgr
-	make -c zindex
+	make -C zindex
 	make -C diskmgr
 	make -C heap
 	make -C index

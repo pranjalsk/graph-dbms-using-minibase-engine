@@ -195,7 +195,7 @@ public class BatchOperations {
 				case 11:
 					try {
 						BatchEdgeInsert newEdgeInsert = new BatchEdgeInsert();
-						newEdgeInsert.insertBatchEdge(gdb.ehf, gdb.btf_node,
+						newEdgeInsert.insertBatchEdge(gdb.ehf, gdb.nhf,
 								filePath);
 						System.out.println("Batch edge insertion done");
 						gdb.createBTEdgeLabel();
@@ -338,6 +338,8 @@ public class BatchOperations {
 				}// switch
 			} // else
 
+			PCounter.initialize();
+			
 		} while (true);
 	}// main
 

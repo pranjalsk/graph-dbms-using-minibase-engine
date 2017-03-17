@@ -95,8 +95,9 @@ public class NodeQueryWithIndex {
 							+ nodeDescriptor.get(4) + "]");
 				}
 				node = nscan.getNext(nid);
+				nIscan.close();
 			}
-
+			nscan.closescan();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -152,7 +153,7 @@ public class NodeQueryWithIndex {
 						+ "]");
 				node = nIscan.get_next();
 			}
-
+			nIscan.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -224,7 +225,7 @@ public class NodeQueryWithIndex {
 						+ nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4)
 						+ "]");
 			}
-
+			nIscan.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -294,7 +295,7 @@ public class NodeQueryWithIndex {
 						+ "]");
 				node = nIscan.get_next();
 			}
-
+			nIscan.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -362,7 +363,7 @@ public class NodeQueryWithIndex {
 						+ nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4)
 						+ "]");
 				BatchInsert bInsert = new BatchInsert();
-				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, btf_node_label);
+				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, nhf);
 
 				List<String> outgoingEdges = new ArrayList<String>();
 				List<String> incomingEdges = new ArrayList<String>();
@@ -399,13 +400,13 @@ public class NodeQueryWithIndex {
 					for (String labelEdge : outgoingEdges) {
 						System.out.println(labelEdge);
 					}
-
+					escan.closescan();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 				node = nIscan.get_next();
 			}
-
+			nIscan.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -476,7 +477,7 @@ public class NodeQueryWithIndex {
 						+ nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4)
 						+ "]");
 				BatchInsert bInsert = new BatchInsert();
-				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, btf_node_label);
+				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, nhf);
 
 				List<String> outgoingEdges = new ArrayList<String>();
 				List<String> incomingEdges = new ArrayList<String>();
@@ -513,13 +514,13 @@ public class NodeQueryWithIndex {
 					for (String labelEdge : outgoingEdges) {
 						System.out.println(labelEdge);
 					}
-
+					escan.closescan();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 				node = nIscan.get_next();
 			}
-
+			nIscan.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -35,8 +35,8 @@ public class EdgeQueryWithIndex {
 	 * @param edgeLabelLength
 	 * @param numBuf
 	 */
-	public void query0(EdgeHeapFile ehf, BTreeFile btf_edge_label, NodeHeapfile nhf, short edgeLabelLength,
-			short numBuf) {
+	public void query0(EdgeHeapFile ehf, BTreeFile btf_edge_label,
+			NodeHeapfile nhf, short edgeLabelLength, short numBuf) {
 		EID eid = new EID();
 		Edge edge;
 		String edgeHeapFileName = ehf.get_fileName();
@@ -90,38 +90,43 @@ public class EdgeQueryWithIndex {
 				NID sourceNID, destinationNID;
 				if (edge != null) {
 					edgeLabel = edge.getLabel();
-					//sourceNodePageID = edge.getSource().pageNo.pid;
-					//sourceNodeSlotID = edge.getSource().slotNo;
-					//destinationNodePageID = edge.getDestination().pageNo.pid;
-					//destinationNodeSlotID = edge.getDestination().slotNo;
+					// sourceNodePageID = edge.getSource().pageNo.pid;
+					// sourceNodeSlotID = edge.getSource().slotNo;
+					// destinationNodePageID = edge.getDestination().pageNo.pid;
+					// destinationNodeSlotID = edge.getDestination().slotNo;
 					sourceNID = edge.getSource();
 					destinationNID = edge.getDestination();
-					
+
 					sourceNode = nhf.getRecord(sourceNID);
 					sourceNode.setHdr();
-					
+
 					destinationNode = nhf.getRecord(destinationNID);
 					destinationNode.setHdr();
-					
+
 					edgeWeight = edge.getWeight();
-					System.out.print("Label: "+edgeLabel + " , Weight:" + edgeWeight+" , ");
+					System.out.print("Label: " + edgeLabel + " , Weight:"
+							+ edgeWeight + " , ");
 					if (sourceNode != null)
-						System.out.print("Source Node: " + sourceNode.getLabel()+" , ");
+						System.out.print("Source Node: "
+								+ sourceNode.getLabel() + " , ");
 					if (destinationNode != null)
-						System.out.print("Destination Node: " + destinationNode.getLabel());
+						System.out.print("Destination Node: "
+								+ destinationNode.getLabel());
 					System.out.println();
 				}
 				edge = escan.getNext(eid);
+				eIscan.close();
 			}
+			escan.closescan();
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void query1(EdgeHeapFile ehf, BTreeFile btf_edge_label, NodeHeapfile nhf,
-			short edgeLabelLength, short numBuf) {
-		
+	public void query1(EdgeHeapFile ehf, BTreeFile btf_edge_label,
+			NodeHeapfile nhf, short edgeLabelLength, short numBuf) {
+
 		String edgeHeapFileName = ehf.get_fileName();
 		String edgeIndexFileName = btf_edge_label.get_fileName();
 
@@ -160,34 +165,39 @@ public class EdgeQueryWithIndex {
 				Node sourceNode = nhf.getRecord(sourceNID);
 				sourceNode.setHdr();
 				String sourceLabel = sourceNode.getLabel();
-				if(sorceNodeToEdgeMap.containsKey(sourceLabel)){
-					ArrayList<Edge> tempList = sorceNodeToEdgeMap.get(sourceLabel);
+				if (sorceNodeToEdgeMap.containsKey(sourceLabel)) {
+					ArrayList<Edge> tempList = sorceNodeToEdgeMap
+							.get(sourceLabel);
 					tempList.add(new Edge(edge));
 					sorceNodeToEdgeMap.put(sourceLabel, tempList);
-				}else{
+				} else {
 					ArrayList<Edge> tempList = new ArrayList<Edge>();
 					tempList.add(new Edge(edge));
 					sorceNodeToEdgeMap.put(sourceLabel, tempList);
 				}
-				
+
 				edge = eIscan.get_next();
 
 			}
 
 			for (String sourceNodeLab : sorceNodeToEdgeMap.keySet()) {
-				ArrayList<Edge> edgeList = sorceNodeToEdgeMap.get(sourceNodeLab);
-				for(Edge edgeToPrint: edgeList){
-					System.out.println("Label: "+edgeToPrint.getLabel() + " , Weight: " + edgeToPrint.getWeight() + " , Source Node Label: " + sourceNodeLab);
+				ArrayList<Edge> edgeList = sorceNodeToEdgeMap
+						.get(sourceNodeLab);
+				for (Edge edgeToPrint : edgeList) {
+					System.out.println("Label: " + edgeToPrint.getLabel()
+							+ " , Weight: " + edgeToPrint.getWeight()
+							+ " , Source Node Label: " + sourceNodeLab);
 				}
 			}
+			eIscan.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 	}
 
-	public void query2(EdgeHeapFile ehf, BTreeFile btf_edge_label, NodeHeapfile nhf,
-			short edgeLabelLength, short numBuf) {
+	public void query2(EdgeHeapFile ehf, BTreeFile btf_edge_label,
+			NodeHeapfile nhf, short edgeLabelLength, short numBuf) {
 		System.out.println("query1");
 
 		String edgeHeapFileName = ehf.get_fileName();
@@ -228,32 +238,35 @@ public class EdgeQueryWithIndex {
 				Node destNode = nhf.getRecord(destNID);
 				destNode.setHdr();
 				String destLabel = destNode.getLabel();
-				if(destNodeToEdgeMap.containsKey(destLabel)){
+				if (destNodeToEdgeMap.containsKey(destLabel)) {
 					ArrayList<Edge> tempList = destNodeToEdgeMap.get(destLabel);
 					tempList.add(new Edge(edge));
 					destNodeToEdgeMap.put(destLabel, tempList);
-				}else{
+				} else {
 					ArrayList<Edge> tempList = new ArrayList<Edge>();
 					tempList.add(new Edge(edge));
 					destNodeToEdgeMap.put(destLabel, tempList);
 				}
-				
+
 				edge = eIscan.get_next();
 
 			}
 
 			for (String destNodeLab : destNodeToEdgeMap.keySet()) {
 				ArrayList<Edge> edgeList = destNodeToEdgeMap.get(destNodeLab);
-				for(Edge edgeToPrint: edgeList){
-					System.out.println("Label: "+edgeToPrint.getLabel() + " , Weight: " + edgeToPrint.getWeight() + " , Destination Node Label: " + destNodeLab);
+				for (Edge edgeToPrint : edgeList) {
+					System.out.println("Label: " + edgeToPrint.getLabel()
+							+ " , Weight: " + edgeToPrint.getWeight()
+							+ " , Destination Node Label: " + destNodeLab);
 				}
 			}
-		}  catch (Exception e) {
+			eIscan.close();
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 	}
-	
+
 	/**
 	 * when {QTYPE = 3,Index =1} then the query will print the edge data in
 	 * increasing alphanumerical order of edge labels. using edge label index
@@ -266,8 +279,8 @@ public class EdgeQueryWithIndex {
 	 * @param edgeLabelLength
 	 * @param numBuf
 	 */
-	public void query3(EdgeHeapFile ehf, BTreeFile btf_edge_label, short edgeLabelLength,
-			short numBuf) {
+	public void query3(EdgeHeapFile ehf, BTreeFile btf_edge_label,
+			short edgeLabelLength, short numBuf) {
 
 		String edgeHeapFileName = ehf.get_fileName();
 		String edgeIndexFileName = btf_edge_label.get_fileName();
@@ -312,10 +325,15 @@ public class EdgeQueryWithIndex {
 				edgeWeight = edge.getWeight();
 				edge = eIscan.get_next();
 
-				System.out.println("Label: " + edgeLabel + " , Weight : " + edgeWeight + "Source Node PageID: "+sourceNodePageID + " , Source Node SlotID: " + sourceNodeSlotID + " , Destination Node PageID: " + destinationNodePageID + " , Destination Node SlotID: "
-						+ destinationNodeSlotID );
+				System.out.println("Label: " + edgeLabel + " , Weight : "
+						+ edgeWeight + "Source Node PageID: "
+						+ sourceNodePageID + " , Source Node SlotID: "
+						+ sourceNodeSlotID + " , Destination Node PageID: "
+						+ destinationNodePageID
+						+ " , Destination Node SlotID: "
+						+ destinationNodeSlotID);
 			}
-
+			eIscan.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -332,8 +350,8 @@ public class EdgeQueryWithIndex {
 	 * @param edgeLabelLength
 	 * @param numBuf
 	 */
-	public void query4(EdgeHeapFile ehf, BTreeFile btf_edge_weight, short edgeLabelLength,
-			short numBuf) {
+	public void query4(EdgeHeapFile ehf, BTreeFile btf_edge_weight,
+			short edgeLabelLength, short numBuf) {
 		System.out.println("query4");
 
 		String edgeHeapFileName = ehf.get_fileName();
@@ -379,9 +397,15 @@ public class EdgeQueryWithIndex {
 				edgeWeight = edge.getWeight();
 				edge = eIscan.get_next();
 
-				System.out.println("Label: " + edgeLabel + " , Weight : " + edgeWeight + "Source Node PageID: "+sourceNodePageID + " , Source Node SlotID: " + sourceNodeSlotID + " , Destination Node PageID: " + destinationNodePageID + " , Destination Node SlotID: "
-						+ destinationNodeSlotID );
+				System.out.println("Label: " + edgeLabel + " , Weight : "
+						+ edgeWeight + "Source Node PageID: "
+						+ sourceNodePageID + " , Source Node SlotID: "
+						+ sourceNodeSlotID + " , Destination Node PageID: "
+						+ destinationNodePageID
+						+ " , Destination Node SlotID: "
+						+ destinationNodeSlotID);
 			}
+			eIscan.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -402,8 +426,8 @@ public class EdgeQueryWithIndex {
 	 * @param bound1
 	 * @param bound2
 	 */
-	public void query5(EdgeHeapFile ehf, BTreeFile btf_edge_weight, short edgeLabelLength,
-			short numBuf, int bound1, int bound2) {
+	public void query5(EdgeHeapFile ehf, BTreeFile btf_edge_weight,
+			short edgeLabelLength, short numBuf, int bound1, int bound2) {
 		System.out.println("query5");
 
 		int lowerBound, upperBound;
@@ -474,21 +498,28 @@ public class EdgeQueryWithIndex {
 				edgeWeight = edge.getWeight();
 				edge = eIscan.get_next();
 
-				System.out.println("Label: " + edgeLabel + " , Weight : " + edgeWeight + "Source Node PageID: "+sourceNodePageID + " , Source Node SlotID: " + sourceNodeSlotID + " , Destination Node PageID: " + destinationNodePageID + " , Destination Node SlotID: "
-						+ destinationNodeSlotID );
+				System.out.println("Label: " + edgeLabel + " , Weight : "
+						+ edgeWeight + "Source Node PageID: "
+						+ sourceNodePageID + " , Source Node SlotID: "
+						+ sourceNodeSlotID + " , Destination Node PageID: "
+						+ destinationNodePageID
+						+ " , Destination Node SlotID: "
+						+ destinationNodeSlotID);
 			}
+			eIscan.close();
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 	}
 
-	public void query6(EdgeHeapFile ehf, BTreeFile btf_edge_label, NodeHeapfile nhf,
-			short edgeLabelLength, short numBuf) {
+	public void query6(EdgeHeapFile ehf, BTreeFile btf_edge_label,
+			NodeHeapfile nhf, short edgeLabelLength, short numBuf) {
 		String edgeHeapFileName = ehf.get_fileName();
 		String edgeIndexFileName = btf_edge_label.get_fileName();
 		ArrayList<Edge> edgeList = new ArrayList<Edge>();
-		
+
 		AttrType[] attrType = new AttrType[6];
 		short[] stringSize = new short[1];
 		stringSize[0] = edgeLabelLength;
@@ -513,8 +544,7 @@ public class EdgeQueryWithIndex {
 		Edge edge = new Edge();
 		Edge edgeObj;
 		Map<String, ArrayList<Edge>> sorceNodeToEdgeMap = new TreeMap<String, ArrayList<Edge>>();
-		
-		
+
 		try {
 			EdgeIndexScan eIscan = new EdgeIndexScan(indType, edgeHeapFileName,
 					edgeIndexFileName, attrType, stringSize, 6, 6, projlist,
@@ -528,14 +558,13 @@ public class EdgeQueryWithIndex {
 
 			}
 
-			
+			eIscan.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-		
+
 		int totalEdges = edgeList.size();
-		int i, j;
+		int i, j, count = 0;
 		Edge firstEdge, secondEdge;
 		NID firstEdgeDestination, secondEdgeSource;
 		Node incidentNode = new Node();
@@ -550,30 +579,35 @@ public class EdgeQueryWithIndex {
 				try {
 					firstEdgeDestination = firstEdge.getDestination();
 					secondEdgeSource = secondEdge.getSource();
-					if (firstEdgeDestination.pageNo.pid == secondEdge.getSource().pageNo.pid) {
+					if (firstEdgeDestination.pageNo.pid == secondEdge
+							.getSource().pageNo.pid) {
 						if (firstEdgeDestination.slotNo == secondEdgeSource.slotNo) {
 							try {
-								incidentNode = nhf.getRecord(firstEdgeDestination);
+								incidentNode = nhf
+										.getRecord(firstEdgeDestination);
 								incidentNode.setHdr();
 							} catch (Exception e) {
 
 								e.printStackTrace();
 							}
-							System.out.println("Edges " + firstEdge.getLabel() + " and " + secondEdge.getLabel()
-									+ " are incident on Node " + incidentNode.getLabel());
+							System.out.println("Edges " + firstEdge.getLabel()
+									+ " and " + secondEdge.getLabel()
+									+ " are incident on Node "
+									+ incidentNode.getLabel());
+							count++;
 						}
 					}
-				} catch (FieldNumberOutOfBoundException  e) {
+				} catch (FieldNumberOutOfBoundException e) {
 
 					e.printStackTrace();
 
-				}catch(IOException e) {
+				} catch (IOException e) {
 
 					e.printStackTrace();
 				}
 
 			}
-
+			System.out.println("No. of incident edge pairs "+count);
 		}
 
 	}
