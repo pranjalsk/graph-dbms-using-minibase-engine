@@ -100,7 +100,7 @@ public class NodeQuery {
 						+ nodeDescriptor.get(2) + " , " + nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4)+"]");
 				t = sort.get_next();
 			}
-			sort.close();
+			//sort.close();
 			nfscan.close();
 			
 		} catch (Exception e) {
@@ -264,7 +264,7 @@ public class NodeQuery {
 				
 				
 				BatchInsert bInsert = new BatchInsert();
-				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, nhf);
+				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, nhf,btf_node_label);
 				
 				List<String> outgoingEdges = new ArrayList<String>();
 				List<String> incomingEdges = new ArrayList<String>();
@@ -368,7 +368,7 @@ public class NodeQuery {
 				
 				
 				BatchInsert bInsert = new BatchInsert();
-				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, nhf);
+				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, nhf, btf_node_label);
 				
 				List<String> outgoingEdges = new ArrayList<String>();
 				List<String> incomingEdges = new ArrayList<String>();

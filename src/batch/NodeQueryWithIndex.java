@@ -363,7 +363,7 @@ public class NodeQueryWithIndex {
 						+ nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4)
 						+ "]");
 				BatchInsert bInsert = new BatchInsert();
-				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, nhf);
+				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, nhf, btf_node_label);
 
 				List<String> outgoingEdges = new ArrayList<String>();
 				List<String> incomingEdges = new ArrayList<String>();
@@ -477,7 +477,7 @@ public class NodeQueryWithIndex {
 						+ nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4)
 						+ "]");
 				BatchInsert bInsert = new BatchInsert();
-				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, nhf);
+				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, nhf, btf_node_label);
 
 				List<String> outgoingEdges = new ArrayList<String>();
 				List<String> incomingEdges = new ArrayList<String>();

@@ -4,6 +4,7 @@ import java.io.*;
 import global.*;
 import bufmgr.*;
 import diskmgr.*;
+import edgeheap.EdgeHeapFile;
 import heap.*;
 import index.*;
 import chainexception.*;

@@ -26,8 +26,8 @@ public class BatchEdgeDelete {
 				
 				
 				BatchInsert batchinsert = new BatchInsert();
-				NID sourceNID = batchinsert.getNidFromNodeLabel(sourceLabel, nhf);
-				NID destinationNID = batchinsert.getNidFromNodeLabel(destinationLabel, nhf);
+				NID sourceNID = batchinsert.getNidFromNodeLabel(sourceLabel, nhf, btf_node);
+				NID destinationNID = batchinsert.getNidFromNodeLabel(destinationLabel, nhf,btf_node);
 				EID newEid = batchinsert.getEidFromEdgeLabel(sourceNID, destinationNID, edgeLabel, ehf, btfEdgeLabl);
 				
 				EID currentEid = new EID();

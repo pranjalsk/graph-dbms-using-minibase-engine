@@ -222,7 +222,7 @@ public class EdgeQuery {
 				t = sort.get_next();
 			}
 			efscan.close();
-			sort.close();
+			//sort.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 
@@ -437,7 +437,6 @@ public class EdgeQuery {
 							count++;
 						}
 					}
-					System.out.println("No. of incident edge pairs "+count);
 				} catch (FieldNumberOutOfBoundException  e) {
 
 					e.printStackTrace();
@@ -451,5 +450,6 @@ public class EdgeQuery {
 
 		}
 
+		System.out.println("No. of incident edge pairs "+count);
 	}
 }

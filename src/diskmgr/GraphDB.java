@@ -123,9 +123,9 @@ public class GraphDB extends DB {
 		ehf = new EdgeHeapFile("EdgeHeapFile_"+graphDBName);
 		//System.out.println("edge heap file created");
 		
-		btf_node = new BTreeFile("IndexNodeLabel", keyTypeString, 32, 1);
-		btf_edge_label = new BTreeFile("IndexEdgeLabel", keyTypeString, 32, 1);
-		btf_edge_weight = new BTreeFile("IndexEdgeWeight", keyTypeInt, 4, 1);
+		btf_node = new BTreeFile("IndexNodeLabel", keyTypeString, 32, 0);
+		btf_edge_label = new BTreeFile("IndexEdgeLabel", keyTypeString, 32, 0);
+		btf_edge_weight = new BTreeFile("IndexEdgeWeight", keyTypeInt, 4, 0);
 		ztf_node_desc = new ZTreeFile();
 		
 	}
@@ -344,6 +344,7 @@ public class GraphDB extends DB {
 					hashSet.add(srcNID);
 				}
 			}
+			newEscan.closescan();
 			return hashSet.size();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -376,6 +377,7 @@ public class GraphDB extends DB {
 					hashSet.add(destNID);
 				}
 			}
+			newEscan.closescan();
 			return hashSet.size();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -415,6 +417,7 @@ public class GraphDB extends DB {
 					hashSet.add(edgeLbl);
 				}
 			}
+			newEscan.closescan();
 			edgeLabelCnt = hashSet.size();
 		} catch (Exception e) {
 			e.printStackTrace();

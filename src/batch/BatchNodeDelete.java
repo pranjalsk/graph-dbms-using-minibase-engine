@@ -41,7 +41,7 @@ public class BatchNodeDelete {
 				NID currentNid = new NID(); // To store a copy of the nid
 
 				// Delete the node
-				NID newNid = batchinsert.getNidFromNodeLabel(nodeLabel, nhf);
+				NID newNid = batchinsert.getNidFromNodeLabel(nodeLabel, nhf, btfNodeLbl);
 				currentNid.copyNid(newNid);
 				
 				Node deletedNode =  nhf.getRecord(currentNid);	
@@ -52,9 +52,8 @@ public class BatchNodeDelete {
 				KeyClass lblKey = new StringKey(lbl);
 				
 				deleteStatus = nhf.deleteRecord(newNid);
-				
-				ztfNodeDesc.Delete(descKey, currentNid);
-				btfNodeLbl.Delete(lblKey, currentNid);
+				NID nidToDel = new NID();
+				nidToDel.copyNid(currentNid);
 
 				// Delete all edges associated with the node
 				EID newEid = new EID();
@@ -93,6 +92,9 @@ public class BatchNodeDelete {
 					}// end-if
 				}// end-while
 				newEscan.closescan();
+
+				ztfNodeDesc.Delete(descKey, nidToDel);
+				btfNodeLbl.Delete(lblKey, nidToDel);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

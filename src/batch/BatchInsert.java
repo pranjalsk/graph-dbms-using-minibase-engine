@@ -12,7 +12,7 @@ public class BatchInsert {
 	/* Function to find the NID for a given Node label
 	 * We get the node heap file from the GraphDB instance; this is passed as argument
 	 */
-	public NID getNidFromNodeLabel(String nodeLabel, NodeHeapfile nhf) throws Exception{
+	public NID getNidFromNodeLabel(String nodeLabel, NodeHeapfile nhf, BTreeFile btf_node) throws Exception{
 		try{
 			NID newNid = new NID();
 			NScan newNscan = nhf.openScan();
@@ -40,7 +40,7 @@ public class BatchInsert {
 //			LeafData newData = (LeafData)newEntry.data;
 //			newRid = newData.getData();
 //			NID newnid = new NID(newRid.pageNo, newRid.slotNo);
-//			
+//			newScan.DestroyBTreeFileScan();
 //			return newnid;
 		}
 		catch(Exception e){

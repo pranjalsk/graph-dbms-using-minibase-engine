@@ -438,7 +438,6 @@ public class EdgeQueryWithIndex {
 			upperBound = bound2;
 			lowerBound = bound1;
 		}
-
 		String edgeHeapFileName = ehf.get_fileName();
 		String edgeIndexFileName = btf_edge_weight.get_fileName();
 
@@ -460,7 +459,6 @@ public class EdgeQueryWithIndex {
 		projlist[3] = new FldSpec(rel, 4);
 		projlist[4] = new FldSpec(rel, 5);
 		projlist[5] = new FldSpec(rel, 6);
-
 		CondExpr[] expr = new CondExpr[3];
 		expr[0] = new CondExpr();
 		expr[0].op = new AttrOperator(AttrOperator.aopGE);
@@ -499,7 +497,7 @@ public class EdgeQueryWithIndex {
 				edge = eIscan.get_next();
 
 				System.out.println("Label: " + edgeLabel + " , Weight : "
-						+ edgeWeight + "Source Node PageID: "
+						+ edgeWeight + " Source Node PageID: "
 						+ sourceNodePageID + " , Source Node SlotID: "
 						+ sourceNodeSlotID + " , Destination Node PageID: "
 						+ destinationNodePageID
@@ -607,8 +605,8 @@ public class EdgeQueryWithIndex {
 				}
 
 			}
-			System.out.println("No. of incident edge pairs "+count);
 		}
 
+		System.out.println("No. of incident edge pairs "+count);
 	}
 }

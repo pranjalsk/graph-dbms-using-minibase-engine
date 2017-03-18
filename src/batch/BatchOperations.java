@@ -195,7 +195,7 @@ public class BatchOperations {
 				case 11:
 					try {
 						BatchEdgeInsert newEdgeInsert = new BatchEdgeInsert();
-						newEdgeInsert.insertBatchEdge(gdb.ehf, gdb.nhf,
+						newEdgeInsert.insertBatchEdge(gdb.ehf, gdb.nhf, gdb.btf_node,
 								filePath);
 						System.out.println("Batch edge insertion done");
 						gdb.createBTEdgeLabel();
@@ -320,7 +320,7 @@ public class BatchOperations {
 							} else if (qtype == 4) {
 								eqi.query4(gdb.ehf, gdb.btf_edge_weight, edgeLabelLength, (short)numBuf);
 							} else if (qtype == 5) {
-								eqi.query5(gdb.ehf, gdb.btf_edge_weight, edgeLabelLength, (short)numBuf, edgeWtBound1, edgeWtBound1);
+								eqi.query5(gdb.ehf, gdb.btf_edge_weight, edgeLabelLength, (short)numBuf, edgeWtBound1, edgeWtBound2);
 							}else if(qtype == 6){
 								eqi.query6(gdb.ehf, gdb.btf_edge_label, gdb.nhf, edgeLabelLength, (short)numBuf);
 							}
