@@ -347,9 +347,8 @@ public class BatchOperations {
 		System.out.println("NodeCount " + n);
 		int n1 = newGDB.getEdgeCnt();
 		System.out.println("EdgeCount " + n1);
-		PCounter pCount = new PCounter();
-		System.out.println("Number of pages read :" + pCount.getRCounter());
-		System.out.println("Number of pages written :" + pCount.getWCounter());
+		System.out.println("Number of pages read :" + PCounter.getRCounter());
+		System.out.println("Number of pages written :" + PCounter.getWCounter());
 
 	}
 
