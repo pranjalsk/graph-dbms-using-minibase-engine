@@ -1,4 +1,5 @@
 package batch;
+
 import java.io.*;
 
 import btree.BTreeFile;
@@ -12,50 +13,57 @@ import global.*;
 
 public class BatchEdgeDelete {
 
-	public void deleteBatchEdge(EdgeHeapFile ehf, NodeHeapfile nhf, BTreeFile btf_node, BTreeFile btfEdgeLabl,
-			BTreeFile btfEdgeWt, String filePath) throws Exception{
-		try{
+	public void deleteBatchEdge(EdgeHeapFile ehf, NodeHeapfile nhf,
+			BTreeFile btf_node, BTreeFile btfEdgeLabl, BTreeFile btfEdgeWt,
+			String filePath) throws Exception {
+		try {
 			BufferedReader br = new BufferedReader(new FileReader(filePath));
 			String newInput = "";
-			while((newInput = br.readLine()) != null){
+			while ((newInput = br.readLine()) != null) {
 				String inputAttributes[] = newInput.trim().split(" ");
 				String sourceLabel = inputAttributes[0];
 				String destinationLabel = inputAttributes[1];
 				String edgeLabel = inputAttributes[2];
-				
-				
-				
+
 				BatchInsert batchinsert = new BatchInsert();
-				NID sourceNID = batchinsert.getNidFromNodeLabel(sourceLabel, nhf, btf_node);
-				NID destinationNID = batchinsert.getNidFromNodeLabel(destinationLabel, nhf,btf_node);
-				EID newEid = batchinsert.getEidFromEdgeLabel(sourceNID, destinationNID, edgeLabel, ehf, btfEdgeLabl);
-				
-				EID currentEid = new EID();
-				currentEid.copyEID(newEid);
-				
-				Edge deletedEdge =  ehf.getRecord(currentEid);
-				deletedEdge.setHdr();
-				String edgelbl = deletedEdge.getLabel();
-				int edgeWt = deletedEdge.getWeight();
-				
-				KeyClass edgelblKey = new StringKey(edgelbl);
-				KeyClass edgeWtKey = new IntegerKey(edgeWt);			
-					
-				
-				try {
-					boolean deleteStatus = ehf.deleteRecord(newEid);
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				NID sourceNID = batchinsert.getNidFromNodeLabel(sourceLabel,
+						nhf, btf_node);
+				NID destinationNID = batchinsert.getNidFromNodeLabel(
+						destinationLabel, nhf, btf_node);
+				if (sourceNID.pageNo.pid != -1 && sourceNID.slotNo != -1
+						&& destinationNID.pageNo.pid != -1
+						&& destinationNID.slotNo != -1) {
+
+					EID newEid = batchinsert.getEidFromEdgeLabel(sourceNID,
+							destinationNID, edgeLabel, ehf, btfEdgeLabl);
+					if (newEid.pageNo.pid != -1 && newEid.slotNo != -1) {
+
+						EID currentEid = new EID();
+						currentEid.copyEID(newEid);
+						Edge deletedEdge = ehf.getRecord(currentEid);
+						deletedEdge.setHdr();
+						String edgelbl = deletedEdge.getLabel();
+						int edgeWt = deletedEdge.getWeight();
+						KeyClass edgelblKey = new StringKey(edgelbl);
+						KeyClass edgeWtKey = new IntegerKey(edgeWt);
+
+						try {
+							boolean deleteStatus = ehf.deleteRecord(newEid);
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+
+						btfEdgeLabl.Delete(edgelblKey, currentEid);
+						btfEdgeWt.Delete(edgeWtKey, currentEid);
+					}
+
 				}
-				
-				btfEdgeLabl.Delete(edgelblKey, currentEid);
-				btfEdgeWt.Delete(edgeWtKey, currentEid);	
+
 			}
-		}
-		catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 }

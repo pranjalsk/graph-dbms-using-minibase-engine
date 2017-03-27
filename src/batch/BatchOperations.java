@@ -177,8 +177,7 @@ public class BatchOperations {
 						while ((sCurrentLine = br.readLine()) != null) {
 
 							BatchNodeInsert newNodeInsert = new BatchNodeInsert();
-							newNodeInsert
-									.insertBatchNode(gdb.nhf, sCurrentLine);
+							newNodeInsert.insertBatchNode(gdb.nhf, sCurrentLine);
 						}
 						System.out.println("Batch Nodes insertion done");
 						printStatistics(gdb);
