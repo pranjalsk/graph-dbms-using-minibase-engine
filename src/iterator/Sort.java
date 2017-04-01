@@ -643,7 +643,6 @@ public class Sort extends Iterator implements GlobalConst {
 		n_tempfiles = ARBIT_RUNS;
 		n_tuples = new int[ARBIT_RUNS];
 		n_runs = ARBIT_RUNS;
-
 		try {
 			temp_files[0] = new Heapfile(null);
 		} catch (Exception e) {
@@ -666,6 +665,7 @@ public class Sort extends Iterator implements GlobalConst {
 		} catch (Exception e) {
 			throw new SortException(e, "Sort.java: op_buf.setHdr() failed");
 		}
+
 	}
 
 	/**
@@ -838,7 +838,9 @@ public class Sort extends Iterator implements GlobalConst {
 	public void close() throws SortException, IOException {
 		// clean up
 		if (!closeFlag) {
-
+			for(int i = 0; i < i_buf.length;i++){
+				i_buf[i].close();
+			}
 			try {
 				_am.close();
 			} catch (Exception e) {
