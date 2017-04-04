@@ -12,11 +12,13 @@ import edgeheap.Edge;
 import edgeheap.EdgeHeapFile;
 import global.AttrOperator;
 import global.AttrType;
+import global.Descriptor;
 import global.EID;
 import global.IndexType;
 import global.NID;
 import heap.FieldNumberOutOfBoundException;
 import index.EdgeIndexScan;
+import index.NodeIndexScan;
 import iterator.CondExpr;
 import iterator.FldSpec;
 import iterator.RelSpec;
@@ -124,147 +126,131 @@ public class EdgeQueryWithIndex {
 		}
 	}
 
-	public void query1(EdgeHeapFile ehf, BTreeFile btf_edge_label,
-			NodeHeapfile nhf, short edgeLabelLength, short numBuf) {
+	public void query1(EdgeHeapFile ehf, BTreeFile btf_node_label,
+			NodeHeapfile nhf, short nodeLabelLength, short numBuf) {
 
-		String edgeHeapFileName = ehf.get_fileName();
-		String edgeIndexFileName = btf_edge_label.get_fileName();
-
-		AttrType[] attrType = new AttrType[6];
+		String nodeHeapFileName = nhf.get_fileName();
+		String nodeIndexFileName = btf_node_label.get_fileName();
+		AttrType[] attrType = new AttrType[2];
 		short[] stringSize = new short[1];
-		stringSize[0] = edgeLabelLength;
-		attrType[0] = new AttrType(AttrType.attrInteger);
-		attrType[1] = new AttrType(AttrType.attrInteger);
-		attrType[2] = new AttrType(AttrType.attrInteger);
-		attrType[3] = new AttrType(AttrType.attrInteger);
-		attrType[4] = new AttrType(AttrType.attrString);
-		attrType[5] = new AttrType(AttrType.attrInteger);
-
-		FldSpec[] projlist = new FldSpec[6];
+		stringSize[0] = nodeLabelLength;
+		attrType[0] = new AttrType(AttrType.attrString);
+		attrType[1] = new AttrType(AttrType.attrDesc);
+		FldSpec[] projlist = new FldSpec[2];
 		RelSpec rel = new RelSpec(RelSpec.outer);
 		projlist[0] = new FldSpec(rel, 1);
 		projlist[1] = new FldSpec(rel, 2);
-		projlist[2] = new FldSpec(rel, 3);
-		projlist[3] = new FldSpec(rel, 4);
-		projlist[4] = new FldSpec(rel, 5);
-		projlist[5] = new FldSpec(rel, 6);
 
 		CondExpr[] expr = null;
 		IndexType indType = new IndexType(1);
-		Edge edge = new Edge();
-		Map<String, ArrayList<Edge>> sorceNodeToEdgeMap = new TreeMap<String, ArrayList<Edge>>();
+		Node node = new Node();
 		try {
-			EdgeIndexScan eIscan = new EdgeIndexScan(indType, edgeHeapFileName,
-					edgeIndexFileName, attrType, stringSize, 6, 6, projlist,
-					expr, 6, false);
-			edge = eIscan.get_next();
-			while (edge != null) {
-				edge.setHdr();
-				NID sourceNID = new NID();
-				sourceNID = edge.getSource();
-				Node sourceNode = nhf.getRecord(sourceNID);
-				sourceNode.setHdr();
-				String sourceLabel = sourceNode.getLabel();
-				if (sorceNodeToEdgeMap.containsKey(sourceLabel)) {
-					ArrayList<Edge> tempList = sorceNodeToEdgeMap
-							.get(sourceLabel);
-					tempList.add(new Edge(edge));
-					sorceNodeToEdgeMap.put(sourceLabel, tempList);
-				} else {
-					ArrayList<Edge> tempList = new ArrayList<Edge>();
-					tempList.add(new Edge(edge));
-					sorceNodeToEdgeMap.put(sourceLabel, tempList);
+			NodeIndexScan nIscan = new NodeIndexScan(indType, nodeHeapFileName,
+					nodeIndexFileName, attrType, stringSize, 2, 2, projlist,
+					expr, 1, false);
+			node = nIscan.get_next();
+			String nodeLabel;
+
+			while (node != null) {
+				node.setHdr();
+				nodeLabel = node.getLabel();
+				BatchInsert bInsert = new BatchInsert();
+				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, nhf,btf_node_label);
+				
+				
+				EID eid = new EID();
+				Edge edge;
+				try {
+
+					NID sourceNID;
+					EScan escan = ehf.openScan();
+					edge = escan.getNext(eid);
+					while (edge != null) {
+						edge.setHdr();
+						sourceNID = edge.getSource();
+						
+						if(nodeNID.equals(sourceNID)){
+							System.out.println("Label: "+edge.getLabel() + " , Weight: " + edge.getWeight() + " , Source Node Label: " + node.getLabel());
+						}
+							
+						edge = escan.getNext(eid);
+					}
+					escan.closescan();
+					
+					
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
-
-				edge = eIscan.get_next();
-
+				node = nIscan.get_next();
 			}
-
-			for (String sourceNodeLab : sorceNodeToEdgeMap.keySet()) {
-				ArrayList<Edge> edgeList = sorceNodeToEdgeMap
-						.get(sourceNodeLab);
-				for (Edge edgeToPrint : edgeList) {
-					System.out.println("Label: " + edgeToPrint.getLabel()
-							+ " , Weight: " + edgeToPrint.getWeight()
-							+ " , Source Node Label: " + sourceNodeLab);
-				}
-			}
-			eIscan.close();
+			nIscan.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 	}
 
-	public void query2(EdgeHeapFile ehf, BTreeFile btf_edge_label,
-			NodeHeapfile nhf, short edgeLabelLength, short numBuf) {
-		System.out.println("query1");
-
-		String edgeHeapFileName = ehf.get_fileName();
-		String edgeIndexFileName = btf_edge_label.get_fileName();
-
-		AttrType[] attrType = new AttrType[6];
+	public void query2(EdgeHeapFile ehf, BTreeFile btf_node_label,
+			NodeHeapfile nhf, short nodeLabelLength, short numBuf) {
+		
+		String nodeHeapFileName = nhf.get_fileName();
+		String nodeIndexFileName = btf_node_label.get_fileName();
+		AttrType[] attrType = new AttrType[2];
 		short[] stringSize = new short[1];
-		stringSize[0] = edgeLabelLength;
-		attrType[0] = new AttrType(AttrType.attrInteger);
-		attrType[1] = new AttrType(AttrType.attrInteger);
-		attrType[2] = new AttrType(AttrType.attrInteger);
-		attrType[3] = new AttrType(AttrType.attrInteger);
-		attrType[4] = new AttrType(AttrType.attrString);
-		attrType[5] = new AttrType(AttrType.attrInteger);
-
-		FldSpec[] projlist = new FldSpec[6];
+		stringSize[0] = nodeLabelLength;
+		attrType[0] = new AttrType(AttrType.attrString);
+		attrType[1] = new AttrType(AttrType.attrDesc);
+		FldSpec[] projlist = new FldSpec[2];
 		RelSpec rel = new RelSpec(RelSpec.outer);
 		projlist[0] = new FldSpec(rel, 1);
 		projlist[1] = new FldSpec(rel, 2);
-		projlist[2] = new FldSpec(rel, 3);
-		projlist[3] = new FldSpec(rel, 4);
-		projlist[4] = new FldSpec(rel, 5);
-		projlist[5] = new FldSpec(rel, 6);
 
 		CondExpr[] expr = null;
 		IndexType indType = new IndexType(1);
-		Edge edge = new Edge();
-		Map<String, ArrayList<Edge>> destNodeToEdgeMap = new TreeMap<String, ArrayList<Edge>>();
+		Node node = new Node();
 		try {
-			EdgeIndexScan eIscan = new EdgeIndexScan(indType, edgeHeapFileName,
-					edgeIndexFileName, attrType, stringSize, 6, 6, projlist,
-					expr, 6, false);
-			edge = eIscan.get_next();
-			while (edge != null) {
-				edge.setHdr();
-				NID destNID = new NID();
-				destNID = edge.getDestination();
-				Node destNode = nhf.getRecord(destNID);
-				destNode.setHdr();
-				String destLabel = destNode.getLabel();
-				if (destNodeToEdgeMap.containsKey(destLabel)) {
-					ArrayList<Edge> tempList = destNodeToEdgeMap.get(destLabel);
-					tempList.add(new Edge(edge));
-					destNodeToEdgeMap.put(destLabel, tempList);
-				} else {
-					ArrayList<Edge> tempList = new ArrayList<Edge>();
-					tempList.add(new Edge(edge));
-					destNodeToEdgeMap.put(destLabel, tempList);
+			NodeIndexScan nIscan = new NodeIndexScan(indType, nodeHeapFileName,
+					nodeIndexFileName, attrType, stringSize, 2, 2, projlist,
+					expr, 1, false);
+			node = nIscan.get_next();
+			String nodeLabel;
+
+			while (node != null) {
+				node.setHdr();
+				nodeLabel = node.getLabel();
+				BatchInsert bInsert = new BatchInsert();
+				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, nhf,btf_node_label);
+				
+				
+				EID eid = new EID();
+				Edge edge;
+				try {
+
+					NID destNID;
+					EScan escan = ehf.openScan();
+					edge = escan.getNext(eid);
+					while (edge != null) {
+						edge.setHdr();
+						destNID = edge.getDestination();
+						
+						if(nodeNID.equals(destNID)){
+							System.out.println("Label: "+edge.getLabel() + " , Weight: " + edge.getWeight() + " , Destination Node Label: " + node.getLabel());
+						}
+							
+						edge = escan.getNext(eid);
+					}
+					escan.closescan();
+					
+					
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
-
-				edge = eIscan.get_next();
-
+				node = nIscan.get_next();
 			}
-
-			for (String destNodeLab : destNodeToEdgeMap.keySet()) {
-				ArrayList<Edge> edgeList = destNodeToEdgeMap.get(destNodeLab);
-				for (Edge edgeToPrint : edgeList) {
-					System.out.println("Label: " + edgeToPrint.getLabel()
-							+ " , Weight: " + edgeToPrint.getWeight()
-							+ " , Destination Node Label: " + destNodeLab);
-				}
-			}
-			eIscan.close();
+			nIscan.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	/**
@@ -514,7 +500,7 @@ public class EdgeQueryWithIndex {
 
 	public void query6(EdgeHeapFile ehf, BTreeFile btf_edge_label,
 			NodeHeapfile nhf, short edgeLabelLength, short numBuf) {
-		String edgeHeapFileName = ehf.get_fileName();
+		/*String edgeHeapFileName = ehf.get_fileName();
 		String edgeIndexFileName = btf_edge_label.get_fileName();
 		ArrayList<Edge> edgeList = new ArrayList<Edge>();
 
@@ -607,6 +593,72 @@ public class EdgeQueryWithIndex {
 			}
 		}
 
+		System.out.println("No. of incident edge pairs "+count);*/
+		
+		
+		String edgeHeapFileName = ehf.get_fileName();
+		String edgeIndexFileName = btf_edge_label.get_fileName();
+
+		AttrType[] attrType = new AttrType[6];
+		short[] stringSize = new short[1];
+		stringSize[0] = edgeLabelLength;
+		attrType[0] = new AttrType(AttrType.attrInteger);
+		attrType[1] = new AttrType(AttrType.attrInteger);
+		attrType[2] = new AttrType(AttrType.attrInteger);
+		attrType[3] = new AttrType(AttrType.attrInteger);
+		attrType[4] = new AttrType(AttrType.attrString);
+		attrType[5] = new AttrType(AttrType.attrInteger);
+
+		FldSpec[] projlist = new FldSpec[6];
+		RelSpec rel = new RelSpec(RelSpec.outer);
+		projlist[0] = new FldSpec(rel, 1);
+		projlist[1] = new FldSpec(rel, 2);
+		projlist[2] = new FldSpec(rel, 3);
+		projlist[3] = new FldSpec(rel, 4);
+		projlist[4] = new FldSpec(rel, 5);
+		projlist[5] = new FldSpec(rel, 6);
+
+		CondExpr[] expr = null;
+		IndexType indType = new IndexType(1);
+		
+		int count = 0;
+		Edge edgeOuter;
+		try {
+			EdgeIndexScan eOuterscan = new EdgeIndexScan(indType, edgeHeapFileName,
+					edgeIndexFileName, attrType, stringSize, 6, 6, projlist,
+					expr, 5, false);
+			edgeOuter = eOuterscan.get_next();
+
+			while (edgeOuter != null) {
+				edgeOuter.setHdr();
+				NID outerEdgeDist = edgeOuter.getDestination();
+				
+				Edge edgeInner;
+				EdgeIndexScan eInnerscan = new EdgeIndexScan(indType, edgeHeapFileName,
+						edgeIndexFileName, attrType, stringSize, 6, 6, projlist,
+						expr, 5, false);
+				edgeInner = eInnerscan.get_next();
+				
+				while(edgeInner != null){
+					edgeInner.setHdr();
+					NID innerEdgeDist = edgeInner.getDestination();
+					if(edgeInner.getLabel() != edgeOuter.getLabel() && edgeInner.getWeight() != edgeOuter.getWeight() 
+							&& edgeInner.getSource() != edgeOuter.getSource() && edgeInner.getDestination() != edgeOuter.getDestination()){
+						if(outerEdgeDist.equals(innerEdgeDist)){
+							System.out.println("Edges " + edgeOuter.getLabel() + " and " + edgeInner.getLabel()
+									+ " are incident pairs.");
+							count++;
+						}
+					}
+					edgeInner = eInnerscan.get_next();
+				}
+				eInnerscan.close();
+				edgeOuter = eOuterscan.get_next();
+			}
+			eOuterscan.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		System.out.println("No. of incident edge pairs "+count);
 	}
 }

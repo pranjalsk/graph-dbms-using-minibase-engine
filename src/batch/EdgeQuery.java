@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 
+import btree.BTreeFile;
+
 import edgeheap.EScan;
 import edgeheap.Edge;
 import edgeheap.EdgeHeapFile;
@@ -76,42 +78,69 @@ public class EdgeQuery {
 	 * @param ehf Edge Heap File
 	 * @param nhf Node Heap File
 	 */
-	public void query1(EdgeHeapFile ehf, NodeHeapfile nhf) {
+	public void query1(EdgeHeapFile ehf, NodeHeapfile nhf, BTreeFile btf_node_label,short nodeLabelLength, short numBuf) {
 		
-		EID eid = new EID();
-		Edge edge;
+		String nodeHeapFileName = nhf.get_fileName();
+		AttrType[] attrType = new AttrType[2];
+		short[] stringSize = new short[1];
+		stringSize[0] = nodeLabelLength;
+		attrType[0] = new AttrType(AttrType.attrString);
+		attrType[1] = new AttrType(AttrType.attrDesc);
+		FldSpec[] projlist = new FldSpec[2];
+		RelSpec rel = new RelSpec(RelSpec.outer);
+		projlist[0] = new FldSpec(rel, 1);
+		projlist[1] = new FldSpec(rel, 2);
+
+		TupleOrder[] order = new TupleOrder[2];
+		order[0] = new TupleOrder(TupleOrder.Ascending);
+		order[1] = new TupleOrder(TupleOrder.Descending);
+
+		Node node = new Node();
 		try {
+			NFileScan nfscan = new NFileScan(nodeHeapFileName, attrType, stringSize, (short) 2, 2, projlist, null);
+			Sort sort = new Sort(attrType, (short) 2, stringSize, nfscan, 1, order[0], nodeLabelLength, numBuf);
 
-			EScan escan = ehf.openScan();
-			edge = escan.getNext(eid);
+			String nodeLabel;
+			Tuple t;
+			t = sort.get_next();
 
-			Map<String, ArrayList<Edge>> sorceNodeToEdgeMap = new TreeMap<String, ArrayList<Edge>>();
-			while (edge != null) {
-				edge.setHdr();
-				NID sourceNID = new NID();
-				sourceNID = edge.getSource();
-				Node sourceNode = nhf.getRecord(sourceNID);
-				sourceNode.setHdr();
-				String sourceLabel = sourceNode.getLabel();
-				if (sorceNodeToEdgeMap.containsKey(sourceLabel)) {
-					ArrayList<Edge> tempList = sorceNodeToEdgeMap.get(sourceLabel);
-					tempList.add(new Edge(edge));
-					sorceNodeToEdgeMap.put(sourceLabel, tempList);
-				} else {
-					ArrayList<Edge> tempList = new ArrayList<Edge>();
-					tempList.add(new Edge(edge));
-					sorceNodeToEdgeMap.put(sourceLabel, tempList);
+			while (t != null) {
+				node.nodeInit(t.getTupleByteArray(), t.getOffset());
+				node.setHdr();
+				nodeLabel = node.getLabel();
+				BatchInsert bInsert = new BatchInsert();
+				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, nhf,btf_node_label);
+				
+				
+				EID eid = new EID();
+				Edge edge;
+				try {
+
+					NID sourceNID;
+					EScan escan = ehf.openScan();
+					edge = escan.getNext(eid);
+					while (edge != null) {
+						edge.setHdr();
+						sourceNID = edge.getSource();
+						
+						if(nodeNID.equals(sourceNID)){
+							System.out.println("Label: "+edge.getLabel() + " , Weight: " + edge.getWeight() + " , Source Node Label: " + node.getLabel());
+						}
+							
+						edge = escan.getNext(eid);
+					}
+					escan.closescan();
+					
+					
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
-				edge = escan.getNext(eid);
+				
+				t = sort.get_next();
 			}
-
-			for (String sourceNodeLab : sorceNodeToEdgeMap.keySet()) {
-				ArrayList<Edge> edgeList = sorceNodeToEdgeMap.get(sourceNodeLab);
-				for (Edge edgeToPrint : edgeList) {
-					System.out.println("Label: "+edgeToPrint.getLabel() + " , Weight: " + edgeToPrint.getWeight() + " , Source Node Label: " + sourceNodeLab);
-				}
-			}
-			escan.closescan();
+			nfscan.close();
+			sort.close();
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -123,44 +152,72 @@ public class EdgeQuery {
 	 * @param ehf Edge Heap File
 	 * @param nhf Node Heap File
 	 */
-	public void query2(EdgeHeapFile ehf, NodeHeapfile nhf) {
-		EID eid = new EID();
-		Edge edge;
-		try {
-			EScan escan = ehf.openScan();
-			edge = escan.getNext(eid);
+	public void query2(EdgeHeapFile ehf, NodeHeapfile nhf, BTreeFile btf_node_label,short nodeLabelLength, short numBuf) {
 		
-			Map<String, ArrayList<Edge>> destNodeToEdgeMap = new TreeMap<String, ArrayList<Edge>>();
-			while (edge != null) {
-				edge.setHdr();
-				NID destNID = new NID();
-				destNID = edge.getDestination();
-				Node destNode = nhf.getRecord(destNID);
-				destNode.setHdr();
-				String destLabel = destNode.getLabel();
-				if (destNodeToEdgeMap.containsKey(destLabel)) {
-					ArrayList<Edge> tempList = destNodeToEdgeMap.get(destLabel);
-					tempList.add(new Edge(edge));
-					destNodeToEdgeMap.put(destLabel, tempList);
-				} else {
-					ArrayList<Edge> tempList = new ArrayList<Edge>();
-					tempList.add(new Edge(edge));
-					destNodeToEdgeMap.put(destLabel, tempList);
-				}
-				edge = escan.getNext(eid);
-			}
+		String nodeHeapFileName = nhf.get_fileName();
+		AttrType[] attrType = new AttrType[2];
+		short[] stringSize = new short[1];
+		stringSize[0] = nodeLabelLength;
+		attrType[0] = new AttrType(AttrType.attrString);
+		attrType[1] = new AttrType(AttrType.attrDesc);
+		FldSpec[] projlist = new FldSpec[2];
+		RelSpec rel = new RelSpec(RelSpec.outer);
+		projlist[0] = new FldSpec(rel, 1);
+		projlist[1] = new FldSpec(rel, 2);
 
-			for (String destNodeLab : destNodeToEdgeMap.keySet()) {
-				ArrayList<Edge> edgeList = destNodeToEdgeMap.get(destNodeLab);
-				for (Edge edgeToPrint : edgeList) {
-					System.out.println("Label: "+edgeToPrint.getLabel() + " , Weight: " + edgeToPrint.getWeight() + " , Destination Node Label: " + destNodeLab);
+		TupleOrder[] order = new TupleOrder[2];
+		order[0] = new TupleOrder(TupleOrder.Ascending);
+		order[1] = new TupleOrder(TupleOrder.Descending);
+
+		Node node = new Node();
+		try {
+			NFileScan nfscan = new NFileScan(nodeHeapFileName, attrType, stringSize, (short) 2, 2, projlist, null);
+			Sort sort = new Sort(attrType, (short) 2, stringSize, nfscan, 1, order[0], nodeLabelLength, numBuf);
+
+			String nodeLabel;
+			Tuple t;
+			t = sort.get_next();
+
+			while (t != null) {
+				node.nodeInit(t.getTupleByteArray(), t.getOffset());
+				node.setHdr();
+				nodeLabel = node.getLabel();
+				BatchInsert bInsert = new BatchInsert();
+				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, nhf,btf_node_label);
+				
+				
+				EID eid = new EID();
+				Edge edge;
+				try {
+
+					NID destNID;
+					EScan escan = ehf.openScan();
+					edge = escan.getNext(eid);
+					while (edge != null) {
+						edge.setHdr();
+						destNID = edge.getDestination();
+						
+						if(nodeNID.equals(destNID)){
+							System.out.println("Label: "+edge.getLabel() + " , Weight: " + edge.getWeight() + " , Destination Node Label: " + node.getLabel());
+						}
+							
+						edge = escan.getNext(eid);
+					}
+					escan.closescan();
+					
+					
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
+				
+				t = sort.get_next();
 			}
-			escan.closescan();
+			nfscan.close();
+			sort.close();
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	/**
@@ -222,7 +279,7 @@ public class EdgeQuery {
 				t = sort.get_next();
 			}
 			efscan.close();
-			//sort.close();
+			sort.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 
@@ -264,7 +321,7 @@ public class EdgeQuery {
 		Edge edge = new Edge();
 		try {
 			EFileScan efscan = new EFileScan(edgeHeapFileName, attrType, stringSize, (short) 6, 6, projlist, null);
-			Sort sort = new Sort(attrType, (short) 6, stringSize, efscan, 6, order[0], edgeLabelLength, numBuf);
+			Sort sort = new Sort(attrType, (short) 6, stringSize, efscan, 6, order[0], 4, numBuf);
 
 			String edgeLabel;
 			int sourceNodePageID, sourceNodeSlotID, destinationNodePageID, destinationNodeSlotID, edgeWeight;
@@ -286,8 +343,8 @@ public class EdgeQuery {
 						+ destinationNodeSlotID );
 				t = sort.get_next();
 			}
-			efscan.close();
 			sort.close();
+			efscan.close();
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -387,69 +444,44 @@ public class EdgeQuery {
 	 * @param ehf Edge Heap File
 	 * @param nhf Node Heap File
 	 */
-	public void query6(EdgeHeapFile ehf, NodeHeapfile nhf) {
+	public void query6(EdgeHeapFile ehf) {
 
-		EID eid = new EID();
-		Edge edge, edgeObj;
-		ArrayList<Edge> edgeList = new ArrayList<Edge>();
+		int count = 0;
+		Edge edgeOuter;
+		EID eidOuter = new EID();
 		try {
+			EScan eOuterscan = ehf.openScan();
+			edgeOuter = eOuterscan.getNext(eidOuter);
 
-			EScan escan = ehf.openScan();
-			edge = escan.getNext(eid);
-
-			while (edge != null) {
-				edge.setHdr();
-				edgeObj = new Edge(edge);
-				edgeList.add(edgeObj);
-				edge = escan.getNext(eid);
-			}
-			escan.closescan();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		int totalEdges = edgeList.size();
-		int i, j, count =0;
-		Edge firstEdge, secondEdge;
-		NID firstEdgeDestination, secondEdgeSource;
-		Node incidentNode = new Node();
-		for (i = 0; i < totalEdges; i++) {
-			firstEdge = (Edge) edgeList.get(i);
-			for (j = 0; j < totalEdges; j++) {
-				if (i == j)
-					continue;
-
-				secondEdge = edgeList.get(j);
-
-				try {
-					firstEdgeDestination = firstEdge.getDestination();
-					secondEdgeSource = secondEdge.getSource();
-					if (firstEdgeDestination.pageNo.pid == secondEdge.getSource().pageNo.pid) {
-						if (firstEdgeDestination.slotNo == secondEdgeSource.slotNo) {
-							try {
-								incidentNode = nhf.getRecord(firstEdgeDestination);
-								incidentNode.setHdr();
-							} catch (Exception e) {
-
-								e.printStackTrace();
-							}
-							System.out.println("Edges " + firstEdge.getLabel() + " and " + secondEdge.getLabel()
-									+ " are incident on Node " + incidentNode.getLabel());
+			while (edgeOuter != null) {
+				edgeOuter.setHdr();
+				NID outerEdgeDist = edgeOuter.getDestination();
+				
+				Edge edgeInner;
+				EID eidInner = new EID();
+				EScan eInnerscan = ehf.openScan();
+				edgeInner = eInnerscan.getNext(eidInner);
+				
+				while(edgeInner != null){
+					edgeInner.setHdr();
+					NID innerEdgeDist = edgeInner.getDestination();
+					if(edgeInner.getLabel() != edgeOuter.getLabel() && edgeInner.getWeight() != edgeOuter.getWeight() 
+							&& edgeInner.getSource() != edgeOuter.getSource() && edgeInner.getDestination() != edgeOuter.getDestination()){
+						if(outerEdgeDist.equals(innerEdgeDist)){
+							System.out.println("Edges " + edgeOuter.getLabel() + " and " + edgeInner.getLabel()
+									+ " are incident pairs.");
 							count++;
 						}
 					}
-				} catch (FieldNumberOutOfBoundException  e) {
-
-					e.printStackTrace();
-
-				}catch(IOException e) {
-
-					e.printStackTrace();
+					edgeInner = eInnerscan.getNext(eidInner);
 				}
-
+				eInnerscan.closescan();
+				edgeOuter = eOuterscan.getNext(eidOuter);
 			}
-
+			eOuterscan.closescan();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-
 		System.out.println("No. of incident edge pairs "+count);
 	}
 }

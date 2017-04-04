@@ -365,8 +365,8 @@ public class NodeQueryWithIndex {
 				BatchInsert bInsert = new BatchInsert();
 				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, nhf, btf_node_label);
 
-				List<String> outgoingEdges = new ArrayList<String>();
-				List<String> incomingEdges = new ArrayList<String>();
+				EdgeHeapFile tempIncomingEdgeFile = new EdgeHeapFile(null);
+				EdgeHeapFile tempOutgoingEdgeFile = new EdgeHeapFile(null);
 
 				EID eid = new EID();
 				Edge edge;
@@ -383,24 +383,40 @@ public class NodeQueryWithIndex {
 						sourceNID = edge.getSource();
 						destinationNID = edge.getDestination();
 
-						if (nodeNID.equals(sourceNID)) {
-							outgoingEdges.add(edgeLabel);
-						} else if (nodeNID.equals(destinationNID)) {
-							incomingEdges.add(edgeLabel);
+						if(nodeNID.equals(sourceNID)){
+							tempOutgoingEdgeFile.insertEdge(edge.getEdgeByteArray());
+						}
+						else if(nodeNID.equals(destinationNID)){
+							tempIncomingEdgeFile.insertEdge(edge.getEdgeByteArray());
 						}
 
 						edge = escan.getNext(eid);
 					}
-
-					System.out.println("Incoming Edges:");
-					for (String labelEdge : incomingEdges) {
-						System.out.println(labelEdge);
-					}
-					System.out.println("Outgoing Edges:");
-					for (String labelEdge : outgoingEdges) {
-						System.out.println(labelEdge);
-					}
 					escan.closescan();
+					
+					EScan incoming_edge_scan = tempIncomingEdgeFile.openScan();
+					EScan outgoing_edge_scan = tempOutgoingEdgeFile.openScan();
+					
+					edge = incoming_edge_scan.getNext(eid);
+					System.out.println("Incoming Edges:");
+					while (edge != null) {
+						edge.setHdr();
+						System.out.println(edge.getLabel());
+						edge = incoming_edge_scan.getNext(eid);
+					}
+					incoming_edge_scan.closescan();
+					edge = outgoing_edge_scan.getNext(eid);
+					System.out.println("Outgoing Edges:");
+					while (edge != null) {
+						edge.setHdr();
+						System.out.println(edge.getLabel());
+						edge = outgoing_edge_scan.getNext(eid);
+					}
+					outgoing_edge_scan.closescan();
+					
+					tempIncomingEdgeFile.deleteFile();
+					tempOutgoingEdgeFile.deleteFile();
+					
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -479,8 +495,8 @@ public class NodeQueryWithIndex {
 				BatchInsert bInsert = new BatchInsert();
 				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, nhf, btf_node_label);
 
-				List<String> outgoingEdges = new ArrayList<String>();
-				List<String> incomingEdges = new ArrayList<String>();
+				EdgeHeapFile tempIncomingEdgeFile = new EdgeHeapFile(null);
+				EdgeHeapFile tempOutgoingEdgeFile = new EdgeHeapFile(null);
 
 				EID eid = new EID();
 				Edge edge;
@@ -497,24 +513,39 @@ public class NodeQueryWithIndex {
 						sourceNID = edge.getSource();
 						destinationNID = edge.getDestination();
 
-						if (nodeNID.equals(sourceNID)) {
-							outgoingEdges.add(edgeLabel);
-						} else if (nodeNID.equals(destinationNID)) {
-							incomingEdges.add(edgeLabel);
+						if(nodeNID.equals(sourceNID)){
+							tempOutgoingEdgeFile.insertEdge(edge.getEdgeByteArray());
+						}
+						else if(nodeNID.equals(destinationNID)){
+							tempIncomingEdgeFile.insertEdge(edge.getEdgeByteArray());
 						}
 
 						edge = escan.getNext(eid);
 					}
-
-					System.out.println("Incoming Edges:");
-					for (String labelEdge : incomingEdges) {
-						System.out.println(labelEdge);
-					}
-					System.out.println("Outgoing Edges:");
-					for (String labelEdge : outgoingEdges) {
-						System.out.println(labelEdge);
-					}
 					escan.closescan();
+
+					EScan incoming_edge_scan = tempIncomingEdgeFile.openScan();
+					EScan outgoing_edge_scan = tempOutgoingEdgeFile.openScan();
+					
+					edge = incoming_edge_scan.getNext(eid);
+					System.out.println("Incoming Edges:");
+					while (edge != null) {
+						edge.setHdr();
+						System.out.println(edge.getLabel());
+						edge = incoming_edge_scan.getNext(eid);
+					}
+					incoming_edge_scan.closescan();
+					edge = outgoing_edge_scan.getNext(eid);
+					System.out.println("Outgoing Edges:");
+					while (edge != null) {
+						edge.setHdr();
+						System.out.println(edge.getLabel());
+						edge = outgoing_edge_scan.getNext(eid);
+					}
+					outgoing_edge_scan.closescan();
+					
+					tempIncomingEdgeFile.deleteFile();
+					tempOutgoingEdgeFile.deleteFile();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

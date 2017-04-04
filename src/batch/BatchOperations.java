@@ -291,9 +291,9 @@ public class BatchOperations {
 							if (qtype == 0) {
 								eq.query0(gdb.ehf, gdb.nhf);
 							} else if (qtype == 1) {
-								eq.query1(gdb.ehf, gdb.nhf);
+								eq.query1(gdb.ehf, gdb.nhf, gdb.btf_node, nodeLabelLength, (short)numBuf);
 							} else if (qtype == 2) {
-								eq.query2(gdb.ehf, gdb.nhf);
+								eq.query2(gdb.ehf, gdb.nhf, gdb.btf_node, nodeLabelLength, (short)numBuf);
 							} else if (qtype == 3) {
 								eq.query3(gdb.ehf, edgeLabelLength, (short)numBuf);
 							} else if (qtype == 4) {
@@ -301,19 +301,18 @@ public class BatchOperations {
 							} else if (qtype == 5) {
 								eq.query5(gdb.ehf, edgeLabelLength, (short)numBuf, edgeWtBound1, edgeWtBound2);
 							}else if(qtype == 6){
-								eq.query6(gdb.ehf, gdb.nhf);
+								eq.query6(gdb.ehf);
 							}
 
 						}
 						// index scan
 						else if (index == 1) {
 							if (qtype == 0) {
-								System.out.println("qtype0");
 								eqi.query0(gdb.ehf, gdb.btf_edge_label, gdb.nhf, edgeLabelLength, (short)numBuf);
 							} else if (qtype == 1) {
-								eqi.query1(gdb.ehf, gdb.btf_edge_label, gdb.nhf, edgeLabelLength, (short)numBuf);
+								eqi.query1(gdb.ehf, gdb.btf_node, gdb.nhf, nodeLabelLength, (short)numBuf);
 							} else if (qtype == 2) {
-								eqi.query2(gdb.ehf, gdb.btf_edge_label, gdb.nhf, edgeLabelLength, (short)numBuf);
+								eqi.query2(gdb.ehf, gdb.btf_node, gdb.nhf, nodeLabelLength, (short)numBuf);
 							} else if (qtype == 3) {
 								eqi.query3(gdb.ehf, gdb.btf_edge_label, edgeLabelLength, (short)numBuf);
 							} else if (qtype == 4) {
@@ -352,7 +351,7 @@ public class BatchOperations {
 
 	}
 
-	public static void scanNodeHeapFile() throws InvalidTupleSizeException,
+	/*public static void scanNodeHeapFile() throws InvalidTupleSizeException,
 			IOException, InvalidTypeException, FieldNumberOutOfBoundException {
 		// scanning of records
 		NID newNid = new NID();
@@ -376,6 +375,6 @@ public class BatchOperations {
 		}
 		newNscan.closescan();
 		System.out.println("test done");
-	}
+	}*/
 
 }

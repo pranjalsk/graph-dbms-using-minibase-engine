@@ -100,12 +100,11 @@ public class NodeQuery {
 						+ nodeDescriptor.get(2) + " , " + nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4)+"]");
 				t = sort.get_next();
 			}
-			//sort.close();
 			nfscan.close();
+			sort.close();
 			
 		} catch (Exception e) {
 			e.printStackTrace();
-
 		}
 	}
 
@@ -131,34 +130,61 @@ public class NodeQuery {
 		projlist[1] = new FldSpec(rel, 2);
 
 		CondExpr[] expr = null;
-		Map<Double, Node> distanceToNodeMap = new TreeMap<Double, Node>();
-		try {
+		TupleOrder[] order = new TupleOrder[2];
+		order[0] = new TupleOrder(TupleOrder.Ascending);
+		order[1] = new TupleOrder(TupleOrder.Descending);
+//		Map<Double, Node> distanceToNodeMap = new TreeMap<Double, Node>();
+//		try {
+//			NFileScan nfscan = new NFileScan(nodeHeapFileName, attrType, stringSize, (short) 2, 2, projlist, expr);
+//			String nodeLabel;
+//			Descriptor nodeDescriptor;
+//			Node node = new Node();
+//			Tuple t;
+//			t = nfscan.get_next();
+//			while (t != null) {
+//				node.nodeInit(t.getTupleByteArray(), t.getOffset());
+//				node.setHdr();
+//				nodeLabel = node.getLabel();
+//				nodeDescriptor = node.getDesc();
+//				double distanceFromTar = nodeDescriptor.distance(targetDescriptor);
+//				distanceToNodeMap.put(distanceFromTar,new Node( node));
+//				t = nfscan.get_next();
+//			}
+//			for(double dist: distanceToNodeMap.keySet()){
+//				node = distanceToNodeMap.get(dist);
+//				nodeLabel = node.getLabel();
+//				nodeDescriptor = node.getDesc();
+//				System.out.println("Label: "+nodeLabel + " , Descriptor: [" + nodeDescriptor.get(0) + " , " + nodeDescriptor.get(1) + " , "
+//						+ nodeDescriptor.get(2) + " , " + nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4)+"]");
+//			}
+//			nfscan.close();
+//			
+//		}
+//		catch(Exception e){
+//			e.printStackTrace();
+//		}
+		Node node = new Node();
+		try{
 			NFileScan nfscan = new NFileScan(nodeHeapFileName, attrType, stringSize, (short) 2, 2, projlist, expr);
+			Sort sort = new Sort(attrType, (short) 2, stringSize, nfscan, 2, order[0], 20, numBuf, distance, targetDescriptor);
 			String nodeLabel;
 			Descriptor nodeDescriptor;
-			Node node = new Node();
 			Tuple t;
-			t = nfscan.get_next();
+			t = sort.get_next();
+
 			while (t != null) {
 				node.nodeInit(t.getTupleByteArray(), t.getOffset());
 				node.setHdr();
 				nodeLabel = node.getLabel();
 				nodeDescriptor = node.getDesc();
-				double distanceFromTar = nodeDescriptor.distance(targetDescriptor);
-				distanceToNodeMap.put(distanceFromTar,new Node( node));
-				t = nfscan.get_next();
-			}
-			for(double dist: distanceToNodeMap.keySet()){
-				node = distanceToNodeMap.get(dist);
-				nodeLabel = node.getLabel();
-				nodeDescriptor = node.getDesc();
 				System.out.println("Label: "+nodeLabel + " , Descriptor: [" + nodeDescriptor.get(0) + " , " + nodeDescriptor.get(1) + " , "
 						+ nodeDescriptor.get(2) + " , " + nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4)+"]");
+				t = sort.get_next();
 			}
 			nfscan.close();
-			
-		}
-		catch(Exception e){
+			sort.close();
+
+		}catch(Exception e){
 			e.printStackTrace();
 		}
 	}
@@ -266,8 +292,6 @@ public class NodeQuery {
 				BatchInsert bInsert = new BatchInsert();
 				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, nhf,btf_node_label);
 				
-				List<String> outgoingEdges = new ArrayList<String>();
-				List<String> incomingEdges = new ArrayList<String>();
 				
 				EID eid = new EID();
 				Edge edge;
@@ -277,7 +301,8 @@ public class NodeQuery {
 					EScan escan = ehf.openScan();
 					edge = escan.getNext(eid);
 					String edgeLabel;
-					
+					EdgeHeapFile tempIncomingEdgeFile = new EdgeHeapFile(null);
+					EdgeHeapFile tempOutgoingEdgeFile = new EdgeHeapFile(null);
 					while (edge != null) {
 						edge.setHdr();
 						edgeLabel = edge.getLabel();
@@ -285,25 +310,39 @@ public class NodeQuery {
 						destinationNID = edge.getDestination();
 						
 						if(nodeNID.equals(sourceNID)){
-							outgoingEdges.add(edgeLabel);
+							tempOutgoingEdgeFile.insertEdge(edge.getEdgeByteArray());
 						}
 						else if(nodeNID.equals(destinationNID)){
-							incomingEdges.add(edgeLabel);
+							tempIncomingEdgeFile.insertEdge(edge.getEdgeByteArray());
 						}
 							
 						edge = escan.getNext(eid);
 					}
+					escan.closescan();
 					
+					EScan incoming_edge_scan = tempIncomingEdgeFile.openScan();
+					EScan outgoing_edge_scan = tempOutgoingEdgeFile.openScan();
+					
+					edge = incoming_edge_scan.getNext(eid);
 					System.out.println("Incoming Edges:");
-					for(String labelEdge: incomingEdges){
-						System.out.println(labelEdge);
+					while (edge != null) {
+						edge.setHdr();
+						System.out.println(edge.getLabel());
+						edge = incoming_edge_scan.getNext(eid);
 					}
+					incoming_edge_scan.closescan();
+					edge = outgoing_edge_scan.getNext(eid);
 					System.out.println("Outgoing Edges:");
-					for(String labelEdge: outgoingEdges){
-						System.out.println(labelEdge);
+					while (edge != null) {
+						edge.setHdr();
+						System.out.println(edge.getLabel());
+						edge = outgoing_edge_scan.getNext(eid);
 					}
+					outgoing_edge_scan.closescan();
 					
-
+					tempIncomingEdgeFile.deleteFile();
+					tempOutgoingEdgeFile.deleteFile();
+					
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -370,8 +409,8 @@ public class NodeQuery {
 				BatchInsert bInsert = new BatchInsert();
 				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, nhf, btf_node_label);
 				
-				List<String> outgoingEdges = new ArrayList<String>();
-				List<String> incomingEdges = new ArrayList<String>();
+				EdgeHeapFile tempIncomingEdgeFile = new EdgeHeapFile(null);
+				EdgeHeapFile tempOutgoingEdgeFile = new EdgeHeapFile(null);
 				
 				EID eid = new EID();
 				Edge edge;
@@ -389,23 +428,38 @@ public class NodeQuery {
 						destinationNID = edge.getDestination();
 						
 						if(nodeNID.equals(sourceNID)){
-							outgoingEdges.add(edgeLabel);
+							tempOutgoingEdgeFile.insertEdge(edge.getEdgeByteArray());
 						}
 						else if(nodeNID.equals(destinationNID)){
-							incomingEdges.add(edgeLabel);
+							tempIncomingEdgeFile.insertEdge(edge.getEdgeByteArray());
 						}
 							
 						edge = escan.getNext(eid);
 					}
+					escan.closescan();
 					
+					EScan incoming_edge_scan = tempIncomingEdgeFile.openScan();
+					EScan outgoing_edge_scan = tempOutgoingEdgeFile.openScan();
+					
+					edge = incoming_edge_scan.getNext(eid);
 					System.out.println("Incoming Edges:");
-					for(String labelEdge: incomingEdges){
-						System.out.println(labelEdge);
+					while (edge != null) {
+						edge.setHdr();
+						System.out.println(edge.getLabel());
+						edge = incoming_edge_scan.getNext(eid);
 					}
+					incoming_edge_scan.closescan();
+					edge = outgoing_edge_scan.getNext(eid);
 					System.out.println("Outgoing Edges:");
-					for(String labelEdge: outgoingEdges){
-						System.out.println(labelEdge);
+					while (edge != null) {
+						edge.setHdr();
+						System.out.println(edge.getLabel());
+						edge = outgoing_edge_scan.getNext(eid);
 					}
+					outgoing_edge_scan.closescan();
+					
+					tempIncomingEdgeFile.deleteFile();
+					tempOutgoingEdgeFile.deleteFile();
 					
 
 				} catch (Exception e) {
