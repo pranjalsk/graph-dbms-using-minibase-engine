@@ -199,8 +199,10 @@ public class Sort extends Iterator implements GlobalConst {
 			cur_node = new pnode();
 			cur_node.tuple = new Tuple(tuple); // tuple copy needed -- Bingjie
 												// 4/29/98
-
-			pcurr_Q.enq(cur_node);
+			if (sortFldType.attrType == AttrType.attrDesc)
+				pcurr_Q.enq(cur_node,target,distance);
+			else
+				pcurr_Q.enq(cur_node);
 			p_elems_curr_Q++;
 		}
 
@@ -223,7 +225,10 @@ public class Sort extends Iterator implements GlobalConst {
 					|| (comp_res > 0 && order.tupleOrder == TupleOrder.Descending)) {
 				// doesn't fit in current run, put into the other queue
 				try {
-					pother_Q.enq(cur_node);
+					if (sortFldType.attrType == AttrType.attrDesc)
+						pother_Q.enq(cur_node,target,distance);
+					else
+						pother_Q.enq(cur_node);
 				} catch (UnknowAttrType e) {
 					throw new SortException(e, "Sort.java: UnknowAttrType caught from Q.enq()");
 				}
@@ -317,7 +322,10 @@ public class Sort extends Iterator implements GlobalConst {
 														// Bingjie 4/29/98
 
 					try {
-						pcurr_Q.enq(cur_node);
+						if (sortFldType.attrType == AttrType.attrDesc)
+							pcurr_Q.enq(cur_node,target,distance);
+						else
+							pcurr_Q.enq(cur_node);
 					} catch (UnknowAttrType e) {
 						throw new SortException(e, "Sort.java: UnknowAttrType caught from Q.enq()");
 					}

@@ -201,6 +201,7 @@ public class TupleUtils {
 			} else {
 				double distanceBetweenDesc1AndTarget = t1_dsc.distance(target);
 				double distanceBetweenDesc2AndTarget = t2_dsc.distance(target);
+//				System.out.println(distanceBetweenDesc1AndTarget+"reached>>>>>>>>>>>"+distanceBetweenDesc2AndTarget);
 				if (distanceBetweenDesc1AndTarget == distanceBetweenDesc2AndTarget)
 					return 0;
 				else if (distanceBetweenDesc1AndTarget < distanceBetweenDesc2AndTarget)
@@ -435,6 +436,13 @@ public class TupleUtils {
 		case AttrType.attrString:
 			try {
 				value.setStrFld(fld_no, tuple.getStrFld(fld_no));
+			} catch (FieldNumberOutOfBoundException e) {
+				throw new TupleUtilsException(e, "FieldNumberOutOfBoundException is caught by TupleUtils.java");
+			}
+			break;
+		case AttrType.attrDesc:
+			try {
+				value.setDescFld(fld_no, tuple.getDescFld(fld_no));
 			} catch (FieldNumberOutOfBoundException e) {
 				throw new TupleUtilsException(e, "FieldNumberOutOfBoundException is caught by TupleUtils.java");
 			}

@@ -51,7 +51,7 @@ public class ZTreeFile extends IndexFile implements GlobalConst {
 	 * @throws PinPageException
 	 */
 	public ZTreeFile() throws GetFileEntryException, ConstructPageException, AddFileEntryException, IOException, PinPageException {
-		zBTFile = new BTreeFile("zBTFile",AttrType.attrString,34,1);
+		zBTFile = new BTreeFile("zBTFile",AttrType.attrString,32,0);
 	}
 
 /** insert record with the given key and nid

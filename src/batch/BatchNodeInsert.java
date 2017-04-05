@@ -20,8 +20,7 @@ public class BatchNodeInsert {
 		int value5=Integer.parseInt(tokens[5]);
 		Descriptor desc= new Descriptor();
 		desc.set(value1, value2, value3, value4, value5);
-		Node node=make_node(label,  desc);
-		
+		Node node=make_node(label, desc);
 		nhf.insertNode(node.getNodeByteArray()); //failing here
  		}
 		catch(Exception ex)

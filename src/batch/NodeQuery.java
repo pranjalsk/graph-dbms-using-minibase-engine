@@ -129,7 +129,8 @@ public class NodeQuery {
 		projlist[0] = new FldSpec(rel, 1);
 		projlist[1] = new FldSpec(rel, 2);
 
-		CondExpr[] expr = null;
+		CondExpr[] expr = new CondExpr[1];
+		expr[0] = null;
 		TupleOrder[] order = new TupleOrder[2];
 		order[0] = new TupleOrder(TupleOrder.Ascending);
 		order[1] = new TupleOrder(TupleOrder.Descending);

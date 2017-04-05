@@ -378,9 +378,10 @@ public class BTreeFile extends IndexFile
     {
       KeyDataEntry  newRootEntry;
       
-      if (BT.getKeyLength(key) > headerPage.get_maxKeySize())
+      if (BT.getKeyLength(key) > headerPage.get_maxKeySize()){
+    	  System.out.println("reached"+BT.getKeyLength(key));
     	  throw new KeyTooLongException(null,"");
-      
+      }
       
       if ( key instanceof StringKey ) {
 	if ( headerPage.get_keyType() != AttrType.attrString ) {

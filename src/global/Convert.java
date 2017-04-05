@@ -5,6 +5,8 @@ package global;
 import java.io.*;
 import java.lang.*;
 
+import sun.util.locale.StringTokenIterator;
+
 public class Convert {
 
 	/**
@@ -36,6 +38,7 @@ public class Convert {
 		instr = new DataInputStream(in);
 		value = instr.readInt();
 
+		
 		return value;
 	}
 
@@ -130,9 +133,34 @@ public class Convert {
 		 * creates a new data input stream to read data from the specified input
 		 * stream
 		 */
+		
 		in = new ByteArrayInputStream(tmp);
 		instr = new DataInputStream(in);
-		value = instr.readUTF();
+		try{
+			value = instr.readUTF();
+		}catch(Exception e){
+			byte[] nonEofArr = new byte[length];
+			byte[] toReadBytes = {tmp[0] , tmp[1]};
+
+			ByteArrayInputStream inLength = new ByteArrayInputStream(toReadBytes);
+			DataInputStream instrLength = new DataInputStream(inLength);
+			length = instrLength.readInt();
+			System.out.println(">>>>>>>>"+length);
+			int numBytesRead   = 0;
+			int totalBytesRead = 0;
+			in = new ByteArrayInputStream(tmp);
+			instr = new DataInputStream(in);
+			while (totalBytesRead != length && numBytesRead != -1)
+			{
+			   numBytesRead = instr.read(nonEofArr);
+			   totalBytesRead += numBytesRead;
+			}
+			StringBuilder sb = new StringBuilder();
+			for(int i = 0; i < totalBytesRead;i+=8){
+				sb.append(getCharValue(i, nonEofArr));
+			}
+			value = sb.toString();
+		}
 		return value;
 	}
 
@@ -307,7 +335,6 @@ public class Convert {
 		DataOutputStream outstr = new DataOutputStream(out);
 
 		// write the value to the output stream
-
 		outstr.writeUTF(value);
 		// creates a byte array with this output stream size and the
 		// valid contents of the buffer have been copied into it
