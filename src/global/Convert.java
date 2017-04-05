@@ -136,31 +136,31 @@ public class Convert {
 		
 		in = new ByteArrayInputStream(tmp);
 		instr = new DataInputStream(in);
-		try{
+//		try{
 			value = instr.readUTF();
-		}catch(Exception e){
-			byte[] nonEofArr = new byte[length];
-			byte[] toReadBytes = {tmp[0] , tmp[1]};
-
-			ByteArrayInputStream inLength = new ByteArrayInputStream(toReadBytes);
-			DataInputStream instrLength = new DataInputStream(inLength);
-			length = instrLength.readInt();
-			System.out.println(">>>>>>>>"+length);
-			int numBytesRead   = 0;
-			int totalBytesRead = 0;
-			in = new ByteArrayInputStream(tmp);
-			instr = new DataInputStream(in);
-			while (totalBytesRead != length && numBytesRead != -1)
-			{
-			   numBytesRead = instr.read(nonEofArr);
-			   totalBytesRead += numBytesRead;
-			}
-			StringBuilder sb = new StringBuilder();
-			for(int i = 0; i < totalBytesRead;i+=8){
-				sb.append(getCharValue(i, nonEofArr));
-			}
-			value = sb.toString();
-		}
+//		}catch(Exception e){
+//			byte[] nonEofArr = new byte[length];
+//			byte[] toReadBytes = {tmp[0] , tmp[1]};
+//
+//			ByteArrayInputStream inLength = new ByteArrayInputStream(toReadBytes);
+//			DataInputStream instrLength = new DataInputStream(inLength);
+//			length = instrLength.readInt();
+//			System.out.println(">>>>>>>>"+length);
+//			int numBytesRead   = 0;
+//			int totalBytesRead = 0;
+//			in = new ByteArrayInputStream(tmp);
+//			instr = new DataInputStream(in);
+//			while (totalBytesRead != length && numBytesRead != -1)
+//			{
+//			   numBytesRead = instr.read(nonEofArr);
+//			   totalBytesRead += numBytesRead;
+//			}
+//			StringBuilder sb = new StringBuilder();
+//			for(int i = 0; i < totalBytesRead;i+=8){
+//				sb.append(getCharValue(i, nonEofArr));
+//			}
+//			value = sb.toString();
+//		}
 		return value;
 	}
 
