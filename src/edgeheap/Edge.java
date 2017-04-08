@@ -20,21 +20,21 @@ public class Edge extends Tuple {
 	
 	public Edge() {
 		super();
-		this.setFldCnt(6);
+		this.setFldCnt(8);
 	}
 	
 	public Edge(byte[] aEdge, int edge_offset, int size) {
 		super( aEdge,  edge_offset, size);
-		this.setFldCnt(6);
+		this.setFldCnt(8);
 	}
 	
 	public Edge(byte[] aEdge, int edge_offset) {
-		super( aEdge,  edge_offset, 70);
+		super( aEdge,  edge_offset, 142);
 	}
 	
 	public Edge(int size) {
 		super(size);
-		this.setFldCnt(6);
+		this.setFldCnt(8);
 
 	}
 	
@@ -72,12 +72,28 @@ public class Edge extends Tuple {
 		return super.getIntFld(6);
 	}
 	
+	public String getSourceLabel() throws FieldNumberOutOfBoundException, IOException{
+		return super.getStrFld(7);
+	}
+	
+	public String getDestLabel() throws FieldNumberOutOfBoundException, IOException{
+		return super.getStrFld(8);
+	}
+	
 	public Edge setLabel(String label) throws FieldNumberOutOfBoundException, IOException{
 		return (Edge)super.setStrFld(5, label);
 	}
 	
 	public Edge setWeight(int weight) throws FieldNumberOutOfBoundException, IOException{
 		return (Edge)super.setIntFld(6, weight);
+	}
+	
+	public Edge setSourceLabel(String srcLabel) throws FieldNumberOutOfBoundException, IOException{
+		return (Edge)super.setStrFld(7, srcLabel);
+	}
+		
+	public Edge setDestLabel(String destLabel) throws FieldNumberOutOfBoundException, IOException{
+		return (Edge)super.setStrFld(8, destLabel);
 	}
 	
 	public Tuple setNIDFld(int fldNo, NID val) throws IOException, FieldNumberOutOfBoundException {
@@ -105,7 +121,7 @@ public class Edge extends Tuple {
 	
 	public void print() throws IOException{
 		AttrType[] type = {new AttrType(1),new AttrType(1),new AttrType(1),new AttrType(1),
-				new AttrType(0),new AttrType(1)};
+				new AttrType(0),new AttrType(1),new AttrType(0),new AttrType(0)};
 		super.print(type);
 	}
 	
@@ -118,17 +134,17 @@ public class Edge extends Tuple {
 	}
 	
 	public void edgeInit(byte[] aEdge, int edge_offset){
-		super.tupleInit(aEdge, edge_offset, 70);
+		super.tupleInit(aEdge, edge_offset, 142);
 	}
 	
 	public void edgeSet(byte[] fromEdge, int offset){
-		super.tupleSet(fromEdge, offset, 70);
+		super.tupleSet(fromEdge, offset, 142);
 	}
 	
 	public void setHdr() throws InvalidTypeException, InvalidTupleSizeException, IOException{
 		AttrType[] types = {new AttrType(1),new AttrType(1),new AttrType(1),new AttrType(1),
-				new AttrType(0),new AttrType(1)};
-		super.setHdr((short)6, types, new short[]{32}); 
+				new AttrType(0),new AttrType(1),new AttrType(0),new AttrType(0)};
+		super.setHdr((short)8, types, new short[]{32,32,32}); 
 	}
 	
 }

@@ -32,6 +32,10 @@ public class BatchEdgeInsert {
 				newEdge.setDestination(destinationNID);
 				newEdge.setLabel(edgeLabel);
 				newEdge.setWeight(edgeWeight);
+				newEdge.setSourceLabel(sourceLabel);
+				newEdge.setDestLabel(destinationLabel);
+				
+				newEdge.print();
 				
 				EID newEid = new EID();
 				newEid = ehf.insertEdge(newEdge.getEdgeByteArray());

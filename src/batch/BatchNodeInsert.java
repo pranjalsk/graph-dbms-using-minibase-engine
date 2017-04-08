@@ -20,7 +20,8 @@ public class BatchNodeInsert {
 		int value5=Integer.parseInt(tokens[5]);
 		Descriptor desc= new Descriptor();
 		desc.set(value1, value2, value3, value4, value5);
-		Node node=make_node(label, desc);
+		Node node=makeNode(label, desc);
+		node.print();
 		nhf.insertNode(node.getNodeByteArray()); //failing here
  		}
 		catch(Exception ex)
@@ -29,7 +30,7 @@ public class BatchNodeInsert {
 		}
 	}
 
-	private Node make_node(String label, Descriptor desc) throws Exception {
+	private Node makeNode(String label, Descriptor desc) throws Exception {
 		// TODO Auto-generated method stub
 		Node node =new Node();
 		node.setHdr();

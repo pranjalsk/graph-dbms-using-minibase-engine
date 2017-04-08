@@ -103,9 +103,6 @@ public class BatchOperations {
 				else if (taskName.equalsIgnoreCase("edgequery"))
 					taskNumber = 15;
 
-
-				
-				
 				
 				if (taskNumber == 10 || taskNumber == 11 || taskNumber == 12
 						|| taskNumber == 13) {
@@ -158,6 +155,8 @@ public class BatchOperations {
 					}
 				}
 				System.out.println("tasknumber"+taskNumber);
+				
+				// DB SETUP
 				if (!hs.contains(graphDBName)) {
 					hs.add(graphDBName);
 					GraphDB.initGraphDB(graphDBName);	
@@ -166,6 +165,9 @@ public class BatchOperations {
 				else{
 					gdb.openDB(graphDBName);
 				}
+				
+				
+				
 				switch (taskNumber) {
 
 				// Task : Batch node insert
@@ -178,6 +180,7 @@ public class BatchOperations {
 
 							BatchNodeInsert newNodeInsert = new BatchNodeInsert();
 							newNodeInsert.insertBatchNode(gdb.nhf, sCurrentLine);
+							
 						}
 						System.out.println("Batch Nodes insertion done");
 						printStatistics(gdb);

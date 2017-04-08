@@ -229,17 +229,21 @@ public class EdgeQuery {
 	public void query3(EdgeHeapFile ehf, short edgeLabelLength, short numBuf) {
 
 		String edgeHeapFileName = ehf.get_fileName();
-		AttrType[] attrType = new AttrType[6];
-		short[] stringSize = new short[1];
+		AttrType[] attrType = new AttrType[8];
+		short[] stringSize = new short[3];
 		stringSize[0] = edgeLabelLength;
+		stringSize[1] = edgeLabelLength;
+		stringSize[2] = edgeLabelLength;
 		attrType[0] = new AttrType(AttrType.attrInteger);
 		attrType[1] = new AttrType(AttrType.attrInteger);
 		attrType[2] = new AttrType(AttrType.attrInteger);
 		attrType[3] = new AttrType(AttrType.attrInteger);
 		attrType[4] = new AttrType(AttrType.attrString);
 		attrType[5] = new AttrType(AttrType.attrInteger);
+		attrType[6] = new AttrType(AttrType.attrString);
+		attrType[7] = new AttrType(AttrType.attrString);
 
-		FldSpec[] projlist = new FldSpec[6];
+		FldSpec[] projlist = new FldSpec[8];
 		RelSpec rel = new RelSpec(RelSpec.outer);
 		projlist[0] = new FldSpec(rel, 1);
 		projlist[1] = new FldSpec(rel, 2);
@@ -247,6 +251,8 @@ public class EdgeQuery {
 		projlist[3] = new FldSpec(rel, 4);
 		projlist[4] = new FldSpec(rel, 5);
 		projlist[5] = new FldSpec(rel, 6);
+		projlist[6] = new FldSpec(rel, 7);
+		projlist[7] = new FldSpec(rel, 8);
 
 		TupleOrder[] order = new TupleOrder[2];
 		order[0] = new TupleOrder(TupleOrder.Ascending);
@@ -254,10 +260,10 @@ public class EdgeQuery {
 
 		Edge edge = new Edge();
 		try {
-			EFileScan efscan = new EFileScan(edgeHeapFileName, attrType, stringSize, (short) 6, 6, projlist, null);
-			Sort sort = new Sort(attrType, (short) 6, stringSize, efscan, 5, order[0], edgeLabelLength, numBuf);
+			EFileScan efscan = new EFileScan(edgeHeapFileName, attrType, stringSize, (short) 8, 8, projlist, null);
+			Sort sort = new Sort(attrType, (short) 8, stringSize, efscan, 5, order[0], edgeLabelLength, numBuf);
 
-			String edgeLabel;
+			String edgeLabel, srcLabel, destLabel;
 			int sourceNodePageID, sourceNodeSlotID, destinationNodePageID, destinationNodeSlotID, edgeWeight;
 
 			Tuple t;
@@ -273,6 +279,8 @@ public class EdgeQuery {
 				destinationNodePageID = edge.getDestination().pageNo.pid;
 				destinationNodeSlotID = edge.getDestination().slotNo;
 				edgeWeight = edge.getWeight();
+				srcLabel = edge.getSourceLabel();
+				destLabel = edge.getDestLabel();
 
 				System.out.println("Label: " + edgeLabel + " , Weight : " + edgeWeight + "Source Node PageID: "+sourceNodePageID + " , Source Node SlotID: " + sourceNodeSlotID + " , Destination Node PageID: " + destinationNodePageID + " , Destination Node SlotID: "
 						+ destinationNodeSlotID );
@@ -295,17 +303,21 @@ public class EdgeQuery {
 	public void query4(EdgeHeapFile ehf, short edgeLabelLength, short numBuf) {
 
 		String edgeHeapFileName = ehf.get_fileName();
-		AttrType[] attrType = new AttrType[6];
-		short[] stringSize = new short[1];
+		AttrType[] attrType = new AttrType[8];
+		short[] stringSize = new short[3];
 		stringSize[0] = edgeLabelLength;
+		stringSize[1] = edgeLabelLength;
+		stringSize[2] = edgeLabelLength;
 		attrType[0] = new AttrType(AttrType.attrInteger);
 		attrType[1] = new AttrType(AttrType.attrInteger);
 		attrType[2] = new AttrType(AttrType.attrInteger);
 		attrType[3] = new AttrType(AttrType.attrInteger);
 		attrType[4] = new AttrType(AttrType.attrString);
 		attrType[5] = new AttrType(AttrType.attrInteger);
+		attrType[6] = new AttrType(AttrType.attrString);
+		attrType[7] = new AttrType(AttrType.attrString);
 
-		FldSpec[] projlist = new FldSpec[6];
+		FldSpec[] projlist = new FldSpec[8];
 		RelSpec rel = new RelSpec(RelSpec.outer);
 		projlist[0] = new FldSpec(rel, 1);
 		projlist[1] = new FldSpec(rel, 2);
@@ -313,6 +325,8 @@ public class EdgeQuery {
 		projlist[3] = new FldSpec(rel, 4);
 		projlist[4] = new FldSpec(rel, 5);
 		projlist[5] = new FldSpec(rel, 6);
+		projlist[6] = new FldSpec(rel, 7);
+		projlist[7] = new FldSpec(rel, 8);
 
 		TupleOrder[] order = new TupleOrder[2];
 		order[0] = new TupleOrder(TupleOrder.Ascending);
@@ -320,10 +334,10 @@ public class EdgeQuery {
 
 		Edge edge = new Edge();
 		try {
-			EFileScan efscan = new EFileScan(edgeHeapFileName, attrType, stringSize, (short) 6, 6, projlist, null);
-			Sort sort = new Sort(attrType, (short) 6, stringSize, efscan, 6, order[0], 4, numBuf);
+			EFileScan efscan = new EFileScan(edgeHeapFileName, attrType, stringSize, (short) 8, 6, projlist, null);
+			Sort sort = new Sort(attrType, (short) 8, stringSize, efscan, 6, order[0], 4, numBuf);
 
-			String edgeLabel;
+			String edgeLabel, edgeSource, edgeDest;
 			int sourceNodePageID, sourceNodeSlotID, destinationNodePageID, destinationNodeSlotID, edgeWeight;
 
 			Tuple t;
@@ -338,6 +352,8 @@ public class EdgeQuery {
 				destinationNodePageID = edge.getDestination().pageNo.pid;
 				destinationNodeSlotID = edge.getDestination().slotNo;
 				edgeWeight = edge.getWeight();
+				edgeSource = edge.getSourceLabel();
+				edgeDest = edge.getDestLabel();
 
 				System.out.println("Label: " + edgeLabel + " , Weight : " + edgeWeight + "Source Node PageID: "+sourceNodePageID + " , Source Node SlotID: " + sourceNodeSlotID + " , Destination Node PageID: " + destinationNodePageID + " , Destination Node SlotID: "
 						+ destinationNodeSlotID );
@@ -373,17 +389,22 @@ public class EdgeQuery {
 		}
 		
 		String edgeHeapFileName = ehf.get_fileName();
-		AttrType[] attrType = new AttrType[6];
-		short[] stringSize = new short[1];
+		AttrType[] attrType = new AttrType[8];
+		short[] stringSize = new short[3];
 		stringSize[0] = edgeLabelLength;
+		stringSize[1] = edgeLabelLength;
+		stringSize[2] = edgeLabelLength;
+				
 		attrType[0] = new AttrType(AttrType.attrInteger);
 		attrType[1] = new AttrType(AttrType.attrInteger);
 		attrType[2] = new AttrType(AttrType.attrInteger);
 		attrType[3] = new AttrType(AttrType.attrInteger);
 		attrType[4] = new AttrType(AttrType.attrString);
 		attrType[5] = new AttrType(AttrType.attrInteger);
+		attrType[6] = new AttrType(AttrType.attrString);
+		attrType[7] = new AttrType(AttrType.attrString);
 
-		FldSpec[] projlist = new FldSpec[6];
+		FldSpec[] projlist = new FldSpec[8];
 		RelSpec rel = new RelSpec(RelSpec.outer);
 		projlist[0] = new FldSpec(rel, 1);
 		projlist[1] = new FldSpec(rel, 2);
@@ -391,6 +412,8 @@ public class EdgeQuery {
 		projlist[3] = new FldSpec(rel, 4);
 		projlist[4] = new FldSpec(rel, 5);
 		projlist[5] = new FldSpec(rel, 6);
+		projlist[6] = new FldSpec(rel, 7);
+		projlist[7] = new FldSpec(rel, 8);
 
 		CondExpr[] expr = new CondExpr[3];
 		expr[0] = new CondExpr();
@@ -409,9 +432,9 @@ public class EdgeQuery {
 
 		Edge edge = new Edge();
 		try {
-			EFileScan efscan = new EFileScan(edgeHeapFileName, attrType, stringSize, (short) 6, 6, projlist, expr);
+			EFileScan efscan = new EFileScan(edgeHeapFileName, attrType, stringSize, (short) 8, 6, projlist, expr);
 
-			String edgeLabel;
+			String edgeLabel, edgeSrc, edgeDest;
 			int sourceNodePageID, sourceNodeSlotID, destinationNodePageID, destinationNodeSlotID, edgeWeight;
 
 			Edge e;
@@ -425,6 +448,8 @@ public class EdgeQuery {
 				destinationNodePageID = edge.getDestination().pageNo.pid;
 				destinationNodeSlotID = edge.getDestination().slotNo;
 				edgeWeight = edge.getWeight();
+				edgeSrc = edge.getSourceLabel();
+				edgeDest = edge.getDestLabel();
 
 				System.out.println("Label: " + edgeLabel + " , Weight : " + edgeWeight + " Source Node PageID: "+sourceNodePageID + " , Source Node SlotID: " + sourceNodeSlotID + " , Destination Node PageID: " + destinationNodePageID + " , Destination Node SlotID: "
 						+ destinationNodeSlotID );

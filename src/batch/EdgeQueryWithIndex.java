@@ -44,17 +44,22 @@ public class EdgeQueryWithIndex {
 		String edgeHeapFileName = ehf.get_fileName();
 		String edgeIndexFileName = btf_edge_label.get_fileName();
 
-		AttrType[] attrType = new AttrType[6];
-		short[] stringSize = new short[1];
+		AttrType[] attrType = new AttrType[8];
+		short[] stringSize = new short[3];
 		stringSize[0] = edgeLabelLength;
+		stringSize[1] = edgeLabelLength;
+		stringSize[2] = edgeLabelLength;
+				
 		attrType[0] = new AttrType(AttrType.attrInteger);
 		attrType[1] = new AttrType(AttrType.attrInteger);
 		attrType[2] = new AttrType(AttrType.attrInteger);
 		attrType[3] = new AttrType(AttrType.attrInteger);
 		attrType[4] = new AttrType(AttrType.attrString);
 		attrType[5] = new AttrType(AttrType.attrInteger);
+		attrType[6] = new AttrType(AttrType.attrString);
+		attrType[7] = new AttrType(AttrType.attrString);
 
-		FldSpec[] projlist = new FldSpec[6];
+		FldSpec[] projlist = new FldSpec[8];
 		RelSpec rel = new RelSpec(RelSpec.outer);
 		projlist[0] = new FldSpec(rel, 1);
 		projlist[1] = new FldSpec(rel, 2);
@@ -62,6 +67,8 @@ public class EdgeQueryWithIndex {
 		projlist[3] = new FldSpec(rel, 4);
 		projlist[4] = new FldSpec(rel, 5);
 		projlist[5] = new FldSpec(rel, 6);
+		projlist[6] = new FldSpec(rel, 7);
+		projlist[7] = new FldSpec(rel, 8);
 
 		CondExpr[] expr = new CondExpr[2];
 		expr[0] = new CondExpr();
@@ -83,15 +90,17 @@ public class EdgeQueryWithIndex {
 				expr[1] = null;
 				EdgeIndexScan eIscan = new EdgeIndexScan(indType,
 						edgeHeapFileName, edgeIndexFileName, attrType,
-						stringSize, 6, 6, projlist, expr, 5, false);
+						stringSize, 8, 8, projlist, expr, 5, false);
 				edge = eIscan.get_next();
 
-				String edgeLabel;
+				String edgeLabel, edgeSrc, edgeDest;
 				int sourceNodePageID, sourceNodeSlotID, destinationNodePageID, destinationNodeSlotID, edgeWeight;
 				Node sourceNode = null, destinationNode = null;
 				NID sourceNID, destinationNID;
 				if (edge != null) {
 					edgeLabel = edge.getLabel();
+					edgeSrc = edge.getSourceLabel();
+					edgeDest = edge.getDestLabel();
 					// sourceNodePageID = edge.getSource().pageNo.pid;
 					// sourceNodeSlotID = edge.getSource().slotNo;
 					// destinationNodePageID = edge.getDestination().pageNo.pid;
@@ -271,17 +280,21 @@ public class EdgeQueryWithIndex {
 		String edgeHeapFileName = ehf.get_fileName();
 		String edgeIndexFileName = btf_edge_label.get_fileName();
 
-		AttrType[] attrType = new AttrType[6];
-		short[] stringSize = new short[1];
+		AttrType[] attrType = new AttrType[8];
+		short[] stringSize = new short[3];
 		stringSize[0] = edgeLabelLength;
+		stringSize[1] = edgeLabelLength;
+		stringSize[2] = edgeLabelLength;
 		attrType[0] = new AttrType(AttrType.attrInteger);
 		attrType[1] = new AttrType(AttrType.attrInteger);
 		attrType[2] = new AttrType(AttrType.attrInteger);
 		attrType[3] = new AttrType(AttrType.attrInteger);
 		attrType[4] = new AttrType(AttrType.attrString);
 		attrType[5] = new AttrType(AttrType.attrInteger);
+		attrType[6] = new AttrType(AttrType.attrString);
+		attrType[7] = new AttrType(AttrType.attrString);
 
-		FldSpec[] projlist = new FldSpec[6];
+		FldSpec[] projlist = new FldSpec[8];
 		RelSpec rel = new RelSpec(RelSpec.outer);
 		projlist[0] = new FldSpec(rel, 1);
 		projlist[1] = new FldSpec(rel, 2);
@@ -289,21 +302,25 @@ public class EdgeQueryWithIndex {
 		projlist[3] = new FldSpec(rel, 4);
 		projlist[4] = new FldSpec(rel, 5);
 		projlist[5] = new FldSpec(rel, 6);
+		projlist[6] = new FldSpec(rel, 7);
+		projlist[7] = new FldSpec(rel, 8);
 
 		CondExpr[] expr = null;
 		IndexType indType = new IndexType(1);
 		Edge edge = new Edge();
 		try {
 			EdgeIndexScan eIscan = new EdgeIndexScan(indType, edgeHeapFileName,
-					edgeIndexFileName, attrType, stringSize, 6, 6, projlist,
+					edgeIndexFileName, attrType, stringSize, 8, 8, projlist,
 					expr, 5, false);
 			edge = eIscan.get_next();
-			String edgeLabel;
+			String edgeLabel, edgeSrc, edgeDest;
 			int sourceNodePageID, sourceNodeSlotID, destinationNodePageID, destinationNodeSlotID, edgeWeight;
 
 			while (edge != null) {
 				edge.setHdr();
 				edgeLabel = edge.getLabel();
+				edgeSrc = edge.getSourceLabel();
+				edgeDest = edge.getDestLabel();
 				sourceNodePageID = edge.getSource().pageNo.pid;
 				sourceNodeSlotID = edge.getSource().slotNo;
 				destinationNodePageID = edge.getDestination().pageNo.pid;
@@ -343,17 +360,21 @@ public class EdgeQueryWithIndex {
 		String edgeHeapFileName = ehf.get_fileName();
 		String edgeIndexFileName = btf_edge_weight.get_fileName();
 
-		AttrType[] attrType = new AttrType[6];
-		short[] stringSize = new short[1];
+		AttrType[] attrType = new AttrType[8];
+		short[] stringSize = new short[3];
 		stringSize[0] = edgeLabelLength;
+		stringSize[1] = edgeLabelLength;
+		stringSize[2] = edgeLabelLength;
 		attrType[0] = new AttrType(AttrType.attrInteger);
 		attrType[1] = new AttrType(AttrType.attrInteger);
 		attrType[2] = new AttrType(AttrType.attrInteger);
 		attrType[3] = new AttrType(AttrType.attrInteger);
 		attrType[4] = new AttrType(AttrType.attrString);
 		attrType[5] = new AttrType(AttrType.attrInteger);
+		attrType[6] = new AttrType(AttrType.attrString);
+		attrType[7] = new AttrType(AttrType.attrString);
 
-		FldSpec[] projlist = new FldSpec[6];
+		FldSpec[] projlist = new FldSpec[8];
 		RelSpec rel = new RelSpec(RelSpec.outer);
 		projlist[0] = new FldSpec(rel, 1);
 		projlist[1] = new FldSpec(rel, 2);
@@ -361,21 +382,26 @@ public class EdgeQueryWithIndex {
 		projlist[3] = new FldSpec(rel, 4);
 		projlist[4] = new FldSpec(rel, 5);
 		projlist[5] = new FldSpec(rel, 6);
+		projlist[6] = new FldSpec(rel, 7);
+		projlist[7] = new FldSpec(rel, 8);
 
 		CondExpr[] expr = null;
 		IndexType indType = new IndexType(1);
 		Edge edge = new Edge();
 		try {
 			EdgeIndexScan eIscan = new EdgeIndexScan(indType, edgeHeapFileName,
-					edgeIndexFileName, attrType, stringSize, 6, 6, projlist,
+					edgeIndexFileName, attrType, stringSize, 8, 8, projlist,
 					expr, 6, false);
 			edge = eIscan.get_next();
-			String edgeLabel;
+			String edgeLabel, edgeSrc, edgeDest;
 			int sourceNodePageID, sourceNodeSlotID, destinationNodePageID, destinationNodeSlotID, edgeWeight;
 
 			while (edge != null) {
 				edge.setHdr();
 				edgeLabel = edge.getLabel();
+				edgeSrc = edge.getSourceLabel();
+				edgeDest = edge.getDestLabel();				
+				
 				sourceNodePageID = edge.getSource().pageNo.pid;
 				sourceNodeSlotID = edge.getSource().slotNo;
 				destinationNodePageID = edge.getDestination().pageNo.pid;
@@ -427,17 +453,21 @@ public class EdgeQueryWithIndex {
 		String edgeHeapFileName = ehf.get_fileName();
 		String edgeIndexFileName = btf_edge_weight.get_fileName();
 
-		AttrType[] attrType = new AttrType[6];
-		short[] stringSize = new short[1];
+		AttrType[] attrType = new AttrType[8];
+		short[] stringSize = new short[3];
 		stringSize[0] = edgeLabelLength;
+		stringSize[1] = edgeLabelLength;
+		stringSize[2] = edgeLabelLength;
 		attrType[0] = new AttrType(AttrType.attrInteger);
 		attrType[1] = new AttrType(AttrType.attrInteger);
 		attrType[2] = new AttrType(AttrType.attrInteger);
 		attrType[3] = new AttrType(AttrType.attrInteger);
 		attrType[4] = new AttrType(AttrType.attrString);
 		attrType[5] = new AttrType(AttrType.attrInteger);
+		attrType[6] = new AttrType(AttrType.attrString);
+		attrType[7] = new AttrType(AttrType.attrString);
 
-		FldSpec[] projlist = new FldSpec[6];
+		FldSpec[] projlist = new FldSpec[8];
 		RelSpec rel = new RelSpec(RelSpec.outer);
 		projlist[0] = new FldSpec(rel, 1);
 		projlist[1] = new FldSpec(rel, 2);
@@ -445,6 +475,10 @@ public class EdgeQueryWithIndex {
 		projlist[3] = new FldSpec(rel, 4);
 		projlist[4] = new FldSpec(rel, 5);
 		projlist[5] = new FldSpec(rel, 6);
+		projlist[6] = new FldSpec(rel, 7);
+		projlist[7] = new FldSpec(rel, 8);
+		
+		
 		CondExpr[] expr = new CondExpr[3];
 		expr[0] = new CondExpr();
 		expr[0].op = new AttrOperator(AttrOperator.aopGE);
@@ -466,15 +500,17 @@ public class EdgeQueryWithIndex {
 		Edge edge = new Edge();
 		try {
 			EdgeIndexScan eIscan = new EdgeIndexScan(indType, edgeHeapFileName,
-					edgeIndexFileName, attrType, stringSize, 6, 6, projlist,
+					edgeIndexFileName, attrType, stringSize, 8, 8, projlist,
 					expr, 6, false);
 			edge = eIscan.get_next();
-			String edgeLabel;
+			String edgeLabel, edgeSrc, edgeDest;
 			int sourceNodePageID, sourceNodeSlotID, destinationNodePageID, destinationNodeSlotID, edgeWeight;
 
 			while (edge != null) {
 				edge.setHdr();
 				edgeLabel = edge.getLabel();
+				edgeSrc = edge.getSourceLabel();
+				edgeDest = edge.getDestLabel();
 				sourceNodePageID = edge.getSource().pageNo.pid;
 				sourceNodeSlotID = edge.getSource().slotNo;
 				destinationNodePageID = edge.getDestination().pageNo.pid;
@@ -599,17 +635,22 @@ public class EdgeQueryWithIndex {
 		String edgeHeapFileName = ehf.get_fileName();
 		String edgeIndexFileName = btf_edge_label.get_fileName();
 
-		AttrType[] attrType = new AttrType[6];
-		short[] stringSize = new short[1];
+		AttrType[] attrType = new AttrType[8];
+		short[] stringSize = new short[3];
 		stringSize[0] = edgeLabelLength;
+		stringSize[1] = edgeLabelLength;
+		stringSize[2] = edgeLabelLength;
 		attrType[0] = new AttrType(AttrType.attrInteger);
 		attrType[1] = new AttrType(AttrType.attrInteger);
 		attrType[2] = new AttrType(AttrType.attrInteger);
 		attrType[3] = new AttrType(AttrType.attrInteger);
 		attrType[4] = new AttrType(AttrType.attrString);
 		attrType[5] = new AttrType(AttrType.attrInteger);
-
-		FldSpec[] projlist = new FldSpec[6];
+		attrType[6] = new AttrType(AttrType.attrString);
+		attrType[7] = new AttrType(AttrType.attrString);
+		
+		
+		FldSpec[] projlist = new FldSpec[8];
 		RelSpec rel = new RelSpec(RelSpec.outer);
 		projlist[0] = new FldSpec(rel, 1);
 		projlist[1] = new FldSpec(rel, 2);
@@ -617,6 +658,8 @@ public class EdgeQueryWithIndex {
 		projlist[3] = new FldSpec(rel, 4);
 		projlist[4] = new FldSpec(rel, 5);
 		projlist[5] = new FldSpec(rel, 6);
+		projlist[6] = new FldSpec(rel, 7);
+		projlist[7] = new FldSpec(rel, 8);
 
 		CondExpr[] expr = null;
 		IndexType indType = new IndexType(1);
@@ -625,7 +668,7 @@ public class EdgeQueryWithIndex {
 		Edge edgeOuter;
 		try {
 			EdgeIndexScan eOuterscan = new EdgeIndexScan(indType, edgeHeapFileName,
-					edgeIndexFileName, attrType, stringSize, 6, 6, projlist,
+					edgeIndexFileName, attrType, stringSize, 8, 8, projlist,
 					expr, 5, false);
 			edgeOuter = eOuterscan.get_next();
 
@@ -635,7 +678,7 @@ public class EdgeQueryWithIndex {
 				
 				Edge edgeInner;
 				EdgeIndexScan eInnerscan = new EdgeIndexScan(indType, edgeHeapFileName,
-						edgeIndexFileName, attrType, stringSize, 6, 6, projlist,
+						edgeIndexFileName, attrType, stringSize, 8, 8, projlist,
 						expr, 5, false);
 				edgeInner = eInnerscan.get_next();
 				
