@@ -212,8 +212,7 @@ public class Heapfile implements Filetype, GlobalConst {
 			_fileName = _fileName + userAccName;
 
 			String filenum = Integer.toString(tempfilecount);
-			_fileName = _fileName + filenum;
-			System.out.println(_fileName.length());
+			_fileName = _fileName + filenum;	
 			_ftype = TEMP;
 			tempfilecount++;
 

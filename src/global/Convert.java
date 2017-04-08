@@ -4,6 +4,7 @@ package global;
 
 import java.io.*;
 import java.lang.*;
+import java.nio.charset.Charset;
 
 import sun.util.locale.StringTokenIterator;
 
@@ -28,8 +29,8 @@ public class Convert {
 		byte tmp[] = new byte[4];
 
 		// copy the value from data array out to a tmp byte array
+		
 		System.arraycopy(data, position, tmp, 0, 4);
-
 		/*
 		 * creates a new data input stream to read data from the specified input
 		 * stream
@@ -126,7 +127,6 @@ public class Convert {
 		String value;
 		byte tmp[] = new byte[length];
 
-		// copy the value from data array out to a tmp byte array
 		System.arraycopy(data, position, tmp, 0, length);
 
 		/*
@@ -136,32 +136,25 @@ public class Convert {
 		
 		in = new ByteArrayInputStream(tmp);
 		instr = new DataInputStream(in);
-//		try{
+		try{
 			value = instr.readUTF();
-//		}catch(Exception e){
-//			byte[] nonEofArr = new byte[length];
-//			byte[] toReadBytes = {tmp[0] , tmp[1]};
-//
-//			ByteArrayInputStream inLength = new ByteArrayInputStream(toReadBytes);
-//			DataInputStream instrLength = new DataInputStream(inLength);
-//			length = instrLength.readInt();
-//			System.out.println(">>>>>>>>"+length);
-//			int numBytesRead   = 0;
-//			int totalBytesRead = 0;
-//			in = new ByteArrayInputStream(tmp);
-//			instr = new DataInputStream(in);
-//			while (totalBytesRead != length && numBytesRead != -1)
-//			{
-//			   numBytesRead = instr.read(nonEofArr);
-//			   totalBytesRead += numBytesRead;
-//			}
-//			StringBuilder sb = new StringBuilder();
-//			for(int i = 0; i < totalBytesRead;i+=8){
-//				sb.append(getCharValue(i, nonEofArr));
-//			}
-//			value = sb.toString();
-//		}
+		}catch(Exception e){
+			value = "";
+		}
+
 		return value;
+		/*short lengthToRead = (short)(((tmp[0] << 8)) | ((tmp[1] & 0xff)));
+		if(lengthToRead < 0) return "";
+		byte[] bytesToread = new byte[lengthToRead];
+		try{
+			System.arraycopy(data, position+2, bytesToread, 0, lengthToRead);
+		}catch(Exception e){
+			System.arraycopy(data, position+2, bytesToread, 0, 0);
+			String values = new String(bytesToread, "UTF-8");
+			System.out.println(">>>>>>>>>>>>>>>>>"+values);
+		}
+			
+		return new String(bytesToread, "UTF-8");*/
 	}
 
 	/**
@@ -333,7 +326,6 @@ public class Convert {
 
 		OutputStream out = new ByteArrayOutputStream();
 		DataOutputStream outstr = new DataOutputStream(out);
-
 		// write the value to the output stream
 		outstr.writeUTF(value);
 		// creates a byte array with this output stream size and the
@@ -341,8 +333,18 @@ public class Convert {
 		byte[] B = ((ByteArrayOutputStream) out).toByteArray();
 
 		int sz = outstr.size();
-		// copies the contents of this byte array into data[]
 		System.arraycopy(B, 0, data, position, sz);
+		
+		// copies the contents of this byte array into data[]Charset.forName("UTF-8")
+		/*byte[] b = value.getBytes("UTF-8");
+		short length = (short)b.length;
+		byte[] B = new byte[b.length+2];
+		B[0] = (byte)((length & 0xFF00) >> 8);
+		B[1] = (byte)(length & 0x00FF);
+		for(int i = 2; i < B.length; i++){
+			B[i] = b[i-2];
+		}
+		System.arraycopy(B, 0, data, position, B.length);*/
 
 	}
 
