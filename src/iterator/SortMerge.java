@@ -41,19 +41,17 @@ public class SortMerge extends Iterator implements GlobalConst {
 	private double distance;
 	private Descriptor target;
 
-
-
 	/**
 	 * constructor,initialization
 	 * 
-	 * @param in1[]
-	 *            Array containing field types of R
+	 * @param in1
+	 *            [] Array containing field types of R
 	 * @param len_in1
 	 *            # of columns in R
 	 * @param s1_sizes
 	 *            shows the length of the string fields in R.
-	 * @param in2[]
-	 *            Array containing field types of S
+	 * @param in2
+	 *            [] Array containing field types of S
 	 * @param len_in2
 	 *            # of columns in S
 	 * @param s2_sizes
@@ -78,8 +76,8 @@ public class SortMerge extends Iterator implements GlobalConst {
 	 *            is am2 sorted?
 	 * @param order
 	 *            the order of the tuple: assending or desecnding?
-	 * @param outFilter[]
-	 *            Ptr to the output filter
+	 * @param outFilter
+	 *            [] Ptr to the output filter
 	 * @param proj_list
 	 *            shows what input fields go where in the output tuple
 	 * @param n_out_flds
@@ -95,16 +93,19 @@ public class SortMerge extends Iterator implements GlobalConst {
 	 * @exception IOException
 	 *                some I/O fault
 	 */
-	public SortMerge(AttrType in1[], int len_in1, short s1_sizes[], AttrType in2[], int len_in2, short s2_sizes[],
+	public SortMerge(AttrType in1[], int len_in1, short s1_sizes[],
+			AttrType in2[], int len_in2, short s2_sizes[],
 
-			int join_col_in1, int sortFld1Len, int join_col_in2, int sortFld2Len,
+			int join_col_in1, int sortFld1Len, int join_col_in2,
+			int sortFld2Len,
 
 			int amt_of_mem, Iterator am1, Iterator am2,
 
 			boolean in1_sorted, boolean in2_sorted, TupleOrder order,
 
 			CondExpr outFilter[], FldSpec proj_list[], int n_out_flds)
-			throws JoinNewFailed, JoinLowMemory, SortException, TupleUtilsException, IOException
+			throws JoinNewFailed, JoinLowMemory, SortException,
+			TupleUtilsException, IOException
 
 	{
 		_in1 = new AttrType[in1.length];
@@ -120,10 +121,11 @@ public class SortMerge extends Iterator implements GlobalConst {
 		perm_mat = proj_list;
 		nOutFlds = n_out_flds;
 		try {
-			ts_size = TupleUtils.setup_op_tuple(Jtuple, Jtypes, in1, len_in1, in2, len_in2, s1_sizes, s2_sizes,
-					proj_list, n_out_flds);
+			ts_size = TupleUtils.setup_op_tuple(Jtuple, Jtypes, in1, len_in1,
+					in2, len_in2, s1_sizes, s2_sizes, proj_list, n_out_flds);
 		} catch (Exception e) {
-			throw new TupleUtilsException(e, "Exception is caught by SortMerge.java");
+			throw new TupleUtilsException(e,
+					"Exception is caught by SortMerge.java");
 		}
 
 		int n_strs2 = 0;
@@ -141,7 +143,8 @@ public class SortMerge extends Iterator implements GlobalConst {
 
 		if (!in1_sorted) {
 			try {
-				p_i1 = new Sort(in1, (short) len_in1, s1_sizes, am1, join_col_in1, order, sortFld1Len, amt_of_mem / 2);
+				p_i1 = new Sort(in1, (short) len_in1, s1_sizes, am1,
+						join_col_in1, order, sortFld1Len, amt_of_mem / 2);
 			} catch (Exception e) {
 				throw new SortException(e, "Sort failed");
 			}
@@ -149,7 +152,8 @@ public class SortMerge extends Iterator implements GlobalConst {
 
 		if (!in2_sorted) {
 			try {
-				p_i2 = new Sort(in2, (short) len_in2, s2_sizes, am2, join_col_in2, order, sortFld2Len, amt_of_mem / 2);
+				p_i2 = new Sort(in2, (short) len_in2, s2_sizes, am2,
+						join_col_in2, order, sortFld2Len, amt_of_mem / 2);
 			} catch (Exception e) {
 				throw new SortException(e, "Sort failed");
 			}
@@ -172,8 +176,8 @@ public class SortMerge extends Iterator implements GlobalConst {
 		tuple1 = new Tuple();
 		tuple2 = new Tuple();
 
-		if (io_buf1 == null || io_buf2 == null || TempTuple1 == null || TempTuple2 == null || tuple1 == null
-				|| tuple2 == null)
+		if (io_buf1 == null || io_buf2 == null || TempTuple1 == null
+				|| TempTuple2 == null || tuple1 == null || tuple2 == null)
 			throw new JoinNewFailed("SortMerge.java: allocate failed");
 		if (amt_of_mem < 2)
 			throw new JoinLowMemory("SortMerge.java: memory not enough");
@@ -217,14 +221,14 @@ public class SortMerge extends Iterator implements GlobalConst {
 	/**
 	 * constructor,initialization
 	 * 
-	 * @param in1[]
-	 *            Array containing field types of R
+	 * @param in1
+	 *            [] Array containing field types of R
 	 * @param len_in1
 	 *            # of columns in R
 	 * @param s1_sizes
 	 *            shows the length of the string fields in R.
-	 * @param in2[]
-	 *            Array containing field types of S
+	 * @param in2
+	 *            [] Array containing field types of S
 	 * @param len_in2
 	 *            # of columns in S
 	 * @param s2_sizes
@@ -249,8 +253,8 @@ public class SortMerge extends Iterator implements GlobalConst {
 	 *            is am2 sorted?
 	 * @param order
 	 *            the order of the tuple: assending or desecnding?
-	 * @param outFilter[]
-	 *            Ptr to the output filter
+	 * @param outFilter
+	 *            [] Ptr to the output filter
 	 * @param proj_list
 	 *            shows what input fields go where in the output tuple
 	 * @param n_out_flds
@@ -266,16 +270,19 @@ public class SortMerge extends Iterator implements GlobalConst {
 	 * @exception IOException
 	 *                some I/O fault
 	 */
-	public SortMerge(AttrType in1[], int len_in1, short s1_sizes[], AttrType in2[], int len_in2, short s2_sizes[],
+	public SortMerge(AttrType in1[], int len_in1, short s1_sizes[],
+			AttrType in2[], int len_in2, short s2_sizes[],
 
-			int join_col_in1, int sortFld1Len, int join_col_in2, int sortFld2Len,
+			int join_col_in1, int sortFld1Len, int join_col_in2,
+			int sortFld2Len,
 
 			int amt_of_mem, Iterator am1, Iterator am2,
 
 			boolean in1_sorted, boolean in2_sorted, TupleOrder order,
 
-			CondExpr outFilter[], FldSpec proj_list[], int n_out_flds, double distance, Descriptor target)
-			throws JoinNewFailed, JoinLowMemory, SortException, TupleUtilsException, IOException {
+			CondExpr outFilter[], FldSpec proj_list[], int n_out_flds,
+			double distance, Descriptor target) throws JoinNewFailed,
+			JoinLowMemory, SortException, TupleUtilsException, IOException {
 
 		_in1 = new AttrType[in1.length];
 		_in2 = new AttrType[in2.length];
@@ -290,10 +297,11 @@ public class SortMerge extends Iterator implements GlobalConst {
 		perm_mat = proj_list;
 		nOutFlds = n_out_flds;
 		try {
-			ts_size = TupleUtils.setup_op_tuple(Jtuple, Jtypes, in1, len_in1, in2, len_in2, s1_sizes, s2_sizes,
-					proj_list, n_out_flds);
+			ts_size = TupleUtils.setup_op_tuple(Jtuple, Jtypes, in1, len_in1,
+					in2, len_in2, s1_sizes, s2_sizes, proj_list, n_out_flds);
 		} catch (Exception e) {
-			throw new TupleUtilsException(e, "Exception is caught by SortMerge.java");
+			throw new TupleUtilsException(e,
+					"Exception is caught by SortMerge.java");
 		}
 
 		int n_strs2 = 0;
@@ -311,7 +319,9 @@ public class SortMerge extends Iterator implements GlobalConst {
 
 		if (!in1_sorted) {
 			try {
-				p_i1 = new Sort(in1, (short) len_in1, s1_sizes, am1, join_col_in1, order, sortFld1Len, amt_of_mem / 2, distance, target);
+				p_i1 = new Sort(in1, (short) len_in1, s1_sizes, am1,
+						join_col_in1, order, sortFld1Len, amt_of_mem / 2,
+						distance, target);
 			} catch (Exception e) {
 				throw new SortException(e, "Sort failed");
 			}
@@ -319,7 +329,9 @@ public class SortMerge extends Iterator implements GlobalConst {
 
 		if (!in2_sorted) {
 			try {
-				p_i2 = new Sort(in2, (short) len_in2, s2_sizes, am2, join_col_in2, order, sortFld2Len, amt_of_mem / 2, distance, target);
+				p_i2 = new Sort(in2, (short) len_in2, s2_sizes, am2,
+						join_col_in2, order, sortFld2Len, amt_of_mem / 2,
+						distance, target);
 			} catch (Exception e) {
 				throw new SortException(e, "Sort failed");
 			}
@@ -342,8 +354,8 @@ public class SortMerge extends Iterator implements GlobalConst {
 		tuple1 = new Tuple();
 		tuple2 = new Tuple();
 
-		if (io_buf1 == null || io_buf2 == null || TempTuple1 == null || TempTuple2 == null || tuple1 == null
-				|| tuple2 == null)
+		if (io_buf1 == null || io_buf2 == null || TempTuple1 == null
+				|| TempTuple2 == null || tuple1 == null || tuple2 == null)
 			throw new JoinNewFailed("SortMerge.java: allocate failed");
 		if (amt_of_mem < 2)
 			throw new JoinLowMemory("SortMerge.java: memory not enough");
@@ -421,9 +433,11 @@ public class SortMerge extends Iterator implements GlobalConst {
 	 *                other exceptions
 	 */
 
-	public Tuple get_next() throws IOException, JoinsException, IndexException, InvalidTupleSizeException,
-			InvalidTypeException, PageNotReadException, TupleUtilsException, PredEvalException, SortException,
-			LowMemException, UnknowAttrType, UnknownKeyTypeException, Exception {
+	public Tuple get_next() throws IOException, JoinsException, IndexException,
+			InvalidTupleSizeException, InvalidTypeException,
+			PageNotReadException, TupleUtilsException, PredEvalException,
+			SortException, LowMemException, UnknowAttrType,
+			UnknownKeyTypeException, Exception {
 
 		int comp_res;
 		Tuple _tuple1, _tuple2;
@@ -445,12 +459,12 @@ public class SortMerge extends Iterator implements GlobalConst {
 					}
 				get_from_in1 = get_from_in2 = false;
 
-				
-				if(sortFldType.attrType == AttrType.attrDesc){
-				// Note that depending on whether the sort order
-				// is ascending or descending,
-				// this loop will be modified.
-					comp_res = TupleUtils.CompareTupleWithTuple(sortFldType, tuple1, jc_in1, tuple2, jc_in2, distance, target);
+				if (sortFldType.attrType == AttrType.attrDesc) {
+					// Note that depending on whether the sort order
+					// is ascending or descending,
+					// this loop will be modified.
+					comp_res = TupleUtils.CompareTupleWithTuple(sortFldType,
+							tuple1, jc_in1, tuple2, jc_in2, distance, target);
 					while ((comp_res < 0 && _order.tupleOrder == TupleOrder.Ascending)
 							|| (comp_res > 0 && _order.tupleOrder == TupleOrder.Descending)) {
 						if ((tuple1 = p_i1.get_next()) == null) {
@@ -458,10 +472,13 @@ public class SortMerge extends Iterator implements GlobalConst {
 							return null;
 						}
 
-						comp_res = TupleUtils.CompareTupleWithTuple(sortFldType, tuple1, jc_in1, tuple2, jc_in2, distance, target);
+						comp_res = TupleUtils.CompareTupleWithTuple(
+								sortFldType, tuple1, jc_in1, tuple2, jc_in2,
+								distance, target);
 					}
 
-					comp_res = TupleUtils.CompareTupleWithTuple(sortFldType, tuple1, jc_in1, tuple2, jc_in2, distance, target);
+					comp_res = TupleUtils.CompareTupleWithTuple(sortFldType,
+							tuple1, jc_in1, tuple2, jc_in2, distance, target);
 					while ((comp_res > 0 && _order.tupleOrder == TupleOrder.Ascending)
 							|| (comp_res < 0 && _order.tupleOrder == TupleOrder.Descending)) {
 						if ((tuple2 = p_i2.get_next()) == null) {
@@ -469,11 +486,13 @@ public class SortMerge extends Iterator implements GlobalConst {
 							return null;
 						}
 
-						comp_res = TupleUtils.CompareTupleWithTuple(sortFldType, tuple1, jc_in1, tuple2, jc_in2, distance, target);
+						comp_res = TupleUtils.CompareTupleWithTuple(
+								sortFldType, tuple1, jc_in1, tuple2, jc_in2,
+								distance, target);
 					}
-				}
-				else{
-					comp_res = TupleUtils.CompareTupleWithTuple(sortFldType, tuple1, jc_in1, tuple2, jc_in2);
+				} else {
+					comp_res = TupleUtils.CompareTupleWithTuple(sortFldType,
+							tuple1, jc_in1, tuple2, jc_in2);
 					while ((comp_res < 0 && _order.tupleOrder == TupleOrder.Ascending)
 							|| (comp_res > 0 && _order.tupleOrder == TupleOrder.Descending)) {
 						if ((tuple1 = p_i1.get_next()) == null) {
@@ -481,10 +500,12 @@ public class SortMerge extends Iterator implements GlobalConst {
 							return null;
 						}
 
-						comp_res = TupleUtils.CompareTupleWithTuple(sortFldType, tuple1, jc_in1, tuple2, jc_in2);
+						comp_res = TupleUtils.CompareTupleWithTuple(
+								sortFldType, tuple1, jc_in1, tuple2, jc_in2);
 					}
 
-					comp_res = TupleUtils.CompareTupleWithTuple(sortFldType, tuple1, jc_in1, tuple2, jc_in2);
+					comp_res = TupleUtils.CompareTupleWithTuple(sortFldType,
+							tuple1, jc_in1, tuple2, jc_in2);
 					while ((comp_res > 0 && _order.tupleOrder == TupleOrder.Ascending)
 							|| (comp_res < 0 && _order.tupleOrder == TupleOrder.Descending)) {
 						if ((tuple2 = p_i2.get_next()) == null) {
@@ -492,11 +513,10 @@ public class SortMerge extends Iterator implements GlobalConst {
 							return null;
 						}
 
-						comp_res = TupleUtils.CompareTupleWithTuple(sortFldType, tuple1, jc_in1, tuple2, jc_in2);
+						comp_res = TupleUtils.CompareTupleWithTuple(
+								sortFldType, tuple1, jc_in1, tuple2, jc_in2);
 					}
 				}
-					
-				
 
 				if (comp_res != 0) {
 					process_next_block = true;
@@ -509,13 +529,16 @@ public class SortMerge extends Iterator implements GlobalConst {
 				io_buf1.init(_bufs1, 1, t1_size, temp_file_fd1);
 				io_buf2.init(_bufs2, 1, t2_size, temp_file_fd2);
 
-				if(sortFldType.attrType == AttrType.attrDesc){
-					while (TupleUtils.CompareTupleWithTuple(sortFldType, tuple1, jc_in1, TempTuple1, jc_in1, distance, target) == 0) {
+				if (sortFldType.attrType == AttrType.attrDesc) {
+					while (TupleUtils.CompareTupleWithTuple(sortFldType,
+							tuple1, jc_in1, TempTuple1, jc_in1, distance,
+							target) == 0) {
 						// Insert tuple1 into io_buf1
 						try {
 							io_buf1.Put(tuple1);
 						} catch (Exception e) {
-							throw new JoinsException(e, "IoBuf error in sortmerge");
+							throw new JoinsException(e,
+									"IoBuf error in sortmerge");
 						}
 						if ((tuple1 = p_i1.get_next()) == null) {
 							get_from_in1 = true;
@@ -523,27 +546,31 @@ public class SortMerge extends Iterator implements GlobalConst {
 						}
 					}
 
-					while (TupleUtils.CompareTupleWithTuple(sortFldType, tuple2, jc_in2, TempTuple2, jc_in2, distance, target) == 0) {
+					while (TupleUtils.CompareTupleWithTuple(sortFldType,
+							tuple2, jc_in2, TempTuple2, jc_in2, distance,
+							target) == 0) {
 						// Insert tuple2 into io_buf2
 
 						try {
 							io_buf2.Put(tuple2);
 						} catch (Exception e) {
-							throw new JoinsException(e, "IoBuf error in sortmerge");
+							throw new JoinsException(e,
+									"IoBuf error in sortmerge");
 						}
 						if ((tuple2 = p_i2.get_next()) == null) {
 							get_from_in2 = true;
 							break;
 						}
 					}
-				}
-				else{
-					while (TupleUtils.CompareTupleWithTuple(sortFldType, tuple1, jc_in1, TempTuple1, jc_in1) == 0) {
+				} else {
+					while (TupleUtils.CompareTupleWithTuple(sortFldType,
+							tuple1, jc_in1, TempTuple1, jc_in1) == 0) {
 						// Insert tuple1 into io_buf1
 						try {
 							io_buf1.Put(tuple1);
 						} catch (Exception e) {
-							throw new JoinsException(e, "IoBuf error in sortmerge");
+							throw new JoinsException(e,
+									"IoBuf error in sortmerge");
 						}
 						if ((tuple1 = p_i1.get_next()) == null) {
 							get_from_in1 = true;
@@ -551,13 +578,15 @@ public class SortMerge extends Iterator implements GlobalConst {
 						}
 					}
 
-					while (TupleUtils.CompareTupleWithTuple(sortFldType, tuple2, jc_in2, TempTuple2, jc_in2) == 0) {
+					while (TupleUtils.CompareTupleWithTuple(sortFldType,
+							tuple2, jc_in2, TempTuple2, jc_in2) == 0) {
 						// Insert tuple2 into io_buf2
 
 						try {
 							io_buf2.Put(tuple2);
 						} catch (Exception e) {
-							throw new JoinsException(e, "IoBuf error in sortmerge");
+							throw new JoinsException(e,
+									"IoBuf error in sortmerge");
 						}
 						if ((tuple2 = p_i2.get_next()) == null) {
 							get_from_in2 = true;
@@ -565,7 +594,6 @@ public class SortMerge extends Iterator implements GlobalConst {
 						}
 					}
 				}
-				
 
 				// tuple1 and tuple2 contain the next tuples to be processed
 				// after this set.
@@ -580,7 +608,8 @@ public class SortMerge extends Iterator implements GlobalConst {
 
 				if ((_tuple1 = io_buf1.Get(TempTuple1)) == null) // Should not
 																	// occur
-					System.out.println("Equiv. class 1 in sort-merge has no tuples");
+					System.out
+							.println("Equiv. class 1 in sort-merge has no tuples");
 			}
 
 			if ((_tuple2 = io_buf2.Get(TempTuple2)) == null) {
@@ -593,7 +622,8 @@ public class SortMerge extends Iterator implements GlobalConst {
 				}
 			}
 			if (PredEval.Eval(OutputFilter, TempTuple1, TempTuple2, _in1, _in2) == true) {
-				Projection.Join(TempTuple1, _in1, TempTuple2, _in2, Jtuple, perm_mat, nOutFlds);
+				Projection.Join(TempTuple1, _in1, TempTuple2, _in2, Jtuple,
+						perm_mat, nOutFlds);
 				return Jtuple;
 			}
 		}
@@ -617,13 +647,15 @@ public class SortMerge extends Iterator implements GlobalConst {
 				p_i1.close();
 				p_i2.close();
 			} catch (Exception e) {
-				throw new JoinsException(e, "SortMerge.java: error in closing iterator.");
+				throw new JoinsException(e,
+						"SortMerge.java: error in closing iterator.");
 			}
 			if (temp_file_fd1 != null) {
 				try {
 					temp_file_fd1.deleteFile();
 				} catch (Exception e) {
-					throw new JoinsException(e, "SortMerge.java: delete file failed");
+					throw new JoinsException(e,
+							"SortMerge.java: delete file failed");
 				}
 				temp_file_fd1 = null;
 			}
@@ -631,7 +663,8 @@ public class SortMerge extends Iterator implements GlobalConst {
 				try {
 					temp_file_fd2.deleteFile();
 				} catch (Exception e) {
-					throw new JoinsException(e, "SortMerge.java: delete file failed");
+					throw new JoinsException(e,
+							"SortMerge.java: delete file failed");
 				}
 				temp_file_fd2 = null;
 			}
