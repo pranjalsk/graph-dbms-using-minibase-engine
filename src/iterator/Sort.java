@@ -192,10 +192,10 @@ public class Sort extends Iterator implements GlobalConst {
 				e.printStackTrace();
 				throw new SortException(e, "Sort.java: get_next() failed");
 			}
-
 			if (tuple == null) {
 				break;
 			}
+
 			cur_node = new pnode();
 			cur_node.tuple = new Tuple(tuple); // tuple copy needed -- Bingjie
 												// 4/29/98
