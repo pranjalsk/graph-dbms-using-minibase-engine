@@ -334,7 +334,7 @@ public class EdgeQuery {
 
 		Edge edge = new Edge();
 		try {
-			EFileScan efscan = new EFileScan(edgeHeapFileName, attrType, stringSize, (short) 8, 6, projlist, null);
+			EFileScan efscan = new EFileScan(edgeHeapFileName, attrType, stringSize, (short) 8, 8, projlist, null);
 			Sort sort = new Sort(attrType, (short) 8, stringSize, efscan, 6, order[0], 4, numBuf);
 
 			String edgeLabel, edgeSource, edgeDest;
