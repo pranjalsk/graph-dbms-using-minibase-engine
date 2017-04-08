@@ -432,7 +432,7 @@ public class EdgeQuery {
 
 		Edge edge = new Edge();
 		try {
-			EFileScan efscan = new EFileScan(edgeHeapFileName, attrType, stringSize, (short) 8, 6, projlist, expr);
+			EFileScan efscan = new EFileScan(edgeHeapFileName, attrType, stringSize, (short) 8, 8, projlist, expr);
 
 			String edgeLabel, edgeSrc, edgeDest;
 			int sourceNodePageID, sourceNodeSlotID, destinationNodePageID, destinationNodeSlotID, edgeWeight;
