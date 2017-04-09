@@ -7,12 +7,9 @@ import java.io.InputStreamReader;
 import java.util.HashSet;
 
 import tests.IndexNestedJoinTest;
-
 import zindex.ZTreeFile;
 import btree.BTreeFile;
-
 import Test_Phase2.QueryTest;
-
 import diskmgr.DB;
 import diskmgr.GraphDB;
 import diskmgr.PCounter;
@@ -68,7 +65,8 @@ public class BatchOperations {
 		do {
 			BufferedReader br = new BufferedReader(new InputStreamReader(
 					System.in));
-			System.out.println("\n\nList of Batch Operations");
+			System.out.println("\n\nList of Operations");
+			
 			System.out.println("1) batchnodeinsert");
 			System.out.println("2) batchedgeinsert");
 			System.out.println("3) batchnodedelete");
@@ -77,9 +75,11 @@ public class BatchOperations {
 			System.out.println("6) edgequery");
 
 			System.out
-					.println("Enter the batch operation, the input file path and the name of the Graph Database in the following format");
+					.println("For Phase2:Enter the batch operation, the input file path and the name of the Graph Database in the following format");
 			System.out.println("<task_name> <file_path> <GraphDB_name>");
+			System.out.println("For Phase 3: Enter <task_name> as 'PathExpressionQuery'");
 
+ 
 			String commandLineInvocation = br.readLine().trim();
 			String inputArguments[] = commandLineInvocation.split(" ");
 
@@ -104,6 +104,8 @@ public class BatchOperations {
 					taskNumber = 14;
 				else if (taskName.equalsIgnoreCase("edgequery"))
 					taskNumber = 15;
+				else if (taskName.equalsIgnoreCase("PathExpressionQuery"))
+					taskNumber = 23;
 
 				
 				if (taskNumber == 10 || taskNumber == 11 || taskNumber == 12
@@ -355,6 +357,14 @@ public class BatchOperations {
 						e.printStackTrace();
 					}
 					break;
+				case 23:
+					System.out
+					.println("Enter the path query expression in the following format");
+      			System.out.println("(Node Label|Node Descriptor)/(Node Label|Node Descriptor)/(Node Label|Node Descriptor)");
+ 
+      			String commandLineInvocation1 = br.readLine().trim();                
+                PathExpressionOperations.parsePathExpression(commandLineInvocation1);
+                break;
 				default:
 					System.out.println("Error: unrecognized task number "
 							+ taskName);
