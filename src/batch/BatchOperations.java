@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashSet;
 
+import tests.IndexNestedJoinTest;
+
 import zindex.ZTreeFile;
 import btree.BTreeFile;
 
@@ -320,6 +322,28 @@ public class BatchOperations {
 								eqi.query3(gdb.ehf, gdb.btf_edge_label, edgeLabelLength, (short)numBuf);
 							} else if (qtype == 4) {
 								eqi.query4(gdb.ehf, gdb.btf_edge_weight, edgeLabelLength, (short)numBuf);
+							} else if (qtype == 5) {
+								eqi.query5(gdb.ehf, gdb.btf_edge_weight, edgeLabelLength, (short)numBuf, edgeWtBound1, edgeWtBound2);
+							}else if(qtype == 6){
+								eqi.query6(gdb.ehf, gdb.btf_edge_label, gdb.nhf, edgeLabelLength, (short)numBuf);
+							}
+						}
+						else if (index == 2) {
+							IndexNestedJoinTest intest = new IndexNestedJoinTest();
+							if (qtype == 0) {
+								eqi.query0(gdb.ehf, gdb.btf_edge_label, gdb.nhf, edgeLabelLength, (short)numBuf);
+							} else if (qtype == 1) {
+								System.out.println("node_edge_source");
+								intest.node_edge_source(gdb.ehf, gdb.nhf, nodeLabelLength, (short)numBuf);
+							} else if (qtype == 2) {
+								System.out.println("node_edge_destination");
+								intest.node_edge_dest(gdb.ehf, gdb.nhf, nodeLabelLength, (short)numBuf);
+							} else if (qtype == 3) {
+								System.out.println("edge_node_source");
+								intest.edge_node_source(gdb.ehf, gdb.nhf, gdb.btf_node, edgeLabelLength, (short)numBuf);
+							} else if (qtype == 4) {
+								System.out.println("edge_node_source");
+								intest.edge_node_dest(gdb.ehf, gdb.nhf, gdb.btf_node, edgeLabelLength, (short)numBuf);
 							} else if (qtype == 5) {
 								eqi.query5(gdb.ehf, gdb.btf_edge_weight, edgeLabelLength, (short)numBuf, edgeWtBound1, edgeWtBound2);
 							}else if(qtype == 6){
