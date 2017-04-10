@@ -6,11 +6,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashSet;
 
+import tests.IndexNestedJoinTest;
 import zindex.ZTreeFile;
 import btree.BTreeFile;
-
 import Test_Phase2.QueryTest;
-
 import diskmgr.DB;
 import diskmgr.GraphDB;
 import diskmgr.PCounter;
@@ -66,7 +65,8 @@ public class BatchOperations {
 		do {
 			BufferedReader br = new BufferedReader(new InputStreamReader(
 					System.in));
-			System.out.println("\n\nList of Batch Operations");
+			System.out.println("\n\nList of Operations");
+			
 			System.out.println("1) batchnodeinsert");
 			System.out.println("2) batchedgeinsert");
 			System.out.println("3) batchnodedelete");
@@ -75,9 +75,11 @@ public class BatchOperations {
 			System.out.println("6) edgequery");
 
 			System.out
-					.println("Enter the batch operation, the input file path and the name of the Graph Database in the following format");
+					.println("For Phase2:Enter the batch operation, the input file path and the name of the Graph Database in the following format");
 			System.out.println("<task_name> <file_path> <GraphDB_name>");
+			System.out.println("For Phase 3: Enter <task_name> as 'PathExpressionQuery'");
 
+ 
 			String commandLineInvocation = br.readLine().trim();
 			String inputArguments[] = commandLineInvocation.split(" ");
 
@@ -102,6 +104,8 @@ public class BatchOperations {
 					taskNumber = 14;
 				else if (taskName.equalsIgnoreCase("edgequery"))
 					taskNumber = 15;
+				else if (taskName.equalsIgnoreCase("PathExpressionQuery"))
+					taskNumber = 23;
 
 				
 				if (taskNumber == 10 || taskNumber == 11 || taskNumber == 12
@@ -326,11 +330,41 @@ public class BatchOperations {
 								eqi.query6(gdb.ehf, gdb.btf_edge_label, gdb.nhf, edgeLabelLength, (short)numBuf);
 							}
 						}
+						else if (index == 2) {
+							IndexNestedJoinTest intest = new IndexNestedJoinTest();
+							if (qtype == 0) {
+								eqi.query0(gdb.ehf, gdb.btf_edge_label, gdb.nhf, edgeLabelLength, (short)numBuf);
+							} else if (qtype == 1) {
+								System.out.println("node_edge_source");
+								intest.node_edge_source(gdb.ehf, gdb.nhf, nodeLabelLength, (short)numBuf);
+							} else if (qtype == 2) {
+								System.out.println("node_edge_destination");
+								intest.node_edge_dest(gdb.ehf, gdb.nhf, nodeLabelLength, (short)numBuf);
+							} else if (qtype == 3) {
+								System.out.println("edge_node_source");
+								intest.edge_node_source(gdb.ehf, gdb.nhf, gdb.btf_node, edgeLabelLength, (short)numBuf);
+							} else if (qtype == 4) {
+								System.out.println("edge_node_source");
+								intest.edge_node_dest(gdb.ehf, gdb.nhf, gdb.btf_node, edgeLabelLength, (short)numBuf);
+							} else if (qtype == 5) {
+								eqi.query5(gdb.ehf, gdb.btf_edge_weight, edgeLabelLength, (short)numBuf, edgeWtBound1, edgeWtBound2);
+							}else if(qtype == 6){
+								eqi.query6(gdb.ehf, gdb.btf_edge_label, gdb.nhf, edgeLabelLength, (short)numBuf);
+							}
+						}
 						printStatistics(gdb);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
 					break;
+				case 23:
+					System.out
+					.println("Enter the path query expression in the following format");
+      			System.out.println("(Node Label|Node Descriptor)/(Node Label|Node Descriptor)/(Node Label|Node Descriptor)");
+ 
+      			String commandLineInvocation1 = br.readLine().trim();                
+                PathExpressionOperations.parsePathExpression(commandLineInvocation1);
+                break;
 				default:
 					System.out.println("Error: unrecognized task number "
 							+ taskName);
