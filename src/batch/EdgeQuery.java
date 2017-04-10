@@ -509,4 +509,8 @@ public class EdgeQuery {
 		}
 		System.out.println("No. of incident edge pairs "+count);
 	}
+	
+	
+	
+	
 }

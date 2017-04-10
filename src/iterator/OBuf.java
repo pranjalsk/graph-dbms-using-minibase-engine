@@ -62,6 +62,8 @@ public class OBuf implements GlobalConst{
       
       byte[] copybuf;
       copybuf = buf.getTupleByteArray();
+      System.out.println(buf.getStrFld(5));
+      System.out.println(t_size+":"+t_wr_to_pg*t_size+":"+_bufs[curr_page].length+":"+copybuf.length);
       System.arraycopy(copybuf,0,_bufs[curr_page],t_wr_to_pg*t_size,t_size); 
       Tuple tuple_ptr = new Tuple(_bufs[curr_page] , t_wr_to_pg * t_size,t_size);
       
