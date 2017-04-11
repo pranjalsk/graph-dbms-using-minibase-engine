@@ -76,7 +76,7 @@ public class IndexNestedJoinTest {
 
 		AttrType[] in1 = new AttrType[2];
 		short[] t1_str_sizes = new short[1];
-		stringSize[0] = nodeLabelLength;
+		t1_str_sizes[0] = nodeLabelLength;
 		in1[0] = new AttrType(AttrType.attrString);
 		in1[1] = new AttrType(AttrType.attrDesc);
 
