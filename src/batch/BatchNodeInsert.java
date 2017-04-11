@@ -9,7 +9,6 @@ public class BatchNodeInsert {
 	public void insertBatchNode(NodeHeapfile nhf, String sCurrentLine) throws Exception{
 		
 		// TODO Auto-generated method stub
-		
 		try{
 		String[] tokens = sCurrentLine.split(" ");
 		String label=tokens[0];

@@ -502,8 +502,10 @@ public class TupleUtils {
 		for (i = 0; i < nOutFlds; i++) {
 			if (proj_list[i].relation.key == RelSpec.outer)
 				res_attrs[i] = new AttrType(in1[proj_list[i].offset - 1].attrType);
-			else if (proj_list[i].relation.key == RelSpec.innerRel)
+			else if (proj_list[i].relation.key == RelSpec.innerRel){
+				//System.out.println(proj_list[i].offset - 1);	
 				res_attrs[i] = new AttrType(in2[proj_list[i].offset - 1].attrType);
+			}
 		}
 
 		// Now construct the res_str_sizes array.
