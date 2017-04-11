@@ -1,12 +1,15 @@
 package tests;
 
 
+import global.AttrOperator;
 import global.AttrType;
+import global.Descriptor;
 import global.EID;
 import heap.InvalidTupleSizeException;
 import heap.InvalidTypeException;
 import heap.Tuple;
 import index.IndexException;
+import iterator.CondExpr;
 import iterator.FldSpec;
 import iterator.IndexNestedLoopsJoins;
 import iterator.Iterator;
@@ -114,11 +117,23 @@ public class IndexNestedJoinTest {
 		proj_list[8] = new FldSpec(inner_relation, 7);
 		proj_list[9] = new FldSpec(inner_relation, 8);
 
+		/*Descriptor desc = new Descriptor();
+		desc.set(33, 38, 17, 34, 39);
+		CondExpr[] out_filter = new CondExpr[2];
+		out_filter[0] = new CondExpr();
+		out_filter[0].op = new AttrOperator(AttrOperator.aopEQ);
+		out_filter[0].type2 = new AttrType(AttrType.attrSymbol);
+		out_filter[0].type1 = new AttrType(AttrType.attrDesc);
+		out_filter[0].operand2.symbol = new FldSpec(new RelSpec(
+				RelSpec.outer), 2);
+		out_filter[0].operand1.attrDesc = desc;
+		out_filter[1] = null;*/
+		
 		IndexNestedLoopsJoins inlj = null;
 		try {
 			inlj = new IndexNestedLoopsJoins(in1, 2, 1, t1_str_sizes, in2, 8,
 					7, t2_str_sizes, numBuf, am_outer, ehf.get_fileName(),
-					btf_edge_source_label.get_fileName(), inner_projlist, null,
+					btf_edge_source_label.get_fileName(), inner_projlist, out_filter,
 					null, proj_list, 10);
 		} catch (Exception e) {
 			System.err.println("*** Error preparing for nested_loop_join");
