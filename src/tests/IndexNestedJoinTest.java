@@ -133,7 +133,7 @@ public class IndexNestedJoinTest {
 		try {
 			inlj = new IndexNestedLoopsJoins(in1, 2, 1, t1_str_sizes, in2, 8,
 					7, t2_str_sizes, numBuf, am_outer, ehf.get_fileName(),
-					btf_edge_source_label.get_fileName(), inner_projlist, out_filter,
+					btf_edge_source_label.get_fileName(), inner_projlist, null,
 					null, proj_list, 10);
 		} catch (Exception e) {
 			System.err.println("*** Error preparing for nested_loop_join");
