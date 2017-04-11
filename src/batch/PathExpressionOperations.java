@@ -21,7 +21,7 @@ public class PathExpressionOperations {
 	static HashMap<String,String> hm=new HashMap<String,String>();
 	public static String nodeLabel;
 	public static String nodeDescriptor;
-    public static PathExpressionOperatorTypeOne pathExprOpTypeOne;
+    //public static PathExpressionOperatorTypeOne pathExprOpTypeOne;
     public static NID sourceNID;
     public static String insideArguments[];
 	public static void parsePathExpression(String commandLineInvocation) throws Exception {
@@ -85,7 +85,7 @@ public class PathExpressionOperations {
 							else{
 								gdb.openDB(graphDBName);
 							}
-							sourceNID= PathExpressionOperatorTypeOne.lookupAndIterateOverPath(nodeLabel,gdb.nhf,gdb.btf_node);
+	//						sourceNID= PathExpressionOperatorTypeOne.lookupAndIterateOverPath(nodeLabel,gdb.nhf,gdb.btf_node);
 						  }//for
 					}//if present
 			//}

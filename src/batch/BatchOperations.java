@@ -309,6 +309,8 @@ public class BatchOperations {
 								eq.query5(gdb.ehf, edgeLabelLength, (short)numBuf, edgeWtBound1, edgeWtBound2);
 							}else if(qtype == 6){
 								eq.query6(gdb.ehf);
+							}else if(qtype == 7){
+								eq.query7(gdb.ehf, (short) 32);
 							}
 
 						}

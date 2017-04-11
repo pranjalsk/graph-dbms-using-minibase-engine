@@ -1,6 +1,5 @@
 package tests;
 
-
 import global.AttrType;
 import global.EID;
 import heap.InvalidTupleSizeException;
@@ -286,11 +285,12 @@ public class IndexNestedJoinTest {
 		btf_edge_dest_label.destroyFile();
 	}
 
-	public void edge_node_source(EdgeHeapFile ehf, NodeHeapfile nhf, BTreeFile btf_node_label,
-			short nodeLabelLength,short numBuf) throws JoinsException,
-			IndexException, InvalidTupleSizeException, InvalidTypeException,
-			PageNotReadException, PredEvalException, SortException,
-			LowMemException, UnknowAttrType, UnknownKeyTypeException, Exception {
+	public void edge_node_source(EdgeHeapFile ehf, NodeHeapfile nhf,
+			BTreeFile btf_node_label, short nodeLabelLength, short numBuf)
+			throws JoinsException, IndexException, InvalidTupleSizeException,
+			InvalidTypeException, PageNotReadException, PredEvalException,
+			SortException, LowMemException, UnknowAttrType,
+			UnknownKeyTypeException, Exception {
 
 		AttrType[] attrType = new AttrType[8];
 		short[] stringSize = new short[3];
@@ -335,7 +335,7 @@ public class IndexNestedJoinTest {
 		in1[5] = new AttrType(AttrType.attrInteger);
 		in1[6] = new AttrType(AttrType.attrString);
 		in1[7] = new AttrType(AttrType.attrString);
-		
+
 		AttrType[] in2 = new AttrType[2];
 		short[] t2_str_sizes = new short[1];
 		t2_str_sizes[0] = nodeLabelLength;
@@ -345,7 +345,7 @@ public class IndexNestedJoinTest {
 		RelSpec outer = new RelSpec(RelSpec.outer);
 		inner_projlist[0] = new FldSpec(outer, 1);
 		inner_projlist[1] = new FldSpec(outer, 2);
-		
+
 		FldSpec[] proj_list = new FldSpec[10];
 		RelSpec inner_relation = new RelSpec(RelSpec.innerRel);
 		RelSpec outer_relation = new RelSpec(RelSpec.outer);
@@ -364,8 +364,8 @@ public class IndexNestedJoinTest {
 		try {
 			inlj = new IndexNestedLoopsJoins(in1, 8, 7, t1_str_sizes, in2, 2,
 					1, t2_str_sizes, numBuf, am_outer, nhf.get_fileName(),
-					btf_node_label.get_fileName(), inner_projlist, null,
-					null, proj_list, 10);
+					btf_node_label.get_fileName(), inner_projlist, null, null,
+					proj_list, 10);
 		} catch (Exception e) {
 			System.err.println("*** Error preparing for nested_loop_join");
 			System.err.println("" + e);
@@ -402,11 +402,12 @@ public class IndexNestedJoinTest {
 
 	}
 
-	public void edge_node_dest(EdgeHeapFile ehf, NodeHeapfile nhf, BTreeFile btf_node_label,
-			short nodeLabelLength,short numBuf) throws JoinsException,
-			IndexException, InvalidTupleSizeException, InvalidTypeException,
-			PageNotReadException, PredEvalException, SortException,
-			LowMemException, UnknowAttrType, UnknownKeyTypeException, Exception {
+	public void edge_node_dest(EdgeHeapFile ehf, NodeHeapfile nhf,
+			BTreeFile btf_node_label, short nodeLabelLength, short numBuf)
+			throws JoinsException, IndexException, InvalidTupleSizeException,
+			InvalidTypeException, PageNotReadException, PredEvalException,
+			SortException, LowMemException, UnknowAttrType,
+			UnknownKeyTypeException, Exception {
 
 		AttrType[] attrType = new AttrType[8];
 		short[] stringSize = new short[3];
@@ -451,7 +452,7 @@ public class IndexNestedJoinTest {
 		in1[5] = new AttrType(AttrType.attrInteger);
 		in1[6] = new AttrType(AttrType.attrString);
 		in1[7] = new AttrType(AttrType.attrString);
-		
+
 		AttrType[] in2 = new AttrType[2];
 		short[] t2_str_sizes = new short[1];
 		t2_str_sizes[0] = nodeLabelLength;
@@ -461,7 +462,7 @@ public class IndexNestedJoinTest {
 		RelSpec outer = new RelSpec(RelSpec.outer);
 		inner_projlist[0] = new FldSpec(outer, 1);
 		inner_projlist[1] = new FldSpec(outer, 2);
-		
+
 		FldSpec[] proj_list = new FldSpec[10];
 		RelSpec inner_relation = new RelSpec(RelSpec.innerRel);
 		RelSpec outer_relation = new RelSpec(RelSpec.outer);
@@ -480,8 +481,8 @@ public class IndexNestedJoinTest {
 		try {
 			inlj = new IndexNestedLoopsJoins(in1, 8, 8, t1_str_sizes, in2, 2,
 					1, t2_str_sizes, numBuf, am_outer, nhf.get_fileName(),
-					btf_node_label.get_fileName(), inner_projlist, null,
-					null, proj_list, 10);
+					btf_node_label.get_fileName(), inner_projlist, null, null,
+					proj_list, 10);
 		} catch (Exception e) {
 			System.err.println("*** Error preparing for nested_loop_join");
 			System.err.println("" + e);
