@@ -357,7 +357,10 @@ public class BatchOperations {
 								new PathExpression().pathExpress1(expression, attr, gdb.nhf.get_fileName(), gdb.ehf.get_fileName(), 
 										"indexEhfSourceNodeName", gdb.btf_node.get_fileName(), (short)numBuf, nodeLabelLength);
 							}else if(qtype == 6){
-								eqi.query6(gdb.ehf, gdb.btf_edge_label, gdb.nhf, edgeLabelLength, (short)numBuf);
+								Object[] expression = new Object[]{new NID(new PageId(43),8), new String("518_809"), new String("809_818"), new Integer(50)};
+								AttrType[] attr = new AttrType[]{new AttrType(0), new AttrType(0), new AttrType(0), new AttrType(1)};
+								new PathExpression().pathExpress2(expression, attr, gdb.nhf.get_fileName(), gdb.ehf.get_fileName(), 
+										"indexEhfSourceNodeName", gdb.btf_node.get_fileName(), (short)numBuf, nodeLabelLength);
 							}
 						}
 						printStatistics(gdb);
