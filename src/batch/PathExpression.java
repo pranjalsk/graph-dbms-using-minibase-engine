@@ -1,20 +1,23 @@
 package batch;
 
-import java.io.IOException;
 
-import nodeheap.NScan;
+import btree.BTreeFile;
+import btree.KeyClass;
+import btree.StringKey;
+import edgeheap.EScan;
+import edgeheap.Edge;
+import edgeheap.EdgeHeapFile;
+
 import nodeheap.Node;
 import nodeheap.NodeHeapfile;
 import global.AttrOperator;
 import global.AttrType;
 import global.Descriptor;
+import global.EID;
 import global.NID;
-import heap.HFBufMgrException;
-import heap.HFDiskMgrException;
-import heap.HFException;
-import heap.Heapfile;
 import heap.InvalidSlotNumberException;
 import heap.InvalidTupleSizeException;
+import heap.Tuple;
 import iterator.CondExpr;
 import iterator.FileScan;
 import iterator.FldSpec;
@@ -29,6 +32,29 @@ public class PathExpression {
 			String indexNodeLabelName, short numBuf, short nodeLabelLength)
 			throws InvalidSlotNumberException, InvalidTupleSizeException,
 			Exception {
+		/***************************************/
+		EdgeHeapFile ehf = new EdgeHeapFile(ehfName);
+		BTreeFile btf_edge_source_label = new BTreeFile(indexEhfSourceNodeName,
+				AttrType.attrString, 32, 0);
+		EID eid = new EID();
+		Edge edge;
+		try {
+
+			EScan escan = ehf.openScan();
+			edge = escan.getNext(eid);
+			KeyClass key;
+			while (edge != null) {
+				edge.setHdr();
+				key = new StringKey(edge.getSourceLabel());
+				btf_edge_source_label.insert(key, eid);
+				edge = escan.getNext(eid);
+			}
+			escan.closescan();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		btf_edge_source_label.close();
+		/***************************************/
 
 		NodeHeapfile nodeHeapFile = new NodeHeapfile(nhfName);
 		Node starNode = nodeHeapFile.getRecord((NID) expression[0]);
@@ -59,7 +85,8 @@ public class PathExpression {
 				outer_Iterator_str_sizes, (short) 2, 2,
 				outer_Iterator_projlist, out_filter_outer_Iterator);
 
-		for (int i = 0; i < expression.length-1; i++) {
+		IndexNestedLoopsJoins inlj = null;
+		for (int i = 0; i < expression.length - 1; i++) {
 
 			short[] t1_str_sizes = new short[1];
 			t1_str_sizes[0] = nodeLabelLength;
@@ -102,8 +129,6 @@ public class PathExpression {
 			proj_list[4] = new FldSpec(inner_relation, 7);
 			proj_list[5] = new FldSpec(inner_relation, 8);
 
-			IndexNestedLoopsJoins inlj = null;
-
 			if (i != 0) {
 				out_filter_outer_Iterator = null;
 			}
@@ -119,8 +144,14 @@ public class PathExpression {
 				e.printStackTrace();
 				Runtime.getRuntime().exit(1);
 			}
-			am_outer.close();
-			
+
+			in1 = new AttrType[6];
+			in1[0] = new AttrType(AttrType.attrInteger);
+			in1[1] = new AttrType(AttrType.attrInteger);
+			in1[2] = new AttrType(AttrType.attrInteger);
+			in1[3] = new AttrType(AttrType.attrInteger);
+			in1[4] = new AttrType(AttrType.attrString);
+			in1[5] = new AttrType(AttrType.attrString);
 			t1_str_sizes = new short[2];
 			t1_str_sizes[0] = nodeLabelLength;
 			t1_str_sizes[1] = nodeLabelLength;
@@ -131,7 +162,7 @@ public class PathExpression {
 			inner_projlist[3] = new FldSpec(outer, 4);
 			inner_projlist[4] = new FldSpec(outer, 5);
 			inner_projlist[5] = new FldSpec(outer, 6);
-			
+
 			t2_str_sizes = new short[2];
 			t2_str_sizes[0] = nodeLabelLength;
 			in2 = new AttrType[2];
@@ -140,33 +171,49 @@ public class PathExpression {
 			CondExpr[] rightFilter = new CondExpr[2];
 			rightFilter[0] = new CondExpr();
 			rightFilter[0].op = new AttrOperator(AttrOperator.aopEQ);
-			if(attr[i+1].attrType == AttrType.attrString){
+			if (attr[i + 1].attrType == AttrType.attrString) {
 				rightFilter[0].type2 = new AttrType(AttrType.attrSymbol);
 				rightFilter[0].type1 = new AttrType(AttrType.attrString);
 				rightFilter[0].operand2.symbol = new FldSpec(new RelSpec(
-						RelSpec.outer), 2);
-				rightFilter[0].operand1.string = (String)expression[i+1];
-			}else{
+						RelSpec.outer), 1);
+				rightFilter[0].operand1.string = (String) expression[i + 1];
+			} else {
 				rightFilter[0].type2 = new AttrType(AttrType.attrSymbol);
 				rightFilter[0].type1 = new AttrType(AttrType.attrDesc);
 				rightFilter[0].operand2.symbol = new FldSpec(new RelSpec(
 						RelSpec.outer), 2);
-				rightFilter[0].operand1.attrDesc = (Descriptor)expression[i+1];
+				rightFilter[0].operand1.attrDesc = (Descriptor) expression[i + 1];
 			}
 			rightFilter[1] = null;
 			try {
 				am_outer = new IndexNestedLoopsJoins(in1, 6, 6, t1_str_sizes,
 						in2, 2, 1, t2_str_sizes, numBuf, inlj, nhfName,
-						indexNodeLabelName, inner_projlist, null,
-						rightFilter, proj_list, 2);
+						indexNodeLabelName, inner_projlist, null, rightFilter,
+						proj_list, 2);
 			} catch (Exception e) {
 				System.err.println("*** Error preparing for nested_loop_join");
 				System.err.println("" + e);
 				e.printStackTrace();
 				Runtime.getRuntime().exit(1);
 			}
-			inlj.close();
+			
 		}
+		/****************************/
+		Tuple tu;
+		
+		 AttrType[] types = new AttrType[2]; 
+		 short[] strSizes = new short[1];
+		 strSizes[0] = 32; 
+		 types[0] = new AttrType(AttrType.attrString);
+		 types[1] = new AttrType(AttrType.attrDesc);
+		 
+		while ((tu = am_outer.get_next()) != null) {
+			tu.setHdr((short) 2, types, strSizes);
+			System.out.println("Node Label: "+tu.getStrFld(1));
+		}
+		/****************************/
+		inlj.close();
+		am_outer.close();
 		return am_outer;
 	}
 }

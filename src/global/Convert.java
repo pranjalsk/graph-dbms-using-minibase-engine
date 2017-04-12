@@ -202,6 +202,23 @@ public class Convert {
 		
 		
 	}
+	
+	public static RID getIdValue(int position, byte[] data) throws IOException {
+
+		RID value = new RID();
+		
+		int intArr[] = new int[2];
+		
+		for(int ind = 0; ind  < 2; ind++, position+=4){
+			intArr[ind] = getIntValue(position, data);
+		}
+		
+		value.pageNo.pid = intArr[0];
+		value.slotNo = intArr[1];
+		return value;
+		
+		
+	}
 
 	/**
 	 * update an integer value in the given byte array at the specified position
@@ -387,6 +404,13 @@ public class Convert {
 		for(int ind  = 0; ind < Descriptor.DESCRIPTOR_SIZE; ind++, position+=4){
 			setIntValue(value.get(ind), position, data);
 		}
+	}
+	
+	public static void setIDValue(RID value, int position, byte[] data) 
+			throws java.io.IOException {
+		
+		setIntValue(value.pageNo.pid, position, data);
+		setIntValue(value.slotNo, position+4, data);
 	}
 
 }

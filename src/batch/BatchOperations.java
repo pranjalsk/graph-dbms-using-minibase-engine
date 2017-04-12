@@ -16,6 +16,7 @@ import diskmgr.PCounter;
 import global.AttrType;
 import global.Descriptor;
 import global.NID;
+import global.PageId;
 import global.SystemDefs;
 import global.TupleOrder;
 import heap.FieldNumberOutOfBoundException;
@@ -349,7 +350,12 @@ public class BatchOperations {
 								System.out.println("edge_node_source");
 								intest.edge_node_dest(gdb.ehf, gdb.nhf, gdb.btf_node, edgeLabelLength, (short)numBuf);
 							} else if (qtype == 5) {
-								eqi.query5(gdb.ehf, gdb.btf_edge_weight, edgeLabelLength, (short)numBuf, edgeWtBound1, edgeWtBound2);
+								Descriptor desc = new Descriptor();
+								desc.set(23, 30, 37, 8, 38);
+								Object[] expression = new Object[]{new NID(new PageId(61),0), new Descriptor(desc),new String("1000")};
+								AttrType[] attr = new AttrType[]{new AttrType(0), new AttrType(5), new AttrType(0)};
+								new PathExpression().pathExpress1(expression, attr, gdb.nhf.get_fileName(), gdb.ehf.get_fileName(), 
+										"indexEhfSourceNodeName", gdb.btf_node.get_fileName(), (short)numBuf, nodeLabelLength);
 							}else if(qtype == 6){
 								eqi.query6(gdb.ehf, gdb.btf_edge_label, gdb.nhf, edgeLabelLength, (short)numBuf);
 							}

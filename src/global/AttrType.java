@@ -13,6 +13,7 @@ public class AttrType {
   public static final int attrSymbol  = 3;
   public static final int attrNull    = 4;
   public static final int attrDesc    = 5;
+  public static final int attrId    = 6;
   
   public int attrType;
 

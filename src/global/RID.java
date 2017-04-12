@@ -67,4 +67,8 @@ public class RID{
       return false;
   }
   
+  public String toString(){
+	  return "[ "+this.pageNo.pid+":"+this.slotNo+" ]";
+  }
+  
 }
