@@ -20,10 +20,12 @@ import global.AttrType;
 import global.Descriptor;
 import global.EID;
 import global.NID;
+import global.RID;
 import global.TupleOrder;
 import heap.HFBufMgrException;
 import heap.HFDiskMgrException;
 import heap.HFException;
+import heap.Heapfile;
 import heap.InvalidSlotNumberException;
 import heap.InvalidTupleSizeException;
 import heap.Tuple;
@@ -217,15 +219,50 @@ public class PathExpression {
 		strSizes[0] = 32;
 		types[0] = new AttrType(AttrType.attrString);
 		types[1] = new AttrType(AttrType.attrDesc);
-
+		
+		Heapfile tailNodeFile = new Heapfile("TailNodeFile");
+		tailNodeFile.deleteFile();
+		tailNodeFile = new Heapfile("TailNodeFile");
+		BatchInsert bi = new BatchInsert();
+		BTreeFile btfNodeLabel = new BTreeFile(indexNodeLabelName);
 		while ((tu = am_outer.get_next()) != null) {
 			tu.setHdr((short) 2, types, strSizes);
 			System.out.println("Node Label: " + tu.getStrFld(1));
+			Tuple tail = new Tuple();
+			RID rid = (RID)(bi.getNidFromNodeLabel(tu.getStrFld(1), nodeHeapFile, btfNodeLabel));
+			System.out.println(rid.pageNo.pid+":"+rid.slotNo);
+			tail.setHdr((short)1, new AttrType[]{new AttrType(AttrType.attrId)}, new short[]{});
+			tail.setIDFld(1, rid);
+			tailNodeFile.insertRecord(tail.getTupleByteArray());
 		}
 		/****************************/
+		btfNodeLabel.close();
 		inlj.close();
 		am_outer.close();
-		return am_outer;
+		
+
+		short[] str_sizes = new short[0];
+		
+
+		AttrType[] atrType = new AttrType[1];
+		atrType[0] = new AttrType(AttrType.attrId);
+
+		FldSpec[] projlist = new FldSpec[1];
+		projlist[0] = new FldSpec(new RelSpec(RelSpec.outer), 1);
+
+
+		Iterator tail_iterator = new FileScan("TailNodeFile" , atrType,
+				str_sizes, (short) 1, 1,
+				projlist, null);
+		/*Tuple t;
+		while((t = tail_iterator.get_next()) != null){
+			t.setHdr((short)1, atrType, str_sizes);
+			RID rid = t.getIDFld(1); 
+			System.out.println(rid.pageNo.pid+":"+rid.slotNo);
+			t.print(atrType);
+		}*/
+		
+		return tail_iterator;
 	}
 
 	public Iterator pathExpress2(Object[] expression, AttrType[] attr,
@@ -493,15 +530,50 @@ public class PathExpression {
 		types[6] = new AttrType(AttrType.attrString); // SrcLabel
 		types[7] = new AttrType(AttrType.attrString); // DestLabel
 
+
+		Heapfile tailNodeFile = new Heapfile("TailNodeFileForEdge");
+		tailNodeFile.deleteFile();
+		tailNodeFile = new Heapfile("TailNodeFileForEdge");
 		while ((tu = inlj.get_next()) != null) {
 			tu.setHdr((short) 8, types, strSizes);
 			tu.print(types);
+			RID rid = new RID();
+			rid.pageNo.pid = tu.getIntFld(3);
+			rid.slotNo = tu.getIntFld(4);
+			Tuple tail = new Tuple();
+			tail.setHdr((short)1, new AttrType[]{new AttrType(AttrType.attrId)}, new short[]{});
+			tail.setIDFld(1, rid);
+			tailNodeFile.insertRecord(tail.getTupleByteArray());
 //			System.out.println("Node Label: " + tu.getStrFld(8));
 		}
 		/****************************/
 		inlj.close();
 		am_outer.close();
-		return am_outer;
+		
+
+		short[] str_sizes = new short[0];
+		
+
+		AttrType[] atrType = new AttrType[1];
+		atrType[0] = new AttrType(AttrType.attrId);
+
+		FldSpec[] projlist = new FldSpec[1];
+		projlist[0] = new FldSpec(new RelSpec(RelSpec.outer), 1);
+
+
+		Iterator tail_iterator = new FileScan("TailNodeFileForEdge" , atrType,
+				str_sizes, (short) 1, 1,
+				projlist, null);
+		
+		/*Tuple t;
+		while((t = tail_iterator.get_next()) != null){
+			t.setHdr((short)1, atrType, str_sizes);
+			RID rid = t.getIDFld(1); 
+			System.out.println(rid.pageNo.pid+":"+rid.slotNo);
+			t.print(atrType);
+		}*/
+		
+		return tail_iterator;
 		
 	}
 }

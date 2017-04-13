@@ -352,7 +352,7 @@ public class BatchOperations {
 							} else if (qtype == 5) {
 								Descriptor desc = new Descriptor();
 								desc.set(23, 30, 37, 8, 38);
-								Object[] expression = new Object[]{new NID(new PageId(61),0), new Descriptor(desc),new String("1000")};
+								Object[] expression = new Object[]{new NID(new PageId(61),0), new Descriptor(desc),new String("949")};
 								AttrType[] attr = new AttrType[]{new AttrType(0), new AttrType(5), new AttrType(0)};
 								new PathExpression().pathExpress1(expression, attr, gdb.nhf.get_fileName(), gdb.ehf.get_fileName(), 
 										"indexEhfSourceNodeName", gdb.btf_node.get_fileName(), (short)numBuf, nodeLabelLength);
