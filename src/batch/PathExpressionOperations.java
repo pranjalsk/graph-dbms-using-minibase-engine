@@ -79,8 +79,8 @@ public class PathExpressionOperations {
 						  hm.put(nodeLabel, nodeDescriptor);
 							if (!hs.contains(graphDBName)) {
 								hs.add(graphDBName);
-								GraphDB.initGraphDB(graphDBName);	
-								gdb = new GraphDB(0);
+							//	GraphDB.initGraphDB(graphDBName);	
+							//	gdb = new GraphDB(0);
 							}
 							else{
 								gdb.openDB(graphDBName);

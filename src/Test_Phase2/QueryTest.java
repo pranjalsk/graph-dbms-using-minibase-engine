@@ -1,4 +1,4 @@
-package Test_Phase2;
+/*package Test_Phase2;
 
 import java.io.IOException;
 
@@ -191,8 +191,8 @@ public class QueryTest {
 		Descriptor desc_high =new Descriptor();
 		desc_high.set(6,2,3,4,5);
 		
-		KeyClass low_key = /*null;*/new DescriptorKey(desc_low);
-		KeyClass high_key = /*null;*/new DescriptorKey(desc_high);
+		KeyClass low_key = null;new DescriptorKey(desc_low);
+		KeyClass high_key = null;new DescriptorKey(desc_high);
 		int distance = 100;
 		ZTFileScan newDscan = gdb.ztf_node_desc.new_scan(low_key, distance);
 		KeyDataEntry newKeyDataEntry = null;
@@ -398,3 +398,4 @@ public class QueryTest {
 	}
 		
 }
+*/

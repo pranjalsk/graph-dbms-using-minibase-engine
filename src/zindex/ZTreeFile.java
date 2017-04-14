@@ -50,8 +50,8 @@ public class ZTreeFile extends IndexFile implements GlobalConst {
 	 * @throws IOException
 	 * @throws PinPageException
 	 */
-	public ZTreeFile() throws GetFileEntryException, ConstructPageException, AddFileEntryException, IOException, PinPageException {
-		zBTFile = new BTreeFile("zBTFile",AttrType.attrString,32,0);
+	public ZTreeFile(String zTBFile) throws GetFileEntryException, ConstructPageException, AddFileEntryException, IOException, PinPageException {
+		zBTFile = new BTreeFile(zTBFile,AttrType.attrString,32,0);
 	}
 
 /** insert record with the given key and nid

@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashSet;
+import java.util.Scanner;
 
 import tests.IndexNestedJoinTest;
 import zindex.ZTreeFile;
@@ -13,6 +14,7 @@ import Test_Phase2.QueryTest;
 import diskmgr.DB;
 import diskmgr.GraphDB;
 import diskmgr.PCounter;
+import edgeheap.EdgeHeapFile;
 import global.AttrType;
 import global.Descriptor;
 import global.NID;
@@ -50,13 +52,15 @@ public class BatchOperations {
 	public static String dbpath;
 	public static String logpath;
 	static HashSet<String> hs;
-	
 
-	
 	public static void main(String[] args) throws Exception {
-		
-		hs = new HashSet<String>();
-		
+
+		Scanner sc= new Scanner(System.in);
+		System.out.println("Enter Graph DB name:");
+		graphDBName = sc.next();
+		initGraphDB(graphDBName);
+		GraphDB gdb = new GraphDB(0, graphDBName);
+
 		/*
 		 * Menu Driven Program (CUI for Batch operations) Enter the task name of
 		 * your choice Enter the input file path Enter the GraphDB name Call the
@@ -66,7 +70,7 @@ public class BatchOperations {
 			BufferedReader br = new BufferedReader(new InputStreamReader(
 					System.in));
 			System.out.println("\n\nList of Operations");
-			
+
 			System.out.println("1) batchnodeinsert");
 			System.out.println("2) batchedgeinsert");
 			System.out.println("3) batchnodedelete");
@@ -79,7 +83,6 @@ public class BatchOperations {
 			System.out.println("<task_name> <file_path> <GraphDB_name>");
 			System.out.println("For Phase 3: Enter <task_name> as 'PathExpressionQuery'");
 
- 
 			String commandLineInvocation = br.readLine().trim();
 			String inputArguments[] = commandLineInvocation.split(" ");
 
@@ -87,7 +90,7 @@ public class BatchOperations {
 			int taskNumber = 0;
 
 			if (taskName.equalsIgnoreCase("exit")) {
-					System.exit(0);
+				System.exit(0);
 			} else {
 
 				System.out.println("Task Name: " + taskName);
@@ -107,15 +110,29 @@ public class BatchOperations {
 				else if (taskName.equalsIgnoreCase("PathExpressionQuery"))
 					taskNumber = 23;
 
-				
 				if (taskNumber == 10 || taskNumber == 11 || taskNumber == 12
 						|| taskNumber == 13) {
 
-					//---------------------------------
+					// ---------------------------------
 					filePath = inputArguments[1];
-					graphDBName = inputArguments[2];
-				} else if (taskNumber == 14) {
-					graphDBName = inputArguments[1];
+					String inputGraphDBName = inputArguments[2];
+					while(!graphDBName.equals(inputGraphDBName)){
+						System.out.println("Wrong graph db name enter graph db name again");
+						System.out.println("Graph DB name: ");
+						Scanner sc1 = new Scanner(System.in);
+						inputGraphDBName = sc1.next();
+					}
+					
+				} 
+				else if (taskNumber == 14) {
+					String inputGraphDBName = inputArguments[1];
+					while(!graphDBName.equals(inputGraphDBName)){
+						System.out.println("Wrong graph db name; enter graph db name again");
+						System.out.println("Graph DB name: ");
+						Scanner sc1 = new Scanner(System.in);
+						inputGraphDBName = sc1.next();
+					}	
+					
 					numBuf = Integer.parseInt(inputArguments[2]);
 					qtype = Integer.parseInt(inputArguments[3]);
 					index = Integer.parseInt(inputArguments[4]);
@@ -148,8 +165,15 @@ public class BatchOperations {
 					} else if (qtype == 4) {
 						targetLabel = inputArguments[5];
 					}
-				} else if(taskNumber == 15){
-					graphDBName = inputArguments[1];
+				} 
+				else if (taskNumber == 15) {
+					String inputGraphDBName = inputArguments[1];
+					while(!graphDBName.equals(inputGraphDBName)){
+						System.out.println("Wrong graph db name; enter graph db name again");
+						System.out.println("Graph DB name: ");
+						Scanner sc1 = new Scanner(System.in);
+						inputGraphDBName = sc1.next();
+					}	
 					numBuf = Integer.parseInt(inputArguments[2]);
 					qtype = Integer.parseInt(inputArguments[3]);
 					index = Integer.parseInt(inputArguments[4]);
@@ -158,19 +182,8 @@ public class BatchOperations {
 						edgeWtBound2 = Integer.parseInt(inputArguments[6]);
 					}
 				}
-				System.out.println("tasknumber"+taskNumber);
-				
-				// DB SETUP
-				if (!hs.contains(graphDBName)) {
-					hs.add(graphDBName);
-					GraphDB.initGraphDB(graphDBName);	
-					gdb = new GraphDB(0);
-				}
-				else{
-					gdb.openDB(graphDBName);
-				}
-				
-				
+				System.out.println("tasknumber" + taskNumber);
+
 				
 				switch (taskNumber) {
 
@@ -178,20 +191,33 @@ public class BatchOperations {
 				case 10:
 					try {
 						String sCurrentLine;
-
+						NodeHeapfile nhf = new NodeHeapfile("NodeHeapFile_"+ graphDBName);
+						EdgeHeapFile ehf =  new EdgeHeapFile("EdgeHeapFile_"+graphDBName);
+						BTreeFile btf_node_label = new BTreeFile("IndNodeLabel_"+graphDBName);
+						ZTreeFile ztf_node_desc = new ZTreeFile("zBTFile");
+						
 						br = new BufferedReader(new FileReader(filePath));
 						while ((sCurrentLine = br.readLine()) != null) {
 
-							BatchNodeInsert newNodeInsert = new BatchNodeInsert();
-							newNodeInsert.insertBatchNode(gdb.nhf, sCurrentLine);
-							
+							BatchNodeInsert newNodeInsert = new BatchNodeInsert();		
+							newNodeInsert.insertBatchNode(nhf, sCurrentLine);
 						}
 						System.out.println("Batch Nodes insertion done");
-						printStatistics(gdb);
-						gdb.createBTNodeLabel();
+						
+						// Insert records in Btree file
+						gdb.createBTNodeLabel(nhf,btf_node_label);
+						
+						printStatistics(gdb,nhf,ehf);
+						
 						System.out.println("Node label BT craeted");
-						gdb.createZTFNodeDesc();
+						btf_node_label.close();
+												
+						gdb.createZTFNodeDesc(nhf,ztf_node_desc);
 						System.out.println("Node descriptor BT created");
+						
+						//ztf_node_desc.close();  //No close method for Z tree file
+						
+					
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -201,15 +227,29 @@ public class BatchOperations {
 				case 11:
 					try {
 						BatchEdgeInsert newEdgeInsert = new BatchEdgeInsert();
-						newEdgeInsert.insertBatchEdge(gdb.ehf, gdb.nhf, gdb.btf_node,
-								filePath);
+						EdgeHeapFile ehf =  new EdgeHeapFile("EdgeHeapFile_"+graphDBName);
+						NodeHeapfile nhf = new NodeHeapfile("NodeHeapFile_"+ graphDBName);
+						BTreeFile btf_node_label = new BTreeFile("IndNodeLabel_"+graphDBName);
+						BTreeFile btf_edge_label = new BTreeFile("IndEdgeLabel_"+graphDBName);
+						BTreeFile btf_edge_weight = new BTreeFile("IndEdgeWeight_"+graphDBName);
+						
+						newEdgeInsert.insertBatchEdge(ehf, nhf,btf_node_label, filePath);
 						System.out.println("Batch edge insertion done");
-						gdb.createBTEdgeLabel();
+						
+						printStatistics(gdb,nhf,ehf);
+						
+						btf_node_label.close();
+						
+						gdb.createBTEdgeLabel(ehf,btf_edge_label);
 						System.out.println("BTree on Edge Label Created");
-						gdb.createBTEdgeWeight();
+						btf_edge_label.close();
+						
+						gdb.createBTEdgeWeight(ehf,btf_edge_weight);
 						System.out.println("BTree on Edge Weight Created");
-						printStatistics(gdb);
-					} catch (Exception e) {
+						btf_edge_weight.close();
+						
+						} 
+					catch (Exception e) {
 						e.printStackTrace();
 					}
 					break;
@@ -218,11 +258,27 @@ public class BatchOperations {
 				case 12:
 					try {
 						BatchNodeDelete newNodeDelete = new BatchNodeDelete();
-						newNodeDelete.deleteBatchNode(gdb.nhf, gdb.ehf,
-								gdb.btf_node, gdb.ztf_node_desc,
-								gdb.btf_edge_label, gdb.btf_edge_weight,
+						
+						EdgeHeapFile ehf =  new EdgeHeapFile("EdgeHeapFile_"+graphDBName);
+						NodeHeapfile nhf = new NodeHeapfile("NodeHeapFile_"+ graphDBName);
+						BTreeFile btf_node_label = new BTreeFile("IndNodeLabel_"+graphDBName);
+						BTreeFile btf_edge_label = new BTreeFile("IndEdgeLabel_"+graphDBName);
+						BTreeFile btf_edge_weight = new BTreeFile("IndEdgeWeight_"+graphDBName);
+						ZTreeFile ztf_node_desc = new ZTreeFile("zBTFile");
+						
+						newNodeDelete.deleteBatchNode(nhf, ehf,
+								btf_node_label, ztf_node_desc,
+								btf_edge_label, btf_edge_weight,
 								filePath);
-						printStatistics(gdb);
+						
+						printStatistics(gdb,nhf,ehf);
+						
+						//close all files
+						btf_node_label.close();
+						btf_edge_label.close();
+						btf_edge_weight.close();
+						//ztf_node_desc.close();     //No close method for Z tree fiel
+						
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -231,11 +287,25 @@ public class BatchOperations {
 				// Task : Batch Edge Delete
 				case 13:
 					try {
-						BatchEdgeDelete newEdgeDelete = new BatchEdgeDelete();
-						newEdgeDelete.deleteBatchEdge(gdb.ehf, gdb.nhf,
-								gdb.btf_node,gdb.btf_edge_label, gdb.btf_edge_weight,
-								filePath);
-						printStatistics(gdb);
+						BatchEdgeDelete newEdgeDelete = new BatchEdgeDelete();	
+
+						EdgeHeapFile ehf =  new EdgeHeapFile("EdgeHeapFile_"+graphDBName);
+						NodeHeapfile nhf = new NodeHeapfile("NodeHeapFile_"+ graphDBName);
+						BTreeFile btf_node_label = new BTreeFile("IndNodeLabel_"+graphDBName);
+						BTreeFile btf_edge_label = new BTreeFile("IndEdgeLabel_"+graphDBName);
+						BTreeFile btf_edge_weight = new BTreeFile("IndEdgeWeight_"+graphDBName);
+						
+						newEdgeDelete.deleteBatchEdge(ehf, nhf,
+								btf_node_label, btf_edge_label,
+								btf_edge_weight, filePath);
+						
+						printStatistics(gdb,nhf,ehf);
+						
+						//close all files
+						btf_node_label.close();
+						btf_edge_label.close();
+						btf_edge_weight.close();	
+						
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -243,130 +313,221 @@ public class BatchOperations {
 
 				// Task : Node Query
 				case 14:
-					System.out.println("task 14");
-					NodeQuery nq = new NodeQuery();
-					NodeQueryWithIndex nqi = new NodeQueryWithIndex();
 					try {
-						// heapfile scan
-						if (index == 0) {
+						System.out.println("task 14");
+						NodeQuery nq = new NodeQuery();
+						NodeQueryWithIndex nqi = new NodeQueryWithIndex();
+						
+						EdgeHeapFile ehf = new EdgeHeapFile("EdgeHeapFile_"+graphDBName);
+						NodeHeapfile nhf = new NodeHeapfile("NodeHeapFile_"+ graphDBName);
+						BTreeFile btf_node_label = new BTreeFile("IndNodeLabel_"+graphDBName);
+						BTreeFile btf_edge_label = new BTreeFile("IndEdgeLabel_"+graphDBName);
+						BTreeFile btf_edge_weight = new BTreeFile("IndEdgeWeight_"+graphDBName);
+						ZTreeFile ztf_node_desc = new ZTreeFile("zBTFile");
+						
+						try {
+							// heapfile scan
+							if (index == 0) {
 
-							if (qtype == 0) {
-								nq.query0(gdb.nhf);
-							} else if (qtype == 1) {
-								nq.query1(gdb.nhf, nodeLabelLength, (short)numBuf);
-							} else if (qtype == 2) {
-								nq.query2(gdb.nhf, nodeLabelLength, (short)numBuf, targetDescriptor, distance);
-							} else if (qtype == 3) {
-								nq.query3(gdb.nhf, nodeLabelLength, (short)numBuf, targetDescriptor, distance);
-							} else if (qtype == 4) {
-								nq.query4(gdb.nhf, gdb.ehf, gdb.btf_node,nodeLabelLength, (short)numBuf, targetLabel);
-							} else if (qtype == 5) {
-								nq.query5(gdb.nhf, gdb.ehf, gdb.btf_node,nodeLabelLength, (short)numBuf, targetDescriptor, distance);
-							}
+								if (qtype == 0) {
+									nq.query0(nhf);
+								} else if (qtype == 1) {
+									nq.query1(nhf, nodeLabelLength,
+											(short) numBuf);
+								} else if (qtype == 2) {
+									nq.query2(nhf, nodeLabelLength,
+											(short) numBuf, targetDescriptor,
+											distance);
+								} else if (qtype == 3) {
+									nq.query3(nhf, nodeLabelLength,
+											(short) numBuf, targetDescriptor,
+											distance);
+								} else if (qtype == 4) {
+									nq.query4(nhf, ehf, btf_node_label,
+											nodeLabelLength, (short) numBuf,
+											targetLabel);
+								} else if (qtype == 5) {
+									nq.query5(nhf, ehf, btf_node_label,
+											nodeLabelLength, (short) numBuf,
+											targetDescriptor, distance);
+								}
 
-						}
-						// index scan
-						else if (index == 1) {
-							if (qtype == 0) {
-								nqi.query0(gdb.nhf, gdb.btf_node, nodeLabelLength, (short)numBuf);
-							} else if (qtype == 1) {
-								nqi.query1(gdb.nhf, gdb.btf_node, nodeLabelLength, (short)numBuf);
-							} else if (qtype == 2) {
-								nqi.query2(gdb.nhf, gdb.ztf_node_desc, nodeLabelLength, (short)numBuf, targetDescriptor, distance);
-							} else if (qtype == 3) {
-								nqi.query3(gdb.nhf, gdb.ztf_node_desc, nodeLabelLength, (short)numBuf, targetDescriptor, distance);
-							} else if (qtype == 4) {
-								nqi.query4(gdb.nhf, gdb.btf_node, gdb.ehf, nodeLabelLength, (short)numBuf, targetLabel);
-							} else if (qtype == 5) {
-								nqi.query5(gdb.nhf, gdb.ztf_node_desc, gdb.btf_node,gdb.ehf, nodeLabelLength, (short)numBuf, targetDescriptor, distance);
 							}
+							// index scan
+							else if (index == 1) {
+								if (qtype == 0) {
+									nqi.query0(nhf, btf_node_label,
+											nodeLabelLength, (short) numBuf);
+								} else if (qtype == 1) {
+									nqi.query1(nhf, btf_node_label,
+											nodeLabelLength, (short) numBuf);
+								} else if (qtype == 2) {
+									nqi.query2(nhf, ztf_node_desc,
+											nodeLabelLength, (short) numBuf,
+											targetDescriptor, distance);
+								} else if (qtype == 3) {
+									nqi.query3(nhf, ztf_node_desc,
+											nodeLabelLength, (short) numBuf,
+											targetDescriptor, distance);
+								} else if (qtype == 4) {
+									nqi.query4(nhf, btf_node_label, ehf,
+											nodeLabelLength, (short) numBuf,
+											targetLabel);
+								} else if (qtype == 5) {
+									nqi.query5(nhf, ztf_node_desc,
+											btf_node_label, ehf, nodeLabelLength,
+											(short) numBuf, targetDescriptor,
+											distance);
+								}
+							}
+							
+							printStatistics(gdb,nhf,ehf);
+							
+							//close all files
+							btf_node_label.close();
+							btf_edge_label.close();
+							btf_edge_weight.close();
+							//ztf_node_desc.close();     //No close method for Z tree fiel
+							
+						} catch (Exception e) {
+							e.printStackTrace();
 						}
-						printStatistics(gdb);
-					} catch (Exception e) {
-						e.printStackTrace();
+					} catch (Exception e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
 					}
 					break;
 
 				// Task : Edge Query
 				case 15:
-					EdgeQuery eq = new EdgeQuery();
-					EdgeQueryWithIndex eqi = new EdgeQueryWithIndex();
 					try {
-						// heapfile scan
-						if (index == 0) {
+						System.out.println("Task 15");
+						EdgeQuery eq = new EdgeQuery();
+						EdgeQueryWithIndex eqi = new EdgeQueryWithIndex();
+											
+						EdgeHeapFile ehf =  new EdgeHeapFile("EdgeHeapFile_"+graphDBName);
+						NodeHeapfile nhf = new NodeHeapfile("NodeHeapFile_"+ graphDBName);
+						BTreeFile btf_node_label = new BTreeFile("IndNodeLabel_"+graphDBName);
+						BTreeFile btf_edge_label = new BTreeFile("IndEdgeLabel_"+graphDBName);
+						BTreeFile btf_edge_weight = new BTreeFile("IndEdgeWeight_"+graphDBName);
+						//ZTreeFile ztf_node_desc = new ZTreeFile("zBTFile");     //never used in this case
+						
+						try {
+							// heapfile scan
+							if (index == 0) {
 
-							if (qtype == 0) {
-								eq.query0(gdb.ehf, gdb.nhf);
-							} else if (qtype == 1) {
-								eq.query1(gdb.ehf, gdb.nhf, gdb.btf_node, nodeLabelLength, (short)numBuf);
-							} else if (qtype == 2) {
-								eq.query2(gdb.ehf, gdb.nhf, gdb.btf_node, nodeLabelLength, (short)numBuf);
-							} else if (qtype == 3) {
-								eq.query3(gdb.ehf, edgeLabelLength, (short)numBuf);
-							} else if (qtype == 4) {
-								eq.query4(gdb.ehf, edgeLabelLength, (short)numBuf);
-							} else if (qtype == 5) {
-								eq.query5(gdb.ehf, edgeLabelLength, (short)numBuf, edgeWtBound1, edgeWtBound2);
-							}else if(qtype == 6){
-								eq.query6(gdb.ehf);
-							}else if(qtype == 7){
-								eq.query7(gdb.ehf, (short) 32);
-							}
+								if (qtype == 0) {
+									eq.query0(ehf, nhf);
+								} else if (qtype == 1) {
+									eq.query1(ehf, nhf, btf_node_label,
+											nodeLabelLength, (short) numBuf);
+								} else if (qtype == 2) {
+									eq.query2(ehf, nhf, btf_node_label,
+											nodeLabelLength, (short) numBuf);
+								} else if (qtype == 3) {
+									eq.query3(ehf, edgeLabelLength,
+											(short) numBuf);
+								} else if (qtype == 4) {
+									eq.query4(ehf, edgeLabelLength,
+											(short) numBuf);
+								} else if (qtype == 5) {
+									eq.query5(ehf, edgeLabelLength,
+											(short) numBuf, edgeWtBound1,
+											edgeWtBound2);
+								} else if (qtype == 6) {
+									eq.query6(ehf);
+								} else if (qtype == 7) {
+									eq.query7(ehf, (short) 32);
+								}
 
-						}
-						// index scan
-						else if (index == 1) {
-							if (qtype == 0) {
-								eqi.query0(gdb.ehf, gdb.btf_edge_label, gdb.nhf, edgeLabelLength, (short)numBuf);
-							} else if (qtype == 1) {
-								eqi.query1(gdb.ehf, gdb.btf_node, gdb.nhf, nodeLabelLength, (short)numBuf);
-							} else if (qtype == 2) {
-								eqi.query2(gdb.ehf, gdb.btf_node, gdb.nhf, nodeLabelLength, (short)numBuf);
-							} else if (qtype == 3) {
-								eqi.query3(gdb.ehf, gdb.btf_edge_label, edgeLabelLength, (short)numBuf);
-							} else if (qtype == 4) {
-								eqi.query4(gdb.ehf, gdb.btf_edge_weight, edgeLabelLength, (short)numBuf);
-							} else if (qtype == 5) {
-								eqi.query5(gdb.ehf, gdb.btf_edge_weight, edgeLabelLength, (short)numBuf, edgeWtBound1, edgeWtBound2);
-							}else if(qtype == 6){
-								eqi.query6(gdb.ehf, gdb.btf_edge_label, gdb.nhf, edgeLabelLength, (short)numBuf);
 							}
-						}
-						else if (index == 2) {
-							IndexNestedJoinTest intest = new IndexNestedJoinTest();
-							if (qtype == 0) {
-								eqi.query0(gdb.ehf, gdb.btf_edge_label, gdb.nhf, edgeLabelLength, (short)numBuf);
-							} else if (qtype == 1) {
-								System.out.println("node_edge_source");
-								intest.node_edge_source(gdb.ehf, gdb.nhf, nodeLabelLength, (short)numBuf);
-							} else if (qtype == 2) {
-								System.out.println("node_edge_destination");
-								intest.node_edge_dest(gdb.ehf, gdb.nhf, nodeLabelLength, (short)numBuf);
-							} else if (qtype == 3) {
-								System.out.println("edge_node_source");
-								intest.edge_node_source(gdb.ehf, gdb.nhf, gdb.btf_node, edgeLabelLength, (short)numBuf);
-							} else if (qtype == 4) {
-								System.out.println("edge_node_source");
-								intest.edge_node_dest(gdb.ehf, gdb.nhf, gdb.btf_node, edgeLabelLength, (short)numBuf);
-							} else if (qtype == 5) {
-								eqi.query5(gdb.ehf, gdb.btf_edge_weight, edgeLabelLength, (short)numBuf, edgeWtBound1, edgeWtBound2);
-							}else if(qtype == 6){
-								eqi.query6(gdb.ehf, gdb.btf_edge_label, gdb.nhf, edgeLabelLength, (short)numBuf);
+							// index scan
+							else if (index == 1) {
+								if (qtype == 0) {
+									eqi.query0(ehf, btf_edge_label,
+											nhf, edgeLabelLength,
+											(short) numBuf);
+								} else if (qtype == 1) {
+									eqi.query1(ehf, btf_node_label, nhf,
+											nodeLabelLength, (short) numBuf);
+								} else if (qtype == 2) {
+									eqi.query2(ehf, btf_node_label, nhf,
+											nodeLabelLength, (short) numBuf);
+								} else if (qtype == 3) {
+									eqi.query3(ehf, btf_edge_label,
+											edgeLabelLength, (short) numBuf);
+								} else if (qtype == 4) {
+									eqi.query4(ehf, btf_edge_weight,
+											edgeLabelLength, (short) numBuf);
+								} else if (qtype == 5) {
+									eqi.query5(ehf, btf_edge_weight,
+											edgeLabelLength, (short) numBuf,
+											edgeWtBound1, edgeWtBound2);
+								} else if (qtype == 6) {
+									eqi.query6(ehf, btf_edge_label,
+											nhf, edgeLabelLength,
+											(short) numBuf);
+								}
+							} else if (index == 2) {
+								IndexNestedJoinTest intest = new IndexNestedJoinTest();
+								if (qtype == 0) {
+									eqi.query0(ehf, btf_edge_label,
+											nhf, edgeLabelLength,
+											(short) numBuf);
+								} else if (qtype == 1) {
+									System.out.println("node_edge_source");
+									intest.node_edge_source(ehf, nhf,
+											nodeLabelLength, (short) numBuf);
+								} else if (qtype == 2) {
+									System.out.println("node_edge_destination");
+									intest.node_edge_dest(ehf, nhf,
+											nodeLabelLength, (short) numBuf);
+								} else if (qtype == 3) {
+									System.out.println("edge_node_source");
+									intest.edge_node_source(ehf, nhf,
+											btf_node_label, edgeLabelLength,
+											(short) numBuf);
+								} else if (qtype == 4) {
+									System.out.println("edge_node_source");
+									intest.edge_node_dest(ehf, nhf,
+											btf_node_label, edgeLabelLength,
+											(short) numBuf);
+								} else if (qtype == 5) {
+									eqi.query5(ehf, btf_edge_weight,
+											edgeLabelLength, (short) numBuf,
+											edgeWtBound1, edgeWtBound2);
+								} else if (qtype == 6) {
+									eqi.query6(ehf, btf_edge_label,
+											nhf, edgeLabelLength,
+											(short) numBuf);
+								}
 							}
+							printStatistics(gdb,nhf,ehf);
+							
+							//close all files
+							btf_node_label.close();
+							btf_edge_label.close();
+							btf_edge_weight.close();
+							//ztf_node_desc.close();     //No close method for Z tree file
+							
+						} catch (Exception e) {
+							e.printStackTrace();
 						}
-						printStatistics(gdb);
 					} catch (Exception e) {
+						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					break;
 				case 23:
 					System.out
-					.println("Enter the path query expression in the following format");
-      			System.out.println("(Node Label|Node Descriptor)/(Node Label|Node Descriptor)/(Node Label|Node Descriptor)");
- 
-      			String commandLineInvocation1 = br.readLine().trim();                
-                PathExpressionOperations.parsePathExpression(commandLineInvocation1);
-                break;
+							.println("Enter the path query expression in the following format");
+					System.out
+							.println("(Node Label|Node Descriptor)/(Node Label|Node Descriptor)/(Node Label|Node Descriptor)");
+
+					String commandLineInvocation1 = br.readLine().trim();
+					PathExpressionOperations
+							.parsePathExpression(commandLineInvocation1);
+					break;
 				default:
 					System.out.println("Error: unrecognized task number "
 							+ taskName);
@@ -376,44 +537,60 @@ public class BatchOperations {
 			} // else
 
 			PCounter.initialize();
-			
+
 		} while (true);
 	}// main
 
-	public static void printStatistics(GraphDB newGDB) throws Exception {
-		int n = newGDB.getNodeCnt();
+	public static void printStatistics(GraphDB newGDB, NodeHeapfile nhf, EdgeHeapFile ehf) throws Exception {
+		int n = newGDB.getNodeCnt(nhf);
 		System.out.println("NodeCount " + n);
-		int n1 = newGDB.getEdgeCnt();
+		int n1 = newGDB.getEdgeCnt(ehf);
 		System.out.println("EdgeCount " + n1);
 		System.out.println("Number of pages read :" + PCounter.getRCounter());
 		System.out.println("Number of pages written :" + PCounter.getWCounter());
 
 	}
 
-	/*public static void scanNodeHeapFile() throws InvalidTupleSizeException,
-			IOException, InvalidTypeException, FieldNumberOutOfBoundException {
-		// scanning of records
-		NID newNid = new NID();
-		NScan newNscan = gdb.nhf.openScan();
-		Node newNode = new Node();
-		boolean done = false;
+	public static void initGraphDB(String db_name) {
+		
+		dbpath = "/tmp/" + db_name + System.getProperty("user.name")
+				+ ".minibase-db";
+		logpath = "/tmp/" + db_name + System.getProperty("user.name")
+				+ ".minibase-log";
 
-		while (!done) {
-			newNode = newNscan.getNext(newNid);
-			if (newNode == null) {
-				done = true;
-				break;
-			}
-			newNode.setHdr();
-			String nodeLabel = newNode.getLabel();
-			System.out.println(nodeLabel);
-			for (int j = 0; j < 5; j++) {
-				System.out.print(newNode.getDesc().get(j));
+		SystemDefs sysdef = new SystemDefs(dbpath, 10000, 500, "Clock");
+		// Kill anything that might be hanging around
+		String newdbpath;
+		String newlogpath;
+		String remove_logcmd;
+		String remove_dbcmd;
+		String remove_cmd = "/bin/rm -rf ";
 
-			}
+		newdbpath = dbpath;
+		newlogpath = logpath;
+
+		remove_logcmd = remove_cmd + logpath;
+		remove_dbcmd = remove_cmd + dbpath;
+
+		// Commands here is very machine dependent. We assume
+		// user are on UNIX system here
+		try {
+			Runtime.getRuntime().exec(remove_logcmd);
+			Runtime.getRuntime().exec(remove_dbcmd);
+		} catch (IOException e) {
+			System.err.println("IO error: " + e);
 		}
-		newNscan.closescan();
-		System.out.println("test done");
-	}*/
+		
+//		
+//		remove_logcmd = remove_cmd + newlogpath;
+//		remove_dbcmd = remove_cmd + newdbpath;
+//
+//		try {
+//			Runtime.getRuntime().exec(remove_logcmd);
+//			Runtime.getRuntime().exec(remove_dbcmd);
+//		} catch (IOException e) {
+//			System.err.println("IO error: " + e);
+//		}
 
+	}
 }

@@ -127,7 +127,7 @@ public class NodeIndexScan extends Iterator {
 			break;
 		case IndexType.Z_Index:
 			try {
-				indFile = new ZTreeFile();
+				indFile = new ZTreeFile("zBTFile");
 			} catch (GetFileEntryException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
