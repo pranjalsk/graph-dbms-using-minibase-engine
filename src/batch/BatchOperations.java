@@ -214,7 +214,7 @@ public class BatchOperations {
 						gdb.createZTFNodeDesc(nhf,ztf_node_desc);
 						System.out.println("Node descriptor BT created");
 						
-						//ztf_node_desc.close();  //No close method for Z tree file
+						ztf_node_desc.close();  
 						
 					
 					} catch (Exception e) {
@@ -276,7 +276,7 @@ public class BatchOperations {
 						btf_node_label.close();
 						btf_edge_label.close();
 						btf_edge_weight.close();
-						//ztf_node_desc.close();     //No close method for Z tree fiel
+						ztf_node_desc.close();     
 						
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -386,7 +386,7 @@ public class BatchOperations {
 							btf_node_label.close();
 							btf_edge_label.close();
 							btf_edge_weight.close();
-							//ztf_node_desc.close();     //No close method for Z tree fiel
+							ztf_node_desc.close();     
 							
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -507,7 +507,7 @@ public class BatchOperations {
 							btf_node_label.close();
 							btf_edge_label.close();
 							btf_edge_weight.close();
-							//ztf_node_desc.close();     //No close method for Z tree file
+							//ztf_node_desc.close();     
 							
 						} catch (Exception e) {
 							e.printStackTrace();
