@@ -10,7 +10,6 @@ import java.util.Scanner;
 import tests.IndexNestedJoinTest;
 import zindex.ZTreeFile;
 import btree.BTreeFile;
-import Test_Phase2.QueryTest;
 import diskmgr.DB;
 import diskmgr.GraphDB;
 import diskmgr.PCounter;
