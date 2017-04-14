@@ -7,11 +7,17 @@ import java.util.List;
 
 public class PathExpressionParser {
 	
-	public List<Object[]> pathExpressionQuery1Parser(List<AttrType[]> attrTypeList,String pathExpression){
-		return new ArrayList<Object[]>();
+	public int pathExpressionQuery1Parser(List<Object[]> objExpList,List<AttrType[]> attrTypeList,String pathExpression){
+		int type = 0; // whether the query type is a,b or c type will be 0,1 or 2.
+		//use objExpList to add object arrays to the list
+		//use attrTypeList to add type to the arrays
+		return type;
 	}
 
-	public List<Object[]> pathExpressionQuery2Parser(List<AttrType[]> attrTypeList,String pathExpression){
-		return new ArrayList<Object[]>();
+	public int pathExpressionQuery2Parser(List<Object[]> objExpList,List<AttrType[]> attrTypeList,String pathExpression){
+		int type = 0; // whether the query type is a,b or c type will be 0,1 or 2.
+		//use objExpList to add object arrays to the list
+		//use attrTypeList to add type to the arrays
+		return type;
 	}
 }
