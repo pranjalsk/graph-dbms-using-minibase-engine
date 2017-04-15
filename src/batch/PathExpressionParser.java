@@ -20,4 +20,12 @@ public class PathExpressionParser {
 		//use attrTypeList to add type to the arrays
 		return type;
 	}
+
+	public int triangleQueryParser(Object[] objExpressions,
+			AttrType[] attrTypes, String trianglePathExpression) {
+		int type = 0; // whether the query type is a,b or c type will be 0,1 or 2.
+		//use objExpressions to add object array
+		//use attrTypes to add type to the array
+		return type;
+	}
 }

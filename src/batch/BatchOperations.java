@@ -51,9 +51,7 @@ public class BatchOperations {
 	public static String dbpath;
 	public static String logpath;
 	static HashSet<String> hs;
-	
 
-	
 	public static void main(String[] args) throws Exception {
 		
 		hs = new HashSet<String>();
@@ -361,6 +359,8 @@ public class BatchOperations {
 								AttrType[] attr = new AttrType[]{new AttrType(0), new AttrType(0), new AttrType(0), new AttrType(1)};
 								new PathExpression().pathExpress2(expression, attr, gdb.nhf.get_fileName(), gdb.ehf.get_fileName(), 
 										"indexEhfSourceNodeName", gdb.btf_node.get_fileName(), (short)numBuf, nodeLabelLength);
+							}else if(qtype == 7){
+								new PathExpressionQuery().triangleQuery("", gdb.nhf.get_fileName(), gdb.ehf.get_fileName(), "", "", (short)numBuf, nodeLabelLength);
 							}
 						}
 						printStatistics(gdb);
@@ -395,34 +395,23 @@ public class BatchOperations {
 		int n1 = newGDB.getEdgeCnt();
 		System.out.println("EdgeCount " + n1);
 		System.out.println("Number of pages read :" + PCounter.getRCounter());
-		System.out.println("Number of pages written :" + PCounter.getWCounter());
+		System.out
+				.println("Number of pages written :" + PCounter.getWCounter());
 
 	}
 
-	/*public static void scanNodeHeapFile() throws InvalidTupleSizeException,
-			IOException, InvalidTypeException, FieldNumberOutOfBoundException {
-		// scanning of records
-		NID newNid = new NID();
-		NScan newNscan = gdb.nhf.openScan();
-		Node newNode = new Node();
-		boolean done = false;
-
-		while (!done) {
-			newNode = newNscan.getNext(newNid);
-			if (newNode == null) {
-				done = true;
-				break;
-			}
-			newNode.setHdr();
-			String nodeLabel = newNode.getLabel();
-			System.out.println(nodeLabel);
-			for (int j = 0; j < 5; j++) {
-				System.out.print(newNode.getDesc().get(j));
-
-			}
-		}
-		newNscan.closescan();
-		System.out.println("test done");
-	}*/
+	/*
+	 * public static void scanNodeHeapFile() throws InvalidTupleSizeException,
+	 * IOException, InvalidTypeException, FieldNumberOutOfBoundException { //
+	 * scanning of records NID newNid = new NID(); NScan newNscan =
+	 * gdb.nhf.openScan(); Node newNode = new Node(); boolean done = false;
+	 * 
+	 * while (!done) { newNode = newNscan.getNext(newNid); if (newNode == null)
+	 * { done = true; break; } newNode.setHdr(); String nodeLabel =
+	 * newNode.getLabel(); System.out.println(nodeLabel); for (int j = 0; j < 5;
+	 * j++) { System.out.print(newNode.getDesc().get(j));
+	 * 
+	 * } } newNscan.closescan(); System.out.println("test done"); }
+	 */
 
 }

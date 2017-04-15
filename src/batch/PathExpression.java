@@ -379,7 +379,7 @@ public class PathExpression {
 					RelSpec.outer), 5);
 			right_filter[0].operand1.string = (String)expression[1];
 		}else{
-			right_filter[0].op = new AttrOperator(AttrOperator.aopLE);
+			right_filter[0].op = new AttrOperator(AttrOperator.aopGE);
 			right_filter[0].type1 = new AttrType(AttrType.attrInteger);
 			right_filter[0].operand2.symbol = new FldSpec(new RelSpec(
 					RelSpec.outer), 6);
