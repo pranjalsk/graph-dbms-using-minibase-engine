@@ -3,7 +3,6 @@ package batch;
 import java.io.IOException;
 
 import diskmgr.Page;
-
 import edgeheap.*;
 import nodeheap.*;
 import global.*;
@@ -119,4 +118,30 @@ public class BatchInsert {
 			return null;
 		}
 	}// getEidFromEdgeLabel
+
+	public NID getNidFromNodeLabel(Descriptor sourceDesc, NodeHeapfile nhf,
+			BTreeFile btf_node) {
+		try{
+
+			NID newnid;
+			RID newRid = new RID();
+			KeyClass key = new DescriptorKey(sourceDesc);
+			BTFileScan newScan = btf_node.new_scan(key, key);	
+			KeyDataEntry newEntry = newScan.get_next();
+			if(newEntry !=null){
+				LeafData newData = (LeafData)newEntry.data;
+				newRid = newData.getData();
+				newnid = new NID(newRid.pageNo, newRid.slotNo);
+			}
+			else{
+				newnid = new NID(new PageId(-1),-1);
+			}
+			
+			newScan.DestroyBTreeFileScan();
+			return newnid;
+		}
+		catch(Exception e){
+			e.printStackTrace();
+			return null;
+		}	}
 }//BatchInsert
