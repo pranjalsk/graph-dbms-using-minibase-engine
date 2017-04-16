@@ -32,7 +32,7 @@ public class PathExpressionUtil {
 			NodeHeapfile nhf, BTreeFile btf_node) {
 		// TODO Auto-generated method stub
 		BatchInsert batchinsert= new BatchInsert();
-		NID newNid = batchinsert.getNidFromNodeLabel( sourceDesc, nhf, btf_node);
+		NID newNid = batchinsert.getNidFromNodeDescriptor( sourceDesc, nhf, btf_node);
 		//System.out.println("HeadnodeLabel:"+nodeLabel);
 		System.out.println("HeadNID:"+newNid);
        //see if any edges from this node points to next node in the path expression
