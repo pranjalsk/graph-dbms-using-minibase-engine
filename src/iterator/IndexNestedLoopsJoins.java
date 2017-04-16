@@ -177,7 +177,6 @@ public class IndexNestedLoopsJoins extends Iterator {
 					inner = null;
 				}
 
-
 				if ((outer_tuple = outer.get_next()) == null) {
 					done = true;
 					if (inner != null) {
@@ -187,7 +186,6 @@ public class IndexNestedLoopsJoins extends Iterator {
 
 					return null;
 				}
-
 				try {
 					CondExpr[] expr = new CondExpr[2];
 					expr[0] = new CondExpr();
@@ -204,7 +202,6 @@ public class IndexNestedLoopsJoins extends Iterator {
 					throw new NestedLoopException(e, "openScan failed");
 				}
 			} // ENDS: if (get_from_outer == TRUE)
-
 			// The next step is to get a tuple from the inner,
 			// while the inner is not completely scanned && there
 			// is no match (with pred),get a tuple from the inner.

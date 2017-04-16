@@ -37,6 +37,7 @@ public class BatchOperations {
 	private static String taskName = "";
 	private static String filePath = "";
 	private static String graphDBName = "";
+	private static String pathExpressionOperationType;
 	private static int numBuf = 0;
 	private static int qtype = 0;
 	private static int index = 0;
@@ -80,7 +81,7 @@ public class BatchOperations {
 			System.out
 					.println("For Phase2:Enter the batch operation, the input file path and the name of the Graph Database in the following format");
 			System.out.println("<task_name> <file_path> <GraphDB_name>");
-			System.out.println("For Phase 3: Enter <task_name> as 'PathExpressionQuery'");
+			System.out.println("For Phase 3: Enter <task_name> <type> <GraphDB_name> as 'PathExpressionQuery' 'PQ1a' 'GraphDB' ");
 
 			String commandLineInvocation = br.readLine().trim();
 			String inputArguments[] = commandLineInvocation.split(" ");
@@ -106,9 +107,17 @@ public class BatchOperations {
 					taskNumber = 14;
 				else if (taskName.equalsIgnoreCase("edgequery"))
 					taskNumber = 15;
-				else if (taskName.equalsIgnoreCase("PathExpressionQuery"))
+				else if( taskName.equalsIgnoreCase("PathExpressionQuery") )
 					taskNumber = 23;
 
+<<<<<<< HEAD
+=======
+				if(taskNumber == 23)
+				{
+					pathExpressionOperationType=inputArguments[1];
+					graphDBName=inputArguments[2];
+				}
+>>>>>>> f9b842e69a9cf0b26b6ecfec9451ea8a0ade710b
 				if (taskNumber == 10 || taskNumber == 11 || taskNumber == 12
 						|| taskNumber == 13) {
 
@@ -202,6 +211,7 @@ public class BatchOperations {
 							newNodeInsert.insertBatchNode(nhf, sCurrentLine);
 						}
 						System.out.println("Batch Nodes insertion done");
+<<<<<<< HEAD
 						
 						// Insert records in Btree file
 						gdb.createBTNodeLabel(nhf,btf_node_label);
@@ -212,6 +222,12 @@ public class BatchOperations {
 						btf_node_label.close();
 												
 						gdb.createZTFNodeDesc(nhf,ztf_node_desc);
+=======
+						printStatistics(gdb);
+						gdb.createBTNodeLabel();
+						System.out.println("Node label BT created");
+						gdb.createZTFNodeDesc();
+>>>>>>> f9b842e69a9cf0b26b6ecfec9451ea8a0ade710b
 						System.out.println("Node descriptor BT created");
 						
 						ztf_node_desc.close();  
@@ -412,6 +428,7 @@ public class BatchOperations {
 				// Task : Edge Query
 				case 15:
 					try {
+<<<<<<< HEAD
 						System.out.println("Task 15");
 						EdgeQuery eq = new EdgeQuery();
 						EdgeQueryWithIndex eqi = new EdgeQueryWithIndex();
@@ -450,6 +467,26 @@ public class BatchOperations {
 								} else if (qtype == 7) {
 									eq.query7(ehf, (short) 32);
 								}
+=======
+						// heapfile scan
+						if (index == 0) {
+
+							if (qtype == 0) {
+								eq.query0(gdb.ehf, gdb.nhf);
+							} else if (qtype == 1) {
+								eq.query1(gdb.ehf, gdb.nhf, gdb.btf_node, nodeLabelLength, (short)numBuf);
+							} else if (qtype == 2) {
+								eq.query2(gdb.ehf, gdb.nhf, gdb.btf_node, nodeLabelLength, (short)numBuf);
+							} else if (qtype == 3) {
+								eq.query3(gdb.ehf, edgeLabelLength, (short)numBuf);
+							} else if (qtype == 4) {
+								eq.query4(gdb.ehf, edgeLabelLength, (short)numBuf);
+							} else if (qtype == 5) {
+								eq.query5(gdb.ehf, edgeLabelLength, (short)numBuf, edgeWtBound1, edgeWtBound2);
+							}else if(qtype == 6){
+								eq.query6(gdb.ehf);
+							}
+>>>>>>> f9b842e69a9cf0b26b6ecfec9451ea8a0ade710b
 
 							}
 							// index scan
@@ -531,6 +568,7 @@ public class BatchOperations {
 					break;
 				case 23:
 					System.out
+<<<<<<< HEAD
 							.println("Enter the path query expression in the following format");
 					System.out
 							.println("(Node Label|Node Descriptor)/(Node Label|Node Descriptor)/(Node Label|Node Descriptor)");
@@ -539,6 +577,17 @@ public class BatchOperations {
 					PathExpressionOperations
 							.parsePathExpression(commandLineInvocation1);
 					break;
+=======
+					.println("Enter the path query expression in the following format");
+				
+      			System.out.println("(Node Label|Node Descriptor)/(Node Label|Node Descriptor)/(Node Label|Node Descriptor)");
+      			
+      			//System.out.println("graphDBName"+graphDBName);
+      			//System.out.println("pathExpressionOperationType"+pathExpressionOperationType);
+      			String commandLineInvocation1 = br.readLine().trim();                
+                PathExpressionOperations.parsePathExpression(commandLineInvocation1,graphDBName,gdb,pathExpressionOperationType);
+                break;
+>>>>>>> f9b842e69a9cf0b26b6ecfec9451ea8a0ade710b
 				default:
 					System.out.println("Error: unrecognized task number "
 							+ taskName);
@@ -562,6 +611,7 @@ public class BatchOperations {
 
 	}
 
+<<<<<<< HEAD
 	public static void initGraphDB(String db_name) {
 		
 		dbpath = "/tmp/" + db_name + System.getProperty("user.name")
@@ -602,6 +652,8 @@ public class BatchOperations {
 //		} catch (IOException e) {
 //			System.err.println("IO error: " + e);
 //		}
+=======
+>>>>>>> f9b842e69a9cf0b26b6ecfec9451ea8a0ade710b
 
 	}
 }

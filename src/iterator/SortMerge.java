@@ -444,7 +444,8 @@ public class SortMerge extends Iterator implements GlobalConst {
 		if (done)
 			return null;
 
-		while (true) {
+		while (true) {				
+
 			if (process_next_block) {
 				process_next_block = false;
 				if (get_from_in1)
@@ -491,6 +492,7 @@ public class SortMerge extends Iterator implements GlobalConst {
 								distance, target);
 					}
 				} else {
+					
 					comp_res = TupleUtils.CompareTupleWithTuple(sortFldType,
 							tuple1, jc_in1, tuple2, jc_in2);
 					while ((comp_res < 0 && _order.tupleOrder == TupleOrder.Ascending)
@@ -522,7 +524,7 @@ public class SortMerge extends Iterator implements GlobalConst {
 					process_next_block = true;
 					continue;
 				}
-
+				
 				TempTuple1.tupleCopy(tuple1);
 				TempTuple2.tupleCopy(tuple2);
 
@@ -610,22 +612,28 @@ public class SortMerge extends Iterator implements GlobalConst {
 																	// occur
 					System.out
 							.println("Equiv. class 1 in sort-merge has no tuples");
+				
 			}
-
 			if ((_tuple2 = io_buf2.Get(TempTuple2)) == null) {
+
 				if ((_tuple1 = io_buf1.Get(TempTuple1)) == null) {
+					io_buf1.close();
+					io_buf2.close();
 					process_next_block = true;
 					continue; // Process next equivalence class
 				} else {
 					io_buf2.reread();
 					_tuple2 = io_buf2.Get(TempTuple2);
+
 				}
 			}
+			
 			if (PredEval.Eval(OutputFilter, TempTuple1, TempTuple2, _in1, _in2) == true) {
 				Projection.Join(TempTuple1, _in1, TempTuple2, _in2, Jtuple,
 						perm_mat, nOutFlds);
 				return Jtuple;
-			}
+			}				
+
 		}
 	}
 
@@ -642,7 +650,6 @@ public class SortMerge extends Iterator implements GlobalConst {
 	 */
 	public void close() throws JoinsException, IOException, IndexException {
 		if (!closeFlag) {
-
 			try {
 				p_i1.close();
 				p_i2.close();
