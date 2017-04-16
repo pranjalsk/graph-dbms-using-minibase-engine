@@ -40,7 +40,7 @@ import iterator.SortMerge;
 
 public class PathExpression {
 
-	public Iterator pathExpress1(Object[] expression, AttrType[] attr,
+	public static Iterator pathExpress1(Object[] expression, AttrType[] attr,
 			String nhfName, String ehfName, String indexEhfSourceNodeName,
 			String indexNodeLabelName, short numBuf, short nodeLabelLength)
 			throws InvalidSlotNumberException, InvalidTupleSizeException,
@@ -265,7 +265,7 @@ public class PathExpression {
 		return tail_iterator;
 	}
 
-	public Iterator pathExpress2(Object[] expression, AttrType[] attr,
+	public static Iterator pathExpress2(Object[] expression, AttrType[] attr,
 			String nhfName, String ehfName, String indexEhfSourceNodeName,
 			String indexNodeLabelName, short numBuf, short nodeLabelLength)
 			throws InvalidSlotNumberException, InvalidTupleSizeException,

@@ -16,7 +16,6 @@ import diskmgr.PCounter;
 import global.AttrType;
 import global.Descriptor;
 import global.NID;
-import global.PageId;
 import global.SystemDefs;
 import global.TupleOrder;
 import heap.FieldNumberOutOfBoundException;
@@ -37,6 +36,7 @@ public class BatchOperations {
 	private static String taskName = "";
 	private static String filePath = "";
 	private static String graphDBName = "";
+	private static String pathExpressionOperationType;
 	private static int numBuf = 0;
 	private static int qtype = 0;
 	private static int index = 0;
@@ -51,7 +51,9 @@ public class BatchOperations {
 	public static String dbpath;
 	public static String logpath;
 	static HashSet<String> hs;
+	
 
+	
 	public static void main(String[] args) throws Exception {
 		
 		hs = new HashSet<String>();
@@ -76,7 +78,7 @@ public class BatchOperations {
 			System.out
 					.println("For Phase2:Enter the batch operation, the input file path and the name of the Graph Database in the following format");
 			System.out.println("<task_name> <file_path> <GraphDB_name>");
-			System.out.println("For Phase 3: Enter <task_name> as 'PathExpressionQuery'");
+			System.out.println("For Phase 3: Enter <task_name> <type> <GraphDB_name> as 'PathExpressionQuery' 'PQ1a' 'GraphDB' ");
 
  
 			String commandLineInvocation = br.readLine().trim();
@@ -103,10 +105,14 @@ public class BatchOperations {
 					taskNumber = 14;
 				else if (taskName.equalsIgnoreCase("edgequery"))
 					taskNumber = 15;
-				else if (taskName.equalsIgnoreCase("PathExpressionQuery"))
+				else if( taskName.equalsIgnoreCase("PathExpressionQuery") )
 					taskNumber = 23;
 
-				
+				if(taskNumber == 23)
+				{
+					pathExpressionOperationType=inputArguments[1];
+					graphDBName=inputArguments[2];
+				}
 				if (taskNumber == 10 || taskNumber == 11 || taskNumber == 12
 						|| taskNumber == 13) {
 
@@ -308,8 +314,6 @@ public class BatchOperations {
 								eq.query5(gdb.ehf, edgeLabelLength, (short)numBuf, edgeWtBound1, edgeWtBound2);
 							}else if(qtype == 6){
 								eq.query6(gdb.ehf);
-							}else if(qtype == 7){
-								eq.query7(gdb.ehf, (short) 32);
 							}
 
 						}
@@ -348,19 +352,9 @@ public class BatchOperations {
 								System.out.println("edge_node_source");
 								intest.edge_node_dest(gdb.ehf, gdb.nhf, gdb.btf_node, edgeLabelLength, (short)numBuf);
 							} else if (qtype == 5) {
-								Descriptor desc = new Descriptor();
-								desc.set(23, 30, 37, 8, 38);
-								Object[] expression = new Object[]{new NID(new PageId(61),0), new Descriptor(desc),new String("949")};
-								AttrType[] attr = new AttrType[]{new AttrType(0), new AttrType(5), new AttrType(0)};
-								new PathExpression().pathExpress1(expression, attr, gdb.nhf.get_fileName(), gdb.ehf.get_fileName(), 
-										"indexEhfSourceNodeName", gdb.btf_node.get_fileName(), (short)numBuf, nodeLabelLength);
+								eqi.query5(gdb.ehf, gdb.btf_edge_weight, edgeLabelLength, (short)numBuf, edgeWtBound1, edgeWtBound2);
 							}else if(qtype == 6){
-								Object[] expression = new Object[]{new NID(new PageId(43),8), new String("518_809"), new String("809_818"), new Integer(50)};
-								AttrType[] attr = new AttrType[]{new AttrType(0), new AttrType(0), new AttrType(0), new AttrType(1)};
-								new PathExpression().pathExpress2(expression, attr, gdb.nhf.get_fileName(), gdb.ehf.get_fileName(), 
-										"indexEhfSourceNodeName", gdb.btf_node.get_fileName(), (short)numBuf, nodeLabelLength);
-							}else if(qtype == 7){
-								new PathExpressionQuery().triangleQuery("", gdb.nhf.get_fileName(), gdb.ehf.get_fileName(), "", "", (short)numBuf, nodeLabelLength);
+								eqi.query6(gdb.ehf, gdb.btf_edge_label, gdb.nhf, edgeLabelLength, (short)numBuf);
 							}
 						}
 						printStatistics(gdb);
@@ -371,10 +365,13 @@ public class BatchOperations {
 				case 23:
 					System.out
 					.println("Enter the path query expression in the following format");
+				
       			System.out.println("(Node Label|Node Descriptor)/(Node Label|Node Descriptor)/(Node Label|Node Descriptor)");
- 
+      			
+      			//System.out.println("graphDBName"+graphDBName);
+      			//System.out.println("pathExpressionOperationType"+pathExpressionOperationType);
       			String commandLineInvocation1 = br.readLine().trim();                
-                PathExpressionOperations.parsePathExpression(commandLineInvocation1);
+                PathExpressionOperations.parsePathExpression(commandLineInvocation1,graphDBName,pathExpressionOperationType);
                 break;
 				default:
 					System.out.println("Error: unrecognized task number "
@@ -395,23 +392,9 @@ public class BatchOperations {
 		int n1 = newGDB.getEdgeCnt();
 		System.out.println("EdgeCount " + n1);
 		System.out.println("Number of pages read :" + PCounter.getRCounter());
-		System.out
-				.println("Number of pages written :" + PCounter.getWCounter());
+		System.out.println("Number of pages written :" + PCounter.getWCounter());
 
 	}
 
-	/*
-	 * public static void scanNodeHeapFile() throws InvalidTupleSizeException,
-	 * IOException, InvalidTypeException, FieldNumberOutOfBoundException { //
-	 * scanning of records NID newNid = new NID(); NScan newNscan =
-	 * gdb.nhf.openScan(); Node newNode = new Node(); boolean done = false;
-	 * 
-	 * while (!done) { newNode = newNscan.getNext(newNid); if (newNode == null)
-	 * { done = true; break; } newNode.setHdr(); String nodeLabel =
-	 * newNode.getLabel(); System.out.println(nodeLabel); for (int j = 0; j < 5;
-	 * j++) { System.out.print(newNode.getDesc().get(j));
-	 * 
-	 * } } newNscan.closescan(); System.out.println("test done"); }
-	 */
 
 }
