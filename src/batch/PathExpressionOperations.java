@@ -51,15 +51,7 @@ public class PathExpressionOperations {
 		 */
 		System.out.println("commandLineInvocationVal" + commandLineInvocation);
 
-/*		if (!hs.contains(graphDBName)) {
-			System.out.println("Hashset does not contain"+graphDBName);
-			hs.add(graphDBName);
-			GraphDB.initGraphDB(graphDBName);
-			gdb = new GraphDB(0);
-		} else {
-			gdb.openDB(graphDBName);
-		}
-*/
+
 		String inputArguments[] = commandLineInvocation.split("/");
 		int length = inputArguments.length;
 		System.out.println("Length" + length);
@@ -101,14 +93,18 @@ public class PathExpressionOperations {
 				|| (pathExpressionOperationType.equalsIgnoreCase("PQ2a"))
 				|| (pathExpressionOperationType.equalsIgnoreCase("PQ3a"))) {
 			for (int i = 1; i < length; i++) {
-				System.out.println("Input argument1:" + inputArguments[i]);
+				//System.out.println("Input argument1:" + inputArguments[i]);
 				String inputArgs = inputArguments[i];
 
 				System.out.println("inputArgs:" + inputArgs);
 				String inputArgs1[] = inputArgs.split(" ");
-				System.out.println("inputArgs1.length" + inputArgs1.length);
-				if (inputArgs1.length == 1) {
-					nodeLabelQuery = true;
+				//System.out.println("inputArgs1.length"+inputArgs1.length);
+				
+				//for(int i1=0; i1 <inputArgs1.length; i1++)
+				//System.out.println("inputArgs" + inputArgs1[i1]);
+				
+				if( (inputArgs1.length == 1)&&(nodeLabelQuery)) {
+					//nodeLabelQuery = true;
 					nodeLabel = inputArgs;
 					attr[i] = new AttrType(0);
 					args[i] = inputArgs;
@@ -117,8 +113,8 @@ public class PathExpressionOperations {
 					nodeDescriptor = inputArgs;
 					attr[i] = new AttrType(5);
 					insideArguments = nodeDescriptor.split(" ");
-					System.out.println("insideArguments.length"
-							+ insideArguments.length);
+				//	System.out.println("insideArguments.length"
+					//		+ insideArguments.length);
 					int value1 = Integer.parseInt(insideArguments[0]);
 					int value2 = Integer.parseInt(insideArguments[1]);
 					int value3 = Integer.parseInt(insideArguments[2]);
