@@ -281,16 +281,15 @@ public class PathExpressionQuery {
 		attrTypes[1] = new AttrType(AttrType.attrInteger);
 		attrTypes[2] = new AttrType(AttrType.attrInteger);
 		
-		objExpressions[0] = new Integer(1);
-		objExpressions[1] = new Integer(2);
-		objExpressions[2] = new Integer(3);
+		objExpressions[0] = new Integer(50);
+		objExpressions[1] = new Integer(50);
+		objExpressions[2] = new Integer(50);
 		/*************************/
 		Heapfile triangleQueryResult = new Heapfile("triangleQueryResult");
+		Iterator am1 = getTriNodeEdgePair(objExpressions,attrTypes,ehfName,numBuf);
+		
+    	Iterator am2 = getThirdConnectingEdge(objExpressions,attrTypes,ehfName, am1,numBuf);
 
-		Iterator am1 = getTriNodeEdgePair(objExpressions,attrTypes,ehfName,numBuf/2);
-		
-    	Iterator am2 = getThirdConnectingEdge(objExpressions,attrTypes,ehfName, am1,numBuf/2);
-		
 		AttrType[] types = new AttrType[7];
 		types[0] = new AttrType(AttrType.attrString);
 		types[1] = new AttrType(AttrType.attrInteger);
@@ -329,6 +328,7 @@ public class PathExpressionQuery {
 		
 		Tuple finalTrio = new Tuple();
 		Tuple tu;
+//		int count  = 0;
 		while((tu = am2.get_next()) != null){
 			tu.setHdr((short)7, types, s1_sizes);
 			finalTrio.setHdr((short)3, types_2, s2_sizes);
@@ -344,9 +344,10 @@ public class PathExpressionQuery {
 			
 			/*tu.setHdr((short)8, types, s1_sizes);
 			
-			
+			count++;
 			System.out.println(tu.getStrFld(3)+":"+tu.getStrFld(4)+":"+tu.getStrFld(8));*/
-		}
+		}		
+//System.out.println(count);
 		am2.close();
 	}
 	
@@ -379,7 +380,7 @@ public class PathExpressionQuery {
 		jtype[4] = new AttrType(AttrType.attrString); // EdgeLabel
 		jtype[5] = new AttrType(AttrType.attrInteger); // EdgeWeight
 		jtype[6] = new AttrType(AttrType.attrString); // SrcLabel
-		jtype[6] = new AttrType(AttrType.attrString); // DestLabel
+		jtype[7] = new AttrType(AttrType.attrString); // DestLabel
 
 		FldSpec[] inputProjList = new FldSpec[8];
 		RelSpec rel1 = new RelSpec(RelSpec.outer);
