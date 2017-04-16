@@ -1,4 +1,4 @@
-package batch;
+/*package batch;
 
 import global.AttrType;
 import global.Descriptor;
@@ -44,12 +44,12 @@ public class PathExpressionOperations {
 
 		//hs = new HashSet<String>();
 
-		/*
+		
 		 * Menu Driven Program (CUI for Batch operations) Enter the task name of
 		 * your choice Enter the input file path Enter the GraphDB name Call the
 		 * appropriate class methods according to the task number
-		 */
-<<<<<<< HEAD
+		 
+
 		    System.out.println("commandLineInvocation1"+commandLineInvocation);
 			BufferedReader br = new BufferedReader(new InputStreamReader(
 					System.in));
@@ -108,9 +108,9 @@ public class PathExpressionOperations {
 			//}
 		//TODO-task 2.3		
 		//	PathExpressionOperatorTypeOne.iterateOverPath(sourceNID,sourceLabel,sourceDescriptor,hm,gdb);
-=======
+
 		System.out.println("commandLineInvocationVal" + commandLineInvocation);
->>>>>>> f9b842e69a9cf0b26b6ecfec9451ea8a0ade710b
+
 
 
 		String inputArguments[] = commandLineInvocation.split("/");
@@ -273,3 +273,4 @@ public class PathExpressionOperations {
 	}// method
 
 }
+*/
