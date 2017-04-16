@@ -23,15 +23,20 @@ public class PathExpressionUtil {
 		BatchInsert batchinsert= new BatchInsert();
 		// Get NID of head node
 		NID newNid = batchinsert.getNidFromNodeLabel(nodeLabel, nhf, btf_node);
-		System.out.println("nodeLabel"+nodeLabel);
-		System.out.println("NID"+newNid);
+		System.out.println("HeadnodeLabel:"+nodeLabel);
+		System.out.println("HeadNID:"+newNid);
        //see if any edges from this node points to next node in the path expression
 		return newNid;
 	}
 	public static NID lookupAndIterateOverPath(Descriptor sourceDesc,
-			NodeHeapfile nhf, BTreeFile btf_edge_label) {
+			NodeHeapfile nhf, BTreeFile btf_node) {
 		// TODO Auto-generated method stub
-		return null;
+		BatchInsert batchinsert= new BatchInsert();
+		NID newNid = batchinsert.getNidFromNodeLabel( sourceDesc, nhf, btf_node);
+		//System.out.println("HeadnodeLabel:"+nodeLabel);
+		System.out.println("HeadNID:"+newNid);
+       //see if any edges from this node points to next node in the path expression
+		return newNid;
 	}
 	public static void iterateOverPath(NID sourceNID, String sourceLabel, String sourceDescriptor, HashMap<String, String> hm, GraphDB gdb) throws Exception {
 		// TODO Auto-generated method stub
