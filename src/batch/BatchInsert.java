@@ -119,14 +119,15 @@ public class BatchInsert {
 		}
 	}// getEidFromEdgeLabel
 
-	public NID getNidFromNodeLabel(Descriptor sourceDesc, NodeHeapfile nhf,
+	public NID getNidFromNodeDescriptor(Descriptor sourceDesc, NodeHeapfile nhf,
 			BTreeFile btf_node) {
 		try{
 
 			NID newnid;
 			RID newRid = new RID();
 			KeyClass key = new DescriptorKey(sourceDesc);
-			BTFileScan newScan = btf_node.new_scan(key, key);	
+			BTFileScan newScan =  new BTFileScan();
+					//btf_node.new_scan(key, key);	
 			KeyDataEntry newEntry = newScan.get_next();
 			if(newEntry !=null){
 				LeafData newData = (LeafData)newEntry.data;
