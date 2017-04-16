@@ -23,6 +23,8 @@ public class GraphDB extends DB {
 	public BTreeFile btf_edge_label;
 	public BTreeFile btf_edge_weight;
 	public ZTreeFile ztf_node_desc;
+	public BTreeFile btf_edge_src_label;
+	public BTreeFile btf_edge_dest_label;
 	public int type;
 	
 	/**
@@ -72,7 +74,8 @@ public class GraphDB extends DB {
 		btf_edge_label = new BTreeFile("IndEdgeLabel_"+graphDBName, keyTypeString, 32, 0);
 		btf_edge_weight = new BTreeFile("IndEdgeWeight_"+graphDBName, keyTypeInt, 4, 0);
 		ztf_node_desc = new ZTreeFile("IndZtree_"+graphDBName);
-		
+		btf_edge_src_label = new BTreeFile("IndEdgeSrcLabel_"+graphDBName, keyTypeString, 32, 0);
+		btf_edge_dest_label = new BTreeFile("IndEdgeDestLabel_"+graphDBName, keyTypeString, 32, 0);
 	}
 
 	//Methods to create index files
@@ -194,6 +197,53 @@ public class GraphDB extends DB {
 		}
 	}
 	
+	public void createBTEdgeSrcLabel(EdgeHeapFile ehf, BTreeFile btf_edge_src_label) throws KeyTooLongException, KeyNotMatchException, LeafInsertRecException, IndexInsertRecException, ConstructPageException, UnpinPageException, PinPageException, NodeNotMatchException, ConvertException, DeleteRecException, IndexSearchException, IteratorException, LeafDeleteException, InsertException, IOException, InvalidTupleSizeException, heap.FieldNumberOutOfBoundException{
+		try {
+			EID eid = new EID();
+			String key = null;
+			Edge newEdge = null;
+			EScan newEscan = ehf.openScan();
+			boolean done = false;
+			
+			while(!done){
+				newEdge = newEscan.getNext(eid);
+				if (newEdge == null) {
+					done = true;
+					break;
+				}
+				newEdge.setHdr();
+				key = newEdge.getSourceLabel();
+				btf_edge_src_label.insert(new StringKey(key), (RID) eid);			
+			}
+			newEscan.closescan();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void createBTEdgeDestLabel(EdgeHeapFile ehf, BTreeFile btf_edge_dest_label) throws KeyTooLongException, KeyNotMatchException, LeafInsertRecException, IndexInsertRecException, ConstructPageException, UnpinPageException, PinPageException, NodeNotMatchException, ConvertException, DeleteRecException, IndexSearchException, IteratorException, LeafDeleteException, InsertException, IOException, InvalidTupleSizeException, heap.FieldNumberOutOfBoundException{
+		try {
+			EID eid = new EID();
+			String key = null;
+			Edge newEdge = null;
+			EScan newEscan = ehf.openScan();
+			boolean done = false;
+			
+			while(!done){
+				newEdge = newEscan.getNext(eid);
+				if (newEdge == null) {
+					done = true;
+					break;
+				}
+				newEdge.setHdr();
+				key = newEdge.getDestLabel();
+				btf_edge_dest_label.insert(new StringKey(key), (RID) eid);			
+			}
+			newEscan.closescan();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 	/**
 	 * creates B-Tree index file on edge weight field
 	 * @throws KeyTooLongException

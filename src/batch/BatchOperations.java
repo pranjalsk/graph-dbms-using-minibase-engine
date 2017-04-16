@@ -231,6 +231,9 @@ public class BatchOperations {
 						BTreeFile btf_node_label = new BTreeFile("IndNodeLabel_"+graphDBName);
 						BTreeFile btf_edge_label = new BTreeFile("IndEdgeLabel_"+graphDBName);
 						BTreeFile btf_edge_weight = new BTreeFile("IndEdgeWeight_"+graphDBName);
+						BTreeFile btf_edge_src_label = new BTreeFile("IndEdgeSrcLabel_"+graphDBName);
+						BTreeFile btf_edge_dest_label = new BTreeFile("IndEdgeDestLabel_"+graphDBName);
+						
 						
 						newEdgeInsert.insertBatchEdge(ehf, nhf,btf_node_label, filePath);
 						System.out.println("Batch edge insertion done");
@@ -246,6 +249,12 @@ public class BatchOperations {
 						gdb.createBTEdgeWeight(ehf,btf_edge_weight);
 						System.out.println("BTree on Edge Weight Created");
 						btf_edge_weight.close();
+						
+						gdb.createBTEdgeSrcLabel(ehf, btf_edge_src_label);
+						btf_edge_src_label.close();
+						
+						gdb.createBTEdgeDestLabel(ehf, btf_edge_dest_label);
+						btf_edge_dest_label.close();
 						
 						} 
 					catch (Exception e) {
@@ -264,10 +273,13 @@ public class BatchOperations {
 						BTreeFile btf_edge_label = new BTreeFile("IndEdgeLabel_"+graphDBName);
 						BTreeFile btf_edge_weight = new BTreeFile("IndEdgeWeight_"+graphDBName);
 						ZTreeFile ztf_node_desc = new ZTreeFile("zBTFile");
+						BTreeFile btf_edge_src_label = new BTreeFile("IndEdgeSrcLabel_"+graphDBName);
+						BTreeFile btf_edge_dest_label = new BTreeFile("IndEdgeDestLabel_"+graphDBName);
 						
 						newNodeDelete.deleteBatchNode(nhf, ehf,
 								btf_node_label, ztf_node_desc,
 								btf_edge_label, btf_edge_weight,
+								btf_edge_src_label,btf_edge_dest_label,
 								filePath);
 						
 						printStatistics(gdb,nhf,ehf);

@@ -120,3 +120,6 @@ public class BatchInsert {
 		}
 	}// getEidFromEdgeLabel
 }//BatchInsert
+
+
+
