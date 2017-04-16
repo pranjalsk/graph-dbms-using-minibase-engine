@@ -105,7 +105,7 @@ public class PathExpressionParser {
 
 		while (m.find()) {
 			// add "a" "b" "c" info
-			type[0] = m.group(1).equals("a") ? 0 : m.group(2).equals("b") ? 1
+			type[0] = m.group(1).equals("a") ? 0 : m.group(1).equals("b") ? 1
 					: 2;
 			rest = m.group(2);
 		}
