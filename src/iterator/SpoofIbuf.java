@@ -144,7 +144,7 @@ public class SpoofIbuf implements GlobalConst  {
       return tot_read;
     }
   public void close(){
-	  hf_scan.closescan();
+	  if(hf_scan != null) hf_scan.closescan();
   }
   
   private  byte[][] _bufs;
