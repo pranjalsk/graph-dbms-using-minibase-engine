@@ -168,11 +168,11 @@ public class BatchOperations {
 				// DB SETUP
 				if (!hs.contains(graphDBName)) {
 					hs.add(graphDBName);
-					//GraphDB.initGraphDB(graphDBName);	
-					//gdb = new GraphDB(0);
+					GraphDB.initGraphDB(graphDBName);	
+					gdb = new GraphDB(0);
 				}
 				else{
-					//gdb.openDB(graphDBName);
+					gdb.openDB(graphDBName);
 				}
 				
 				
