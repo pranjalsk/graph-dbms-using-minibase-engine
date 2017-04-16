@@ -1,6 +1,11 @@
 package batch;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import zindex.ZTFileScan;
+import zindex.ZTreeFile;
 
 import diskmgr.Page;
 import edgeheap.*;
@@ -145,6 +150,44 @@ public class BatchInsert {
 			e.printStackTrace();
 			return null;
 		}	}
+
+	
+	
+	public List<NID> getNidFromDescriptor(String input, NodeHeapfile nhf, ZTreeFile ztf_desc) throws Exception{
+		try{
+			List<NID> nidlist = new ArrayList<NID>();
+			NScan newNscan = nhf.openScan();
+			ZTFileScan newScan = ztf_desc.new_scan(null, null);
+			KeyDataEntry newEntry = newScan.get_next();
+			
+			while(newEntry != null) {
+				LeafData newData = (LeafData)newEntry.data;
+				RID newRid = newData.getData();
+				NID newNid = new NID(newRid.pageNo, newRid.slotNo);
+				Node newNode = newNscan.getNext(newNid);
+				newNode.setHdr();
+				Descriptor inputDesc = new Descriptor();				
+				String[] descInput = input.trim().split(" ");
+				int[] values = new int[5];
+				for(int ctr=0; ctr<5; ctr++){
+					values[ctr] = Integer.parseInt(descInput[ctr]);
+				}
+				inputDesc.set(values[0], values[1], values[2], values[3], values[4]);
+				if(newNode.getDesc().equals(inputDesc)) {
+					nidlist.add(newNid);
+				}
+			}
+			
+			newScan.DestroyBTreeFileScan();
+			newNscan.closescan();
+			return nidlist;
+		}
+		catch(Exception e){
+			e.printStackTrace();
+			return null;
+		}		
+	}//getNidFromDescriptor
+
 }//BatchInsert
 
 

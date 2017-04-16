@@ -1,5 +1,6 @@
 package batch;
 
+import edgeheap.EdgeHeapFile;
 import global.AttrOperator;
 import global.AttrType;
 import global.NID;
@@ -36,6 +37,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import zindex.ZTreeFile;
+
+import btree.BTreeFile;
 import bufmgr.PageNotReadException;
 
 import nodeheap.Node;
@@ -43,17 +47,24 @@ import nodeheap.NodeHeapfile;
 
 public class PathExpressionQuery {
 
-	public void pathExpressQuery1(String pathExpression, String nhfName,
-			String ehfName, String indexEhfSourceNodeName,
-			String indexNodeLabelName, short numBuf, short nodeLabelLength)
+	public void pathExpressQuery1(String pathExpression, NodeHeapfile nhfRef,
+			EdgeHeapFile ehfRef, BTreeFile btf_edge_src_label,
+			BTreeFile btf_node_label, ZTreeFile ztf_node_desc,short numBuf, short nodeLabelLength)
 			throws InvalidSlotNumberException, InvalidTupleSizeException,
 			Exception {
 
+		String nhfName = nhfRef.get_fileName();
+		String ehfName = ehfRef.get_fileName();
+		String indexEhfSourceNodeName = btf_edge_src_label.get_fileName();
+		String indexNodeLabelName = btf_node_label.get_fileName();	
+		
 		PathExpressionParser parsr = new PathExpressionParser();
 		List<AttrType[]> attrTypeList = new ArrayList<AttrType[]>();
 		List<Object[]> objExpList = new ArrayList<Object[]>();
 		int type = parsr.pathExpressionQuery1Parser(objExpList, attrTypeList,
-				pathExpression);
+				pathExpression,btf_node_label,nhfRef,ztf_node_desc);
+		
+		
 		PathExpression pathExp = new PathExpression();
 
 		NodeHeapfile nhf = new NodeHeapfile(nhfName);
@@ -103,11 +114,16 @@ public class PathExpressionQuery {
 
 	}
 
-	public void pathExpressQuery2(String pathExpression, String nhfName,
-			String ehfName, String indexEhfSourceNodeName,
-			String indexNodeLabelName, short numBuf, short nodeLabelLength)
+	public void pathExpressQuery2(String pathExpression, NodeHeapfile nhfRef,
+			EdgeHeapFile ehfRef, BTreeFile btf_edge_src_label,
+			BTreeFile btf_node_label, ZTreeFile ztf_node_desc, short numBuf, short nodeLabelLength)
 			throws InvalidSlotNumberException, InvalidTupleSizeException,
 			Exception {
+		
+		String nhfName = nhfRef.get_fileName();
+		String ehfName = ehfRef.get_fileName();
+		String indexEhfSourceNodeName = btf_edge_src_label.get_fileName();
+		String indexNodeLabelName = btf_node_label.get_fileName();
 
 		PathExpressionParser parsr = new PathExpressionParser();
 		List<AttrType[]> attrTypeList = new ArrayList<AttrType[]>();
