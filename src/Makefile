@@ -29,6 +29,7 @@ JAVADOC=javadoc -public -d $(PACKAGEINDEX)
 
 ### Generate jar and javadoc files.  Apply to most assignments.
 db: 
+	make -C batch
 	make -C global
 	make -C chainexception
 	make -C btree
@@ -40,6 +41,7 @@ db:
 	make -C iterator
 	make -C nodeheap
 	make -C edgeheap
+	
 	
 doc:
 	$(JAVADOC) $(DOCFILES)
