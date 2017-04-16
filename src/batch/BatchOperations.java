@@ -194,7 +194,7 @@ public class BatchOperations {
 						System.out.println("Batch Nodes insertion done");
 						printStatistics(gdb);
 						gdb.createBTNodeLabel();
-						System.out.println("Node label BT craeted");
+						System.out.println("Node label BT created");
 						gdb.createZTFNodeDesc();
 						System.out.println("Node descriptor BT created");
 					} catch (Exception e) {
@@ -371,7 +371,7 @@ public class BatchOperations {
       			//System.out.println("graphDBName"+graphDBName);
       			//System.out.println("pathExpressionOperationType"+pathExpressionOperationType);
       			String commandLineInvocation1 = br.readLine().trim();                
-                PathExpressionOperations.parsePathExpression(commandLineInvocation1,graphDBName,pathExpressionOperationType);
+                PathExpressionOperations.parsePathExpression(commandLineInvocation1,graphDBName,gdb,pathExpressionOperationType);
                 break;
 				default:
 					System.out.println("Error: unrecognized task number "
