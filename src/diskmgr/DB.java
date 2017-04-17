@@ -33,6 +33,7 @@ public class DB implements GlobalConst {
 
 		name = fname;
 
+		
 		// Create a random access file
 		fp = new RandomAccessFile(fname, "rw");
 

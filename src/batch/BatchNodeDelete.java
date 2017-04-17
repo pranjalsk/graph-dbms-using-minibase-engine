@@ -30,7 +30,7 @@ public class BatchNodeDelete {
 	 */
 	public void deleteBatchNode(NodeHeapfile nhf, EdgeHeapFile ehf,
 			BTreeFile btfNodeLbl, ZTreeFile ztfNodeDesc, BTreeFile btfEdgeLabl,
-			BTreeFile btfEdgeWt, String filePath) throws Exception {
+			BTreeFile btfEdgeWt, BTreeFile btf_edge_src_label, BTreeFile btf_edge_dest_label, String filePath) throws Exception {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(filePath));
 			String newInput = "";

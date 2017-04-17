@@ -1,8 +1,10 @@
 package batch;
 
+import edgeheap.EdgeHeapFile;
 import global.AttrOperator;
 import global.AttrType;
 import global.NID;
+import global.PageId;
 import global.TupleOrder;
 import heap.HFBufMgrException;
 import heap.HFDiskMgrException;
@@ -36,6 +38,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import zindex.ZTreeFile;
+
+import btree.BTreeFile;
 import bufmgr.PageNotReadException;
 
 import nodeheap.Node;
@@ -43,23 +48,31 @@ import nodeheap.NodeHeapfile;
 
 public class PathExpressionQuery {
 
-	public void pathExpressQuery1(String pathExpression, String nhfName,
-			String ehfName, String indexEhfSourceNodeName,
-			String indexNodeLabelName, short numBuf, short nodeLabelLength)
+	public void pathExpressQuery1(String pathExpression, NodeHeapfile nhfRef,
+			EdgeHeapFile ehfRef, BTreeFile btf_edge_src_label,
+			BTreeFile btf_node_label, ZTreeFile ztf_node_desc,short numBuf, short nodeLabelLength)
 			throws InvalidSlotNumberException, InvalidTupleSizeException,
 			Exception {
 
+		String nhfName = nhfRef.get_fileName();
+		String ehfName = ehfRef.get_fileName();
+		String indexEhfSourceNodeName = btf_edge_src_label.get_fileName();
+		String indexNodeLabelName = btf_node_label.get_fileName();	
+		
 		PathExpressionParser parsr = new PathExpressionParser();
 		List<AttrType[]> attrTypeList = new ArrayList<AttrType[]>();
 		List<Object[]> objExpList = new ArrayList<Object[]>();
 		int type = parsr.pathExpressionQuery1Parser(objExpList, attrTypeList,
-				pathExpression);
+				pathExpression,btf_node_label,nhfRef,ztf_node_desc);
+		
+		
 		PathExpression pathExp = new PathExpression();
 
 		NodeHeapfile nhf = new NodeHeapfile(nhfName);
 		Heapfile pathExprQuery1Result = new Heapfile("pathExprQuery1Result");
 
 		for (int i = 0; i < objExpList.size(); i++) {
+			System.out.println("reached"+i);
 			Object[] expression = objExpList.get(i);
 			AttrType[] attr = attrTypeList.get(i);
 			Iterator tailNodeIds = pathExp.pathExpress1(expression, attr,
@@ -78,7 +91,7 @@ public class PathExpressionQuery {
 			while ((tail = tailNodeIds.get_next()) != null) {
 				tail.setHdr((short) 1, new AttrType[] { new AttrType(
 						AttrType.attrId) }, new short[] {});
-				NID tailNid = (NID) tail.getIDFld(1);
+				NID tailNid =  new NID(tail.getIDFld(1).pageNo, tail.getIDFld(1).slotNo);
 				tailNode = nhf.getRecord(tailNid);
 				tailNode.setHdr();
 				headTailPair.setStrFld(1, headNode.getLabel());
@@ -90,12 +103,15 @@ public class PathExpressionQuery {
 
 			switch (type) {
 			case 0:
+				System.out.println("type a");
 				typeA("pathExprQuery1Result");
 				break;
 			case 1:
+				System.out.println("type b");
 				typeB("pathExprQuery1Result", numBuf);
 				break;
 			case 2:
+				System.out.println("type c");
 				typeC("pathExprQuery1Result", numBuf);
 				break;
 			}
@@ -103,11 +119,16 @@ public class PathExpressionQuery {
 
 	}
 
-	public void pathExpressQuery2(String pathExpression, String nhfName,
-			String ehfName, String indexEhfSourceNodeName,
-			String indexNodeLabelName, short numBuf, short nodeLabelLength)
+	public void pathExpressQuery2(String pathExpression, NodeHeapfile nhfRef,
+			EdgeHeapFile ehfRef, BTreeFile btf_edge_src_label,
+			BTreeFile btf_node_label, ZTreeFile ztf_node_desc, short numBuf, short nodeLabelLength)
 			throws InvalidSlotNumberException, InvalidTupleSizeException,
 			Exception {
+		
+		String nhfName = nhfRef.get_fileName();
+		String ehfName = ehfRef.get_fileName();
+		String indexEhfSourceNodeName = btf_edge_src_label.get_fileName();
+		String indexNodeLabelName = btf_node_label.get_fileName();
 
 		PathExpressionParser parsr = new PathExpressionParser();
 		List<AttrType[]> attrTypeList = new ArrayList<AttrType[]>();
@@ -138,7 +159,7 @@ public class PathExpressionQuery {
 			while ((tail = tailNodeIds.get_next()) != null) {
 				tail.setHdr((short) 1, new AttrType[] { new AttrType(
 						AttrType.attrId) }, new short[] {});
-				NID tailNid = (NID) tail.getIDFld(1);
+				NID tailNid = (NID) new NID(tail.getIDFld(1).pageNo, tail.getIDFld(1).slotNo);
 				tailNode = nhf.getRecord(tailNid);
 				tailNode.setHdr();
 				headTailPair.setStrFld(1, headNode.getLabel());
@@ -150,12 +171,15 @@ public class PathExpressionQuery {
 
 			switch (type) {
 			case 0:
+				System.out.println("type a");
 				typeA("pathExprQuery2Result");
 				break;
 			case 1:
+				System.out.println("type b");
 				typeB("pathExprQuery2Result", numBuf);
 				break;
 			case 2:
+				System.out.println("type c");
 				typeC("pathExprQuery2Result", numBuf);
 				break;
 			}

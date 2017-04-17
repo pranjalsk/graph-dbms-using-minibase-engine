@@ -92,7 +92,7 @@ public class SystemDefs {
 			try {
 				JavabaseDB.openDB(dbname, num_pgs);
 				JavabaseBM.flushAllPages();
-				//MINIBASE_RESTART_FLAG = true;
+				MINIBASE_RESTART_FLAG = true;
 			} catch (Exception e) {
 				System.err.println("" + e);
 				e.printStackTrace();
