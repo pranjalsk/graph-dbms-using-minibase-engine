@@ -525,7 +525,8 @@ public class BatchOperations {
 	 								new PathExpressionQuery().pathExpressQuery2(pathx, nhf, ehf, btf_edge_src_label, btf_node_label, ztf_node_desc, (short)numBuf, nodeLabelLength);
 
 								}else if(qtype == 7){
-									new PathExpressionQuery().triangleQuery("", gdb.nhf.get_fileName(), gdb.ehf.get_fileName(), "", "", (short)numBuf, nodeLabelLength);
+									String pathx = "TQa > EW:50/EW:50/EW:50";
+									new PathExpressionQuery().triangleQuery(pathx, gdb.nhf.get_fileName(), gdb.ehf.get_fileName(), btf_edge_src_label.get_fileName(), btf_node_label.get_fileName(), (short)numBuf, nodeLabelLength);
 									
 	 							}
 							}

@@ -305,28 +305,29 @@ public class PathExpressionQuery {
 			PredEvalException, SortException, LowMemException, UnknowAttrType,
 			UnknownKeyTypeException, Exception {
 
-		// PathExpressionParser parsr = new PathExpressionParser();
+		PathExpressionParser parsr = new PathExpressionParser();
 		AttrType[] attrTypes = new AttrType[3];
 		Object[] objExpressions = new Object[3];
-		// int type = parsr.triangleQueryParser(objExpressions, attrTypes,
-		// trianglePathExpression);
-		// PathExpression pathExp = new PathExpression();
+		int type = parsr.triangleQueryParser(objExpressions, attrTypes,
+				trianglePathExpression);
+		PathExpression pathExp = new PathExpression();
 
 		/*************************/
-		attrTypes[0] = new AttrType(AttrType.attrInteger);
-		attrTypes[1] = new AttrType(AttrType.attrInteger);
-		attrTypes[2] = new AttrType(AttrType.attrInteger);
-
-		objExpressions[0] = new Integer(50);
-		objExpressions[1] = new Integer(50);
-		objExpressions[2] = new Integer(50);
+		/*
+		 * attrTypes[0] = new AttrType(AttrType.attrInteger); attrTypes[1] = new
+		 * AttrType(AttrType.attrInteger); attrTypes[2] = new
+		 * AttrType(AttrType.attrInteger);
+		 * 
+		 * objExpressions[0] = new Integer(50); objExpressions[1] = new
+		 * Integer(50); objExpressions[2] = new Integer(50);
+		 */
 		/*************************/
 		Heapfile triangleQueryResult = new Heapfile("triangleQueryResult");
 		Iterator am1 = getTriNodeEdgePair(objExpressions, attrTypes, ehfName,
 				numBuf);
 
 		Iterator am2 = getThirdConnectingEdge(objExpressions, attrTypes,
-				ehfName,indexEhfSourceNodeName, am1, numBuf);
+				ehfName, indexEhfSourceNodeName, am1, numBuf);
 
 		AttrType[] types = new AttrType[7];
 		types[0] = new AttrType(AttrType.attrString);
@@ -505,16 +506,21 @@ public class PathExpressionQuery {
 		TupleOrder order = new TupleOrder(TupleOrder.Ascending);
 		EFileScan efscan1 = null;
 		EFileScan efscan2 = null;
-		SortMerge sm = null;
+		Iterator sm = null;
 
 		try {
 			efscan1 = new EFileScan(ehfName, attrType, s1_sizes, (short) 8, 8,
 					inputProjList, null);
 			efscan2 = new EFileScan(ehfName, attrType, s1_sizes, (short) 8, 8,
 					inputProjList, null);
-			sm = new SortMerge(attrType, 8, s1_sizes, attrType, 8, s1_sizes, 8,
-					32, 7, 32, numBuf, efscan1, efscan2, false, false, order,
-					expr, outputProjList, outputProjList.length);
+			/*
+			 * sm = new SortMerge(attrType, 8, s1_sizes, attrType, 8, s1_sizes,
+			 * 8, 32, 7, 32, numBuf, efscan1, efscan2, false, false, order,
+			 * expr, outputProjList, outputProjList.length);
+			 */
+			sm = new NestedLoopsJoins(attrType, 8, s1_sizes, attrType, 8,
+					s1_sizes, numBuf, efscan1, ehfName, expr, null,
+					outputProjList, outputProjList.length);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -523,7 +529,8 @@ public class PathExpressionQuery {
 	}
 
 	private Iterator getThirdConnectingEdge(Object[] objExpressions,
-			AttrType[] attrTypes, String ehfName, String indexEhfSourceNodeName, Iterator am1, int numBuf) {
+			AttrType[] attrTypes, String ehfName,
+			String indexEhfSourceNodeName, Iterator am1, int numBuf) {
 
 		AttrType[] attrType = new AttrType[8];
 		attrType[0] = new AttrType(AttrType.attrInteger); // SrcNID.pageid
@@ -642,17 +649,22 @@ public class PathExpressionQuery {
 
 			efscan2 = new EFileScan(ehfName, attrType, s2_sizes, (short) 8, 8,
 					inputProjList, null);
-			/*sm = new NestedLoopsJoins(jtype, 8, s1_sizes, attrType, 8,
-					s2_sizes, numBuf, am1, ehfName, expr,
-					null, outputProjList, outputProjList.length);*/
-			/*
-			 *sm =  new (jtype, 8, s1_sizes, attrType, 8, s2_sizes, 8, 32, 7, 32,
-			 * numBuf, am1, efscan2, false, false, order, expr, outputProjList,
-			 * outputProjList.length);
-			 */
+			
+			 /*sm = new NestedLoopsJoins(jtype, 8, s1_sizes, attrType, 8,
+			 s2_sizes, numBuf, am1, ehfName, expr, null, outputProjList,
+			 outputProjList.length);*/
+			 
+
+			
+			 /*sm = new SortMerge(jtype, 8, s1_sizes, attrType, 8, s2_sizes, 8,
+			 32, 7, 32, numBuf, am1, efscan2, false, false, order, expr,
+			 outputProjList, outputProjList.length);*/
+			 
+
 			sm = new IndexNestedLoopsJoins(jtype, 8, 8, s1_sizes, attrType, 8,
 					7, s2_sizes, (short) numBuf, am1, ehfName,
-					indexEhfSourceNodeName, inputProjList, expr, null, outputProjList, outputProjList.length);
+					indexEhfSourceNodeName, inputProjList, expr, null,
+					outputProjList, outputProjList.length);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
