@@ -115,11 +115,22 @@ public class PathExpressionParser {
 	
 	public int triangleQueryParser(Object[] objExpressions,
 			AttrType[] attrTypes, String trianglePathExpression) {
-		int type = 0; // whether the query type is a,b or c type will be 0,1 or
-						// 2.
-		// use objExpressions to add object array
-		// use attrTypes to add type to the array
-		return type;
+		int[] type = new int[1];
+		List<String[]> pathExpression = splitPathExpression(trianglePathExpression, type);
+		int i;
+		//int n = pathExpression.size();
+		for(i=0; i<3; i++){
+			String input = pathExpression.get(i)[1].trim();
+			if (pathExpression.get(i)[0].equals("EL")) {
+				objExpressions[i] = input;
+				attrTypes[i] = new AttrType(AttrType.attrString);
+			}
+			else {
+				objExpressions[i] = Integer.parseInt(input);
+				attrTypes[i] = new AttrType(AttrType.attrInteger);
+			}
+		}
+		return type[0];
 	}
 
 	public List<String[]> splitPathExpression(String pathexp, int[] type) {
@@ -151,7 +162,7 @@ public class PathExpressionParser {
 		for (String pathex : partialListForQueries) {
 			String[] keyValue = new String[2];
 			Pattern p = Pattern
-					.compile("(MNE|MTEW|MEW|NL|ND|EL|EW)\\s?[:]\\s?(\\d+_\\d+|\\d+ \\d+ \\d+ \\d+ \\d+|\\d+)");
+					.compile("(MNE|MTEW|MEW||NL|ND|EL|EW)\\s?[:]\\s?(\\d+_\\d+|\\d+ \\d+ \\d+ \\d+ \\d+|\\d+)");
 			Matcher m = p.matcher(pathex);
 			while (m.find()) {
 				keyValue[0] = m.group(1);
