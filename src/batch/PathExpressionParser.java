@@ -115,6 +115,51 @@ public class PathExpressionParser {
 		return type[0];
 	}
 
+	public int pathExpressionQuery3Parser(List<Object[]> objExpList,
+			List<AttrType[]> attrTypeList, String inputPathExpression, NodeHeapfile nhf, ZTreeFile ztf_desc, BTreeFile btf_node) throws Exception {
+		int [] type = new int[1];
+		
+		List<String[]> pathExpression = splitPathExpression(inputPathExpression, type);
+
+		// Finding the list of NIDs corresponding to the headnode
+		BatchInsert batchinsert = new BatchInsert();
+		String headnode = pathExpression.get(0)[1];
+		List<NID> nidlist = null;
+		if (headnode.matches("\\d+\\s?\\d+\\s?\\d+\\s?\\d+\\s?\\d+")) {
+			nidlist = batchinsert.getNidFromDescriptor(headnode, nhf, ztf_desc); 
+		} else {
+			nidlist = new ArrayList<NID>();
+			nidlist.add(batchinsert.getNidFromNodeLabel(headnode, nhf, btf_node));
+		}
+
+		int i;
+		//int n = pathExpression.size();
+
+		Object[] objectArray = new Object[2];
+		AttrType[] attrArray = new AttrType[2];
+
+		objectArray[0] = null;
+		attrArray[0] = new AttrType(AttrType.attrInteger);
+		//for (i = 1; i < n; i++) {
+		String input = pathExpression.get(1)[1].trim();
+		if (pathExpression.get(1)[0].equals("MNE")) {								
+			objectArray[1] = input+":MNE";				
+			attrArray[1] = new AttrType(AttrType.attrInteger);
+		} else {
+			objectArray[1] = input+":MTEW";	
+			attrArray[1] = new AttrType(AttrType.attrInteger);
+		}
+		//}
+		for (i = 0; i < nidlist.size(); i++) {
+			Object[] finalObjectArray = new Object[2];
+			System.arraycopy(objectArray, 0, finalObjectArray, 0, 2);
+			finalObjectArray[0] = nidlist.get(i);
+			objExpList.add(finalObjectArray);
+			attrTypeList.add(attrArray);
+		}
+		// ObjectArray is [[NID1, 10:MNE],[NID2, 15:MTEW]...]
+		return type[0];
+	}
 	
 	public int triangleQueryParser(Object[] objExpressions,
 			AttrType[] attrTypes, String trianglePathExpression) {
