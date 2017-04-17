@@ -513,7 +513,7 @@ public class BatchOperations {
 									AttrType[] attr = new AttrType[]{new AttrType(0), new AttrType(5), new AttrType(0)};
 									new PathExpression().pathExpress1(expression, attr, gdb.nhf.get_fileName(), gdb.ehf.get_fileName(), 
 											"indexEhfSourceNodeName", gdb.btf_node_label.get_fileName(), (short)numBuf, nodeLabelLength);*/
-									String pathx = "PQ1a > ND:13 34 7 6 10/ND:14 38 2 18 45/NL:628/ND:16 46 9 2 18/NL:251/NL:461/ND:45 10 43 48 47/ND:27 16 22 43 22/NL:1053";
+									String pathx = "PQ1a > NL:428/NL:628/NL:753/NL:1043/ND:22 9 0 8 20";
 									
 									new PathExpressionQuery().pathExpressQuery1(pathx, nhf, ehf, btf_edge_src_label, btf_node_label, ztf_node_desc, (short)numBuf, nodeLabelLength);
 	 							}else if(qtype == 6){
