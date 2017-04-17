@@ -17,6 +17,7 @@ import edgeheap.EdgeHeapFile;
 import global.AttrType;
 import global.Descriptor;
 import global.NID;
+import global.PageId;
 import global.SystemDefs;
 import global.TupleOrder;
 import heap.FieldNumberOutOfBoundException;
@@ -421,7 +422,9 @@ public class BatchOperations {
 						BTreeFile btf_node_label = new BTreeFile("IndNodeLabel_"+graphDBName);
 						BTreeFile btf_edge_label = new BTreeFile("IndEdgeLabel_"+graphDBName);
 						BTreeFile btf_edge_weight = new BTreeFile("IndEdgeWeight_"+graphDBName);
-						//ZTreeFile ztf_node_desc = new ZTreeFile("zBTFile");     //never used in this case
+						ZTreeFile ztf_node_desc = new ZTreeFile("zBTFile");
+						BTreeFile btf_edge_src_label = new BTreeFile("IndEdgeSrcLabel_"+graphDBName);
+						BTreeFile btf_edge_dest_label = new BTreeFile("IndEdgeDestLabel_"+graphDBName);
 						
 						try {
 							// heapfile scan
@@ -504,14 +507,24 @@ public class BatchOperations {
 											btf_node_label, edgeLabelLength,
 											(short) numBuf);
 								} else if (qtype == 5) {
-									eqi.query5(ehf, btf_edge_weight,
-											edgeLabelLength, (short) numBuf,
-											edgeWtBound1, edgeWtBound2);
-								} else if (qtype == 6) {
-									eqi.query6(ehf, btf_edge_label,
-											nhf, edgeLabelLength,
-											(short) numBuf);
-								}
+									/*Descriptor desc = new Descriptor();
+								desc.set(23, 30, 37, 8, 38);
+									Object[] expression = new Object[]{new NID(new PageId(61),0), new Descriptor(desc),new String("949")};
+									AttrType[] attr = new AttrType[]{new AttrType(0), new AttrType(5), new AttrType(0)};
+									new PathExpression().pathExpress1(expression, attr, gdb.nhf.get_fileName(), gdb.ehf.get_fileName(), 
+											"indexEhfSourceNodeName", gdb.btf_node_label.get_fileName(), (short)numBuf, nodeLabelLength);*/
+									String pathx = "PQ1a > ND:13 34 7 6 10/ND:14 38 2 18 45/NL:628/ND:16 46 9 2 18/NL:251/NL:461/ND:45 10 43 48 47/ND:27 16 22 43 22/NL:1053";
+									
+									new PathExpressionQuery().pathExpressQuery1(pathx, nhf, ehf, btf_edge_src_label, btf_node_label, ztf_node_desc, (short)numBuf, nodeLabelLength);
+	 							}else if(qtype == 6){
+									Object[] expression = new Object[]{new NID(new PageId(43),8), new String("518_809"), new String("809_818"), new Integer(50)};
+									AttrType[] attr = new AttrType[]{new AttrType(0), new AttrType(0), new AttrType(0), new AttrType(1)};
+									new PathExpression().pathExpress2(expression, attr, gdb.nhf.get_fileName(), gdb.ehf.get_fileName(), 
+											"indexEhfSourceNodeName", gdb.btf_node_label.get_fileName(), (short)numBuf, nodeLabelLength);
+								}else if(qtype == 7){
+									new PathExpressionQuery().triangleQuery("", gdb.nhf.get_fileName(), gdb.ehf.get_fileName(), "", "", (short)numBuf, nodeLabelLength);
+									
+	 							}
 							}
 							printStatistics(gdb,nhf,ehf);
 							

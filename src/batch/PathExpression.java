@@ -40,35 +40,12 @@ import iterator.SortMerge;
 
 public class PathExpression {
 
-	public static Iterator pathExpress1(Object[] expression, AttrType[] attr,
+	public Iterator pathExpress1(Object[] expression, AttrType[] attr,
 			String nhfName, String ehfName, String indexEhfSourceNodeName,
 			String indexNodeLabelName, short numBuf, short nodeLabelLength)
 			throws InvalidSlotNumberException, InvalidTupleSizeException,
 			Exception {
-		/***************************************/
-		EdgeHeapFile ehf = new EdgeHeapFile(ehfName);
-		BTreeFile btf_edge_source_label = new BTreeFile(indexEhfSourceNodeName,
-				AttrType.attrString, 32, 0);
-		EID eid = new EID();
-		Edge edge;
-		try {
-
-			EScan escan = ehf.openScan();
-			edge = escan.getNext(eid);
-			KeyClass key;
-			while (edge != null) {
-				edge.setHdr();
-				key = new StringKey(edge.getSourceLabel());
-				btf_edge_source_label.insert(key, eid);
-				edge = escan.getNext(eid);
-			}
-			escan.closescan();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		btf_edge_source_label.close();
-		/***************************************/
-
+		
 		NodeHeapfile nodeHeapFile = new NodeHeapfile(nhfName);
 		Node starNode = nodeHeapFile.getRecord((NID) expression[0]);
 		starNode.setHdr();
@@ -150,7 +127,7 @@ public class PathExpression {
 				inlj = new IndexNestedLoopsJoins(in1, 2, 1, t1_str_sizes, in2,
 						8, 7, t2_str_sizes, numBuf, am_outer, ehfName,
 						indexEhfSourceNodeName, inner_projlist,
-						out_filter_outer_Iterator, null, proj_list, 6);
+						null, null, proj_list, 6);
 			} catch (Exception e) {
 				System.err.println("*** Error preparing for nested_loop_join");
 				System.err.println("" + e);
@@ -168,19 +145,16 @@ public class PathExpression {
 			t1_str_sizes = new short[2];
 			t1_str_sizes[0] = nodeLabelLength;
 			t1_str_sizes[1] = nodeLabelLength;
-			inner_projlist = new FldSpec[6];
+			inner_projlist = new FldSpec[2];
 			inner_projlist[0] = new FldSpec(outer, 1);
 			inner_projlist[1] = new FldSpec(outer, 2);
-			inner_projlist[2] = new FldSpec(outer, 3);
-			inner_projlist[3] = new FldSpec(outer, 4);
-			inner_projlist[4] = new FldSpec(outer, 5);
-			inner_projlist[5] = new FldSpec(outer, 6);
 
 			t2_str_sizes = new short[2];
 			t2_str_sizes[0] = nodeLabelLength;
 			in2 = new AttrType[2];
 			in2[0] = new AttrType(AttrType.attrString);
 			in2[1] = new AttrType(AttrType.attrDesc);
+						
 			CondExpr[] rightFilter = new CondExpr[2];
 			rightFilter[0] = new CondExpr();
 			rightFilter[0].op = new AttrOperator(AttrOperator.aopEQ);
@@ -198,6 +172,7 @@ public class PathExpression {
 				rightFilter[0].operand1.attrDesc = (Descriptor) expression[i + 1];
 			}
 			rightFilter[1] = null;
+			
 			try {
 				am_outer = new IndexNestedLoopsJoins(in1, 6, 6, t1_str_sizes,
 						in2, 2, 1, t2_str_sizes, numBuf, inlj, nhfName,
@@ -227,10 +202,10 @@ public class PathExpression {
 		BTreeFile btfNodeLabel = new BTreeFile(indexNodeLabelName);
 		while ((tu = am_outer.get_next()) != null) {
 			tu.setHdr((short) 2, types, strSizes);
-			System.out.println("Node Label: " + tu.getStrFld(1));
+//			System.out.println("Node Label: " + tu.getStrFld(1));
 			Tuple tail = new Tuple();
 			RID rid = (RID)(bi.getNidFromNodeLabel(tu.getStrFld(1), nodeHeapFile, btfNodeLabel));
-			System.out.println(rid.pageNo.pid+":"+rid.slotNo);
+//			System.out.println(rid.pageNo.pid+":"+rid.slotNo);
 			tail.setHdr((short)1, new AttrType[]{new AttrType(AttrType.attrId)}, new short[]{});
 			tail.setIDFld(1, rid);
 			tailNodeFile.insertRecord(tail.getTupleByteArray());
@@ -265,7 +240,7 @@ public class PathExpression {
 		return tail_iterator;
 	}
 
-	public static Iterator pathExpress2(Object[] expression, AttrType[] attr,
+	public Iterator pathExpress2(Object[] expression, AttrType[] attr,
 			String nhfName, String ehfName, String indexEhfSourceNodeName,
 			String indexNodeLabelName, short numBuf, short nodeLabelLength)
 			throws InvalidSlotNumberException, InvalidTupleSizeException,

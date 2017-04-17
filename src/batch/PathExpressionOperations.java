@@ -126,8 +126,9 @@ public class PathExpressionOperations {
 			nodeLabelQuery = true;
 			nodeLabel = inputArg;
 			attr[0] = new AttrType(0);
+			System.out.println("Reached>>>>>>>>");
 			sourceNID = PathExpressionUtil.lookupAndIterateOverPath(nodeLabel,
-				gdb.nhf, gdb.btf_edge_label);
+				gdb.nhf, gdb.btf_node);
 			args[0] = sourceNID;
 		} else {
 			nodeDescriptorQuery = true;
@@ -196,7 +197,7 @@ public class PathExpressionOperations {
 		     Set<String> set=new LinkedHashSet<String>();
 			Iterator it=PathExpression.pathExpress1(args, attr,
 					 gdb.nhf.get_fileName(), gdb.ehf.get_fileName(),
-					 gdb.btf_edge_label.get_fileName(), nodeLabel, numbuf,
+					 gdb.btf_edge_label.get_fileName(), gdb.btf_node.get_fileName(), numbuf,
 					 (short)32);
 			if (pathExpressionOperationType.equalsIgnoreCase("PQ1a")) {
 				// need to make this method static?
