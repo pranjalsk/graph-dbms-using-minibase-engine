@@ -277,8 +277,8 @@ public class PathExpressionQuery {
 		while ((res = headNodesSort.get_next()) != null) {
 			res.setHdr((short) 2, type, str_sizes);
 			if (prevRes == null
-					|| !(prevRes.getStrFld(1) == res.getStrFld(1) && prevRes
-							.getStrFld(2) == res.getStrFld(2))) {
+					|| !(prevRes.getStrFld(1).equalsIgnoreCase(res.getStrFld(1)) && prevRes
+							.getStrFld(2).equalsIgnoreCase(res.getStrFld(2)))) {
 				res.print(type);
 				prevRes = res;
 			}
