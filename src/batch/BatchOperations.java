@@ -56,7 +56,7 @@ public class BatchOperations {
 
 	public static void main(String[] args) throws Exception {
 
-		Scanner sc= new Scanner(System.in);
+		Scanner sc = new Scanner(System.in);
 		System.out.println("Enter Graph DB name:");
 		graphDBName = sc.next();
 		initGraphDB(graphDBName);
@@ -82,7 +82,8 @@ public class BatchOperations {
 			System.out
 					.println("For Phase2:Enter the batch operation, the input file path and the name of the Graph Database in the following format");
 			System.out.println("<task_name> <file_path> <GraphDB_name>");
-			System.out.println("For Phase 3: Enter <task_name> as 'PathExpressionQuery'");
+			System.out
+					.println("For Phase 3: Enter <task_name> as 'PathExpressionQuery'");
 
 			String commandLineInvocation = br.readLine().trim();
 			String inputArguments[] = commandLineInvocation.split(" ");
@@ -117,23 +118,24 @@ public class BatchOperations {
 					// ---------------------------------
 					filePath = inputArguments[1];
 					String inputGraphDBName = inputArguments[2];
-					while(!graphDBName.equals(inputGraphDBName)){
-						System.out.println("Wrong graph db name enter graph db name again");
+					while (!graphDBName.equals(inputGraphDBName)) {
+						System.out
+								.println("Wrong graph db name enter graph db name again");
 						System.out.println("Graph DB name: ");
 						Scanner sc1 = new Scanner(System.in);
 						inputGraphDBName = sc1.next();
 					}
-					
-				} 
-				else if (taskNumber == 14) {
+
+				} else if (taskNumber == 14) {
 					String inputGraphDBName = inputArguments[1];
-					while(!graphDBName.equals(inputGraphDBName)){
-						System.out.println("Wrong graph db name; enter graph db name again");
+					while (!graphDBName.equals(inputGraphDBName)) {
+						System.out
+								.println("Wrong graph db name; enter graph db name again");
 						System.out.println("Graph DB name: ");
 						Scanner sc1 = new Scanner(System.in);
 						inputGraphDBName = sc1.next();
-					}	
-					
+					}
+
 					numBuf = Integer.parseInt(inputArguments[2]);
 					qtype = Integer.parseInt(inputArguments[3]);
 					index = Integer.parseInt(inputArguments[4]);
@@ -166,15 +168,15 @@ public class BatchOperations {
 					} else if (qtype == 4) {
 						targetLabel = inputArguments[5];
 					}
-				} 
-				else if (taskNumber == 15) {
+				} else if (taskNumber == 15) {
 					String inputGraphDBName = inputArguments[1];
-					while(!graphDBName.equals(inputGraphDBName)){
-						System.out.println("Wrong graph db name; enter graph db name again");
+					while (!graphDBName.equals(inputGraphDBName)) {
+						System.out
+								.println("Wrong graph db name; enter graph db name again");
 						System.out.println("Graph DB name: ");
 						Scanner sc1 = new Scanner(System.in);
 						inputGraphDBName = sc1.next();
-					}	
+					}
 					numBuf = Integer.parseInt(inputArguments[2]);
 					qtype = Integer.parseInt(inputArguments[3]);
 					index = Integer.parseInt(inputArguments[4]);
@@ -185,40 +187,39 @@ public class BatchOperations {
 				}
 				System.out.println("tasknumber" + taskNumber);
 
-				
 				switch (taskNumber) {
 
 				// Task : Batch node insert
 				case 10:
 					try {
 						String sCurrentLine;
-						NodeHeapfile nhf = new NodeHeapfile("NodeHeapFile_"+ graphDBName);
-						EdgeHeapFile ehf =  new EdgeHeapFile("EdgeHeapFile_"+graphDBName);
-						BTreeFile btf_node_label = new BTreeFile("IndNodeLabel_"+graphDBName);
+						NodeHeapfile nhf = new NodeHeapfile("NodeHeapFile_"
+								+ graphDBName);
+						EdgeHeapFile ehf = new EdgeHeapFile("EdgeHeapFile_"
+								+ graphDBName);
+						BTreeFile btf_node_label = new BTreeFile(
+								"IndNodeLabel_" + graphDBName);
 						ZTreeFile ztf_node_desc = new ZTreeFile("zBTFile");
-						
+
 						br = new BufferedReader(new FileReader(filePath));
 						while ((sCurrentLine = br.readLine()) != null) {
 
-							BatchNodeInsert newNodeInsert = new BatchNodeInsert();		
+							BatchNodeInsert newNodeInsert = new BatchNodeInsert();
 							newNodeInsert.insertBatchNode(nhf, sCurrentLine);
 						}
 						System.out.println("Batch Nodes insertion done");
-						
+
+						printStatistics(gdb, nhf, ehf);
+
 						// Insert records in Btree file
-						gdb.createBTNodeLabel(nhf,btf_node_label);
-						
-						printStatistics(gdb,nhf,ehf);
-						
-						System.out.println("Node label BT craeted");
+						gdb.createBTNodeLabel(nhf, btf_node_label);
+						System.out.println("Node label BTree index created");
 						btf_node_label.close();
-												
-						gdb.createZTFNodeDesc(nhf,ztf_node_desc);
-						System.out.println("Node descriptor BT created");
-						
-						ztf_node_desc.close();  
-						
-					
+
+						gdb.createZTFNodeDesc(nhf, ztf_node_desc);
+						System.out.println("Node Desc ZTree index created");
+						ztf_node_desc.close();
+
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -228,37 +229,44 @@ public class BatchOperations {
 				case 11:
 					try {
 						BatchEdgeInsert newEdgeInsert = new BatchEdgeInsert();
-						EdgeHeapFile ehf =  new EdgeHeapFile("EdgeHeapFile_"+graphDBName);
-						NodeHeapfile nhf = new NodeHeapfile("NodeHeapFile_"+ graphDBName);
-						BTreeFile btf_node_label = new BTreeFile("IndNodeLabel_"+graphDBName);
-						BTreeFile btf_edge_label = new BTreeFile("IndEdgeLabel_"+graphDBName);
-						BTreeFile btf_edge_weight = new BTreeFile("IndEdgeWeight_"+graphDBName);
-						BTreeFile btf_edge_src_label = new BTreeFile("IndEdgeSrcLabel_"+graphDBName);
-						BTreeFile btf_edge_dest_label = new BTreeFile("IndEdgeDestLabel_"+graphDBName);
-												
-						newEdgeInsert.insertBatchEdge(ehf, nhf,btf_node_label, filePath);
+						EdgeHeapFile ehf = new EdgeHeapFile("EdgeHeapFile_"
+								+ graphDBName);
+						NodeHeapfile nhf = new NodeHeapfile("NodeHeapFile_"
+								+ graphDBName);
+						BTreeFile btf_node_label = new BTreeFile(
+								"IndNodeLabel_" + graphDBName);
+						BTreeFile btf_edge_label = new BTreeFile(
+								"IndEdgeLabel_" + graphDBName);
+						BTreeFile btf_edge_weight = new BTreeFile(
+								"IndEdgeWeight_" + graphDBName);
+						BTreeFile btf_edge_src_label = new BTreeFile(
+								"IndEdgeSrcLabel_" + graphDBName);
+						BTreeFile btf_edge_dest_label = new BTreeFile(
+								"IndEdgeDestLabel_" + graphDBName);
+
+						newEdgeInsert.insertBatchEdge(ehf, nhf, btf_node_label,
+								filePath);
 						System.out.println("Batch edge insertion done");
-						
-						printStatistics(gdb,nhf,ehf);
-						
+
+						printStatistics(gdb, nhf, ehf);
+
 						btf_node_label.close();
-						
-						gdb.createBTEdgeLabel(ehf,btf_edge_label);
+
+						gdb.createBTEdgeLabel(ehf, btf_edge_label);
 						System.out.println("BTree on Edge Label Created");
 						btf_edge_label.close();
-						
-						gdb.createBTEdgeWeight(ehf,btf_edge_weight);
+
+						gdb.createBTEdgeWeight(ehf, btf_edge_weight);
 						System.out.println("BTree on Edge Weight Created");
 						btf_edge_weight.close();
-						
+
 						gdb.createBTEdgeSrcLabel(ehf, btf_edge_src_label);
 						btf_edge_src_label.close();
-						
+
 						gdb.createBTEdgeDestLabel(ehf, btf_edge_dest_label);
 						btf_edge_dest_label.close();
-						
-						} 
-					catch (Exception e) {
+
+					} catch (Exception e) {
 						e.printStackTrace();
 					}
 					break;
@@ -267,30 +275,36 @@ public class BatchOperations {
 				case 12:
 					try {
 						BatchNodeDelete newNodeDelete = new BatchNodeDelete();
-						
-						EdgeHeapFile ehf =  new EdgeHeapFile("EdgeHeapFile_"+graphDBName);
-						NodeHeapfile nhf = new NodeHeapfile("NodeHeapFile_"+ graphDBName);
-						BTreeFile btf_node_label = new BTreeFile("IndNodeLabel_"+graphDBName);
-						BTreeFile btf_edge_label = new BTreeFile("IndEdgeLabel_"+graphDBName);
-						BTreeFile btf_edge_weight = new BTreeFile("IndEdgeWeight_"+graphDBName);
+
+						EdgeHeapFile ehf = new EdgeHeapFile("EdgeHeapFile_"
+								+ graphDBName);
+						NodeHeapfile nhf = new NodeHeapfile("NodeHeapFile_"
+								+ graphDBName);
+						BTreeFile btf_node_label = new BTreeFile(
+								"IndNodeLabel_" + graphDBName);
+						BTreeFile btf_edge_label = new BTreeFile(
+								"IndEdgeLabel_" + graphDBName);
+						BTreeFile btf_edge_weight = new BTreeFile(
+								"IndEdgeWeight_" + graphDBName);
 						ZTreeFile ztf_node_desc = new ZTreeFile("zBTFile");
-						BTreeFile btf_edge_src_label = new BTreeFile("IndEdgeSrcLabel_"+graphDBName);
-						BTreeFile btf_edge_dest_label = new BTreeFile("IndEdgeDestLabel_"+graphDBName);
-						
-						newNodeDelete.deleteBatchNode(nhf, ehf,
-								btf_node_label, ztf_node_desc,
-								btf_edge_label, btf_edge_weight,
-								btf_edge_src_label,btf_edge_dest_label,
+						BTreeFile btf_edge_src_label = new BTreeFile(
+								"IndEdgeSrcLabel_" + graphDBName);
+						BTreeFile btf_edge_dest_label = new BTreeFile(
+								"IndEdgeDestLabel_" + graphDBName);
+
+						newNodeDelete.deleteBatchNode(nhf, ehf, btf_node_label,
+								ztf_node_desc, btf_edge_label, btf_edge_weight,
+								btf_edge_src_label, btf_edge_dest_label,
 								filePath);
-						
-						printStatistics(gdb,nhf,ehf);
-						
-						//close all files
+
+						printStatistics(gdb, nhf, ehf);
+
+						// close all files
 						btf_node_label.close();
 						btf_edge_label.close();
 						btf_edge_weight.close();
-						ztf_node_desc.close();     
-						
+						ztf_node_desc.close();
+
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -299,25 +313,29 @@ public class BatchOperations {
 				// Task : Batch Edge Delete
 				case 13:
 					try {
-						BatchEdgeDelete newEdgeDelete = new BatchEdgeDelete();	
+						BatchEdgeDelete newEdgeDelete = new BatchEdgeDelete();
 
-						EdgeHeapFile ehf =  new EdgeHeapFile("EdgeHeapFile_"+graphDBName);
-						NodeHeapfile nhf = new NodeHeapfile("NodeHeapFile_"+ graphDBName);
-						BTreeFile btf_node_label = new BTreeFile("IndNodeLabel_"+graphDBName);
-						BTreeFile btf_edge_label = new BTreeFile("IndEdgeLabel_"+graphDBName);
-						BTreeFile btf_edge_weight = new BTreeFile("IndEdgeWeight_"+graphDBName);
-						
-						newEdgeDelete.deleteBatchEdge(ehf, nhf,
-								btf_node_label, btf_edge_label,
-								btf_edge_weight, filePath);
-						
-						printStatistics(gdb,nhf,ehf);
-						
-						//close all files
+						EdgeHeapFile ehf = new EdgeHeapFile("EdgeHeapFile_"
+								+ graphDBName);
+						NodeHeapfile nhf = new NodeHeapfile("NodeHeapFile_"
+								+ graphDBName);
+						BTreeFile btf_node_label = new BTreeFile(
+								"IndNodeLabel_" + graphDBName);
+						BTreeFile btf_edge_label = new BTreeFile(
+								"IndEdgeLabel_" + graphDBName);
+						BTreeFile btf_edge_weight = new BTreeFile(
+								"IndEdgeWeight_" + graphDBName);
+
+						newEdgeDelete.deleteBatchEdge(ehf, nhf, btf_node_label,
+								btf_edge_label, btf_edge_weight, filePath);
+
+						printStatistics(gdb, nhf, ehf);
+
+						// close all files
 						btf_node_label.close();
 						btf_edge_label.close();
-						btf_edge_weight.close();	
-						
+						btf_edge_weight.close();
+
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -329,14 +347,19 @@ public class BatchOperations {
 						System.out.println("task 14");
 						NodeQuery nq = new NodeQuery();
 						NodeQueryWithIndex nqi = new NodeQueryWithIndex();
-						
-						EdgeHeapFile ehf = new EdgeHeapFile("EdgeHeapFile_"+graphDBName);
-						NodeHeapfile nhf = new NodeHeapfile("NodeHeapFile_"+ graphDBName);
-						BTreeFile btf_node_label = new BTreeFile("IndNodeLabel_"+graphDBName);
-						BTreeFile btf_edge_label = new BTreeFile("IndEdgeLabel_"+graphDBName);
-						BTreeFile btf_edge_weight = new BTreeFile("IndEdgeWeight_"+graphDBName);
+
+						EdgeHeapFile ehf = new EdgeHeapFile("EdgeHeapFile_"
+								+ graphDBName);
+						NodeHeapfile nhf = new NodeHeapfile("NodeHeapFile_"
+								+ graphDBName);
+						BTreeFile btf_node_label = new BTreeFile(
+								"IndNodeLabel_" + graphDBName);
+						BTreeFile btf_edge_label = new BTreeFile(
+								"IndEdgeLabel_" + graphDBName);
+						BTreeFile btf_edge_weight = new BTreeFile(
+								"IndEdgeWeight_" + graphDBName);
 						ZTreeFile ztf_node_desc = new ZTreeFile("zBTFile");
-						
+
 						try {
 							// heapfile scan
 							if (index == 0) {
@@ -387,20 +410,20 @@ public class BatchOperations {
 											targetLabel);
 								} else if (qtype == 5) {
 									nqi.query5(nhf, ztf_node_desc,
-											btf_node_label, ehf, nodeLabelLength,
-											(short) numBuf, targetDescriptor,
-											distance);
+											btf_node_label, ehf,
+											nodeLabelLength, (short) numBuf,
+											targetDescriptor, distance);
 								}
 							}
-							
-							printStatistics(gdb,nhf,ehf);
-							
-							//close all files
+
+							printStatistics(gdb, nhf, ehf);
+
+							// close all files
 							btf_node_label.close();
 							btf_edge_label.close();
 							btf_edge_weight.close();
-							ztf_node_desc.close();     
-							
+							ztf_node_desc.close();
+
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -416,16 +439,23 @@ public class BatchOperations {
 						System.out.println("Task 15");
 						EdgeQuery eq = new EdgeQuery();
 						EdgeQueryWithIndex eqi = new EdgeQueryWithIndex();
-											
-						EdgeHeapFile ehf =  new EdgeHeapFile("EdgeHeapFile_"+graphDBName);
-						NodeHeapfile nhf = new NodeHeapfile("NodeHeapFile_"+ graphDBName);
-						BTreeFile btf_node_label = new BTreeFile("IndNodeLabel_"+graphDBName);
-						BTreeFile btf_edge_label = new BTreeFile("IndEdgeLabel_"+graphDBName);
-						BTreeFile btf_edge_weight = new BTreeFile("IndEdgeWeight_"+graphDBName);
+
+						EdgeHeapFile ehf = new EdgeHeapFile("EdgeHeapFile_"
+								+ graphDBName);
+						NodeHeapfile nhf = new NodeHeapfile("NodeHeapFile_"
+								+ graphDBName);
+						BTreeFile btf_node_label = new BTreeFile(
+								"IndNodeLabel_" + graphDBName);
+						BTreeFile btf_edge_label = new BTreeFile(
+								"IndEdgeLabel_" + graphDBName);
+						BTreeFile btf_edge_weight = new BTreeFile(
+								"IndEdgeWeight_" + graphDBName);
 						ZTreeFile ztf_node_desc = new ZTreeFile("zBTFile");
-						BTreeFile btf_edge_src_label = new BTreeFile("IndEdgeSrcLabel_"+graphDBName);
-						BTreeFile btf_edge_dest_label = new BTreeFile("IndEdgeDestLabel_"+graphDBName);
-						
+						BTreeFile btf_edge_src_label = new BTreeFile(
+								"IndEdgeSrcLabel_" + graphDBName);
+						BTreeFile btf_edge_dest_label = new BTreeFile(
+								"IndEdgeDestLabel_" + graphDBName);
+
 						try {
 							// heapfile scan
 							if (index == 0) {
@@ -458,9 +488,8 @@ public class BatchOperations {
 							// index scan
 							else if (index == 1) {
 								if (qtype == 0) {
-									eqi.query0(ehf, btf_edge_label,
-											nhf, edgeLabelLength,
-											(short) numBuf);
+									eqi.query0(ehf, btf_edge_label, nhf,
+											edgeLabelLength, (short) numBuf);
 								} else if (qtype == 1) {
 									eqi.query1(ehf, btf_node_label, nhf,
 											nodeLabelLength, (short) numBuf);
@@ -478,16 +507,14 @@ public class BatchOperations {
 											edgeLabelLength, (short) numBuf,
 											edgeWtBound1, edgeWtBound2);
 								} else if (qtype == 6) {
-									eqi.query6(ehf, btf_edge_label,
-											nhf, edgeLabelLength,
-											(short) numBuf);
+									eqi.query6(ehf, btf_edge_label, nhf,
+											edgeLabelLength, (short) numBuf);
 								}
 							} else if (index == 2) {
 								IndexNestedJoinTest intest = new IndexNestedJoinTest();
 								if (qtype == 0) {
-									eqi.query0(ehf, btf_edge_label,
-											nhf, edgeLabelLength,
-											(short) numBuf);
+									eqi.query0(ehf, btf_edge_label, nhf,
+											edgeLabelLength, (short) numBuf);
 								} else if (qtype == 1) {
 									System.out.println("node_edge_source");
 									intest.node_edge_source(ehf, nhf,
@@ -507,37 +534,74 @@ public class BatchOperations {
 											btf_node_label, edgeLabelLength,
 											(short) numBuf);
 								} else if (qtype == 5) {
-									/*Descriptor desc = new Descriptor();
-								desc.set(23, 30, 37, 8, 38);
-									Object[] expression = new Object[]{new NID(new PageId(61),0), new Descriptor(desc),new String("949")};
-									AttrType[] attr = new AttrType[]{new AttrType(0), new AttrType(5), new AttrType(0)};
-									new PathExpression().pathExpress1(expression, attr, gdb.nhf.get_fileName(), gdb.ehf.get_fileName(), 
-											"indexEhfSourceNodeName", gdb.btf_node_label.get_fileName(), (short)numBuf, nodeLabelLength);*/
+									/*
+									 * Descriptor desc = new Descriptor();
+									 * desc.set(23, 30, 37, 8, 38); Object[]
+									 * expression = new Object[]{new NID(new
+									 * PageId(61),0), new Descriptor(desc),new
+									 * String("949")}; AttrType[] attr = new
+									 * AttrType[]{new AttrType(0), new
+									 * AttrType(5), new AttrType(0)}; new
+									 * PathExpression().pathExpress1(expression,
+									 * attr, gdb.nhf.get_fileName(),
+									 * gdb.ehf.get_fileName(),
+									 * "indexEhfSourceNodeName",
+									 * gdb.btf_node_label.get_fileName(),
+									 * (short)numBuf, nodeLabelLength);
+									 */
 									String pathx = "PQ1a > NL:1/ND:13 38 2 18 45/ND:49 32 0 2 3/ND:44 22 26 37 10/ND:4 17 5 10 6/ND:33 38 17 34 39";
-									
-									new PathExpressionQuery().pathExpressQuery1(pathx, nhf, ehf, btf_edge_src_label, btf_node_label, ztf_node_desc, (short)numBuf, nodeLabelLength);
-	 							}else if(qtype == 6){
-									/*Object[] expression = new Object[]{new NID(new PageId(43),8), new String("518_809"), new String("809_818"), new Integer(50)};
-									AttrType[] attr = new AttrType[]{new AttrType(0), new AttrType(0), new AttrType(0), new AttrType(1)};
-									new PathExpression().pathExpress2(expression, attr, gdb.nhf.get_fileName(), gdb.ehf.get_fileName(), 
-											"indexEhfSourceNodeName", gdb.btf_node_label.get_fileName(), (short)numBuf, nodeLabelLength);*/
-	 								String pathx = "PQ2a > ND:13 34 7 6 10/EW:50/EW:50/EW:50/EW:50";
-	 								new PathExpressionQuery().pathExpressQuery2(pathx, nhf, ehf, btf_edge_src_label, btf_node_label, ztf_node_desc, (short)numBuf, nodeLabelLength);
 
-								}else if(qtype == 7){
+									new PathExpressionQuery()
+											.pathExpressQuery1(pathx, nhf, ehf,
+													btf_edge_src_label,
+													btf_node_label,
+													ztf_node_desc,
+													(short) numBuf,
+													nodeLabelLength);
+								} else if (qtype == 6) {
+									/*
+									 * Object[] expression = new Object[]{new
+									 * NID(new PageId(43),8), new
+									 * String("518_809"), new String("809_818"),
+									 * new Integer(50)}; AttrType[] attr = new
+									 * AttrType[]{new AttrType(0), new
+									 * AttrType(0), new AttrType(0), new
+									 * AttrType(1)}; new
+									 * PathExpression().pathExpress2(expression,
+									 * attr, gdb.nhf.get_fileName(),
+									 * gdb.ehf.get_fileName(),
+									 * "indexEhfSourceNodeName",
+									 * gdb.btf_node_label.get_fileName(),
+									 * (short)numBuf, nodeLabelLength);
+									 */
+									String pathx = "PQ2a > ND:13 34 7 6 10/EW:50/EW:50/EW:50/EW:50";
+									new PathExpressionQuery()
+											.pathExpressQuery2(pathx, nhf, ehf,
+													btf_edge_src_label,
+													btf_node_label,
+													ztf_node_desc,
+													(short) numBuf,
+													nodeLabelLength);
+
+								} else if (qtype == 7) {
 									String pathx = "TQa > EW:50/EW:50/EW:50";
-									new PathExpressionQuery().triangleQuery(pathx, gdb.nhf.get_fileName(), gdb.ehf.get_fileName(), btf_edge_src_label.get_fileName(), btf_node_label.get_fileName(), (short)numBuf, nodeLabelLength);
-									
-	 							}
+									new PathExpressionQuery().triangleQuery(
+											pathx, gdb.nhf.get_fileName(),
+											gdb.ehf.get_fileName(),
+											btf_edge_src_label.get_fileName(),
+											btf_node_label.get_fileName(),
+											(short) numBuf, nodeLabelLength);
+
+								}
 							}
-							printStatistics(gdb,nhf,ehf);
-							
-							//close all files
+							printStatistics(gdb, nhf, ehf);
+
+							// close all files
 							btf_node_label.close();
 							btf_edge_label.close();
 							btf_edge_weight.close();
-							//ztf_node_desc.close();     
-							
+							// ztf_node_desc.close();
+
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -553,7 +617,7 @@ public class BatchOperations {
 							.println("(Node Label|Node Descriptor)/(Node Label|Node Descriptor)/(Node Label|Node Descriptor)");
 
 					String commandLineInvocation1 = br.readLine().trim();
-					//PathExpressionOperations.parsePathExpression(commandLineInvocation1);
+					// PathExpressionOperations.parsePathExpression(commandLineInvocation1);
 					break;
 				default:
 					System.out.println("Error: unrecognized task number "
@@ -568,18 +632,20 @@ public class BatchOperations {
 		} while (true);
 	}// main
 
-	public static void printStatistics(GraphDB newGDB, NodeHeapfile nhf, EdgeHeapFile ehf) throws Exception {
+	public static void printStatistics(GraphDB newGDB, NodeHeapfile nhf,
+			EdgeHeapFile ehf) throws Exception {
 		int n = newGDB.getNodeCnt(nhf);
 		System.out.println("NodeCount " + n);
 		int n1 = newGDB.getEdgeCnt(ehf);
 		System.out.println("EdgeCount " + n1);
 		System.out.println("Number of pages read :" + PCounter.getRCounter());
-		System.out.println("Number of pages written :" + PCounter.getWCounter());
+		System.out
+				.println("Number of pages written :" + PCounter.getWCounter());
 
 	}
 
 	public static void initGraphDB(String db_name) {
-		
+
 		dbpath = "/tmp/" + db_name + System.getProperty("user.name")
 				+ ".minibase-db";
 		logpath = "/tmp/" + db_name + System.getProperty("user.name")
@@ -607,17 +673,17 @@ public class BatchOperations {
 		} catch (IOException e) {
 			System.err.println("IO error: " + e);
 		}
-		
-//		
-//		remove_logcmd = remove_cmd + newlogpath;
-//		remove_dbcmd = remove_cmd + newdbpath;
-//
-//		try {
-//			Runtime.getRuntime().exec(remove_logcmd);
-//			Runtime.getRuntime().exec(remove_dbcmd);
-//		} catch (IOException e) {
-//			System.err.println("IO error: " + e);
-//		}
+
+		//
+		// remove_logcmd = remove_cmd + newlogpath;
+		// remove_dbcmd = remove_cmd + newdbpath;
+		//
+		// try {
+		// Runtime.getRuntime().exec(remove_logcmd);
+		// Runtime.getRuntime().exec(remove_dbcmd);
+		// } catch (IOException e) {
+		// System.err.println("IO error: " + e);
+		// }
 
 	}
 }

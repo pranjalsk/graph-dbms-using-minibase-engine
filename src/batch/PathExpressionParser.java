@@ -165,7 +165,7 @@ public class PathExpressionParser {
 		for (String pathex : partialListForQueries) {
 			String[] keyValue = new String[2];
 			Pattern p = Pattern
-					.compile("(MNE|MTEW|MEW||NL|ND|EL|EW)\\s?[:]\\s?(\\d+_\\d+|\\d+ \\d+ \\d+ \\d+ \\d+|\\d+)");
+					.compile("(MNE|MTEW|MEW|NL|ND|EL|EW)\\s?[:]\\s?(\\d+_\\d+|\\d+ \\d+ \\d+ \\d+ \\d+|\\d+)");
 			Matcher m = p.matcher(pathex);
 			while (m.find()) {
 				keyValue[0] = m.group(1);
