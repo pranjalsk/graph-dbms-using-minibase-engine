@@ -31,8 +31,7 @@ public class PathExpressionParser {
 			nidlist = batchinsert.getNidFromDescriptor(headnode, nhf, ztf_desc); 
 		} else {
 			nidlist = new ArrayList<NID>();
-			nidlist.add(batchinsert
-					.getNidFromNodeLabel(headnode, nhf, btf_node));
+			nidlist.add(batchinsert.getNidFromNodeLabel(headnode, nhf, btf_node));
 		}
 
 		int i;
@@ -41,14 +40,6 @@ public class PathExpressionParser {
 		Object[] objectArray = new Object[n];
 		AttrType[] attrArray = new AttrType[n];
 
-		/*
-		 * For each object array, except for the first element, all other
-		 * elements are the same. So create 1 object array as common Then set
-		 * the first element to an nid in nidlist Add this object array to the
-		 * objExpList Repeat this for all nids in the nidlist Similarly, create
-		 * a common attrType array Add this array to the attrTypeList, for every
-		 * corresponding objectarray
-		 */
 		objectArray[0] = null;
 		attrArray[0] = new AttrType(AttrType.attrInteger);
 		for (i = 1; i < n; i++) {
@@ -78,14 +69,50 @@ public class PathExpressionParser {
 	}
 
 	public int pathExpressionQuery2Parser(List<Object[]> objExpList,
-			List<AttrType[]> attrTypeList, String pathExpression) {
-		int type = 0; // whether the query type is a,b or c type will be 0,1 or
-						// 2.
-		// use objExpList to add object arrays to the list
-		// use attrTypeList to add type to the arrays
-		return type;
+			List<AttrType[]> attrTypeList, String inputPathExpression, NodeHeapfile nhf, ZTreeFile ztf_desc, BTreeFile btf_node) throws Exception {
+		int [] type = new int[1];
+		
+		List<String[]> pathExpression = splitPathExpression(inputPathExpression, type);
+
+		// Finding the list of NIDs corresponding to the headnode
+		BatchInsert batchinsert = new BatchInsert();
+		String headnode = pathExpression.get(0)[1];
+		List<NID> nidlist = null;
+		if (headnode.matches("\\d+\\s?\\d+\\s?\\d+\\s?\\d+\\s?\\d+")) {
+			nidlist = batchinsert.getNidFromDescriptor(headnode, nhf, ztf_desc); 
+		} else {
+			nidlist = new ArrayList<NID>();
+			nidlist.add(batchinsert.getNidFromNodeLabel(headnode, nhf, btf_node));
+		}
+
+		int i;
+		int n = pathExpression.size();
+
+		Object[] objectArray = new Object[n];
+		AttrType[] attrArray = new AttrType[n];
+
+		objectArray[0] = null;
+		attrArray[0] = new AttrType(AttrType.attrInteger);
+		for (i = 1; i < n; i++) {
+			String input = pathExpression.get(i)[1].trim();
+			if (pathExpression.get(i)[0].equals("EL")) {								
+				objectArray[i] = input;				
+				attrArray[i] = new AttrType(AttrType.attrString);
+			} else {
+				objectArray[i] = Integer.parseInt(input);
+				attrArray[i] = new AttrType(AttrType.attrInteger);
+			}
+		}
+
+		for (i = 0; i < nidlist.size(); i++) {
+			objectArray[0] = nidlist.get(i);
+			objExpList.add(objectArray);
+			attrTypeList.add(attrArray);
+		}
+		return type[0];
 	}
 
+	
 	public int triangleQueryParser(Object[] objExpressions,
 			AttrType[] attrTypes, String trianglePathExpression) {
 		int type = 0; // whether the query type is a,b or c type will be 0,1 or
@@ -100,7 +127,7 @@ public class PathExpressionParser {
 		List<String> partialListForQueries = new ArrayList<String>();
 		String rest = "";
 
-		Pattern p = Pattern.compile("PQ\\d(\\w)\\s?[:>]\\s?(.*)");
+		Pattern p = Pattern.compile("[PT]Q\\d?(\\w)\\s?[:>]\\s?(.*)");
 		Matcher m = p.matcher(pathexp);
 
 		while (m.find()) {
@@ -124,7 +151,7 @@ public class PathExpressionParser {
 		for (String pathex : partialListForQueries) {
 			String[] keyValue = new String[2];
 			Pattern p = Pattern
-					.compile("(ME|MEW|NL|ND|EL|EW)\\s?[:]\\s?(\\d+_\\d+|\\d+ \\d+ \\d+ \\d+ \\d+|\\d+)");
+					.compile("(MNE|MTEW|MEW|NL|ND|EL|EW)\\s?[:]\\s?(\\d+_\\d+|\\d+ \\d+ \\d+ \\d+ \\d+|\\d+)");
 			Matcher m = p.matcher(pathex);
 			while (m.find()) {
 				keyValue[0] = m.group(1);

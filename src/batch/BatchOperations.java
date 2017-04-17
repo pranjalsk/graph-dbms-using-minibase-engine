@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Scanner;
 
 import tests.IndexNestedJoinTest;
@@ -234,8 +235,7 @@ public class BatchOperations {
 						BTreeFile btf_edge_weight = new BTreeFile("IndEdgeWeight_"+graphDBName);
 						BTreeFile btf_edge_src_label = new BTreeFile("IndEdgeSrcLabel_"+graphDBName);
 						BTreeFile btf_edge_dest_label = new BTreeFile("IndEdgeDestLabel_"+graphDBName);
-						
-						
+												
 						newEdgeInsert.insertBatchEdge(ehf, nhf,btf_node_label, filePath);
 						System.out.println("Batch edge insertion done");
 						
