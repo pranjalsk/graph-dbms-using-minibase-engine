@@ -127,7 +127,7 @@ public class PathExpressionParser {
 		List<String> partialListForQueries = new ArrayList<String>();
 		String rest = "";
 
-		Pattern p = Pattern.compile("PQ\\d(\\w)\\s?[:>]\\s?(.*)");
+		Pattern p = Pattern.compile("[PT]Q\\d?(\\w)\\s?[:>]\\s?(.*)");
 		Matcher m = p.matcher(pathexp);
 
 		while (m.find()) {
@@ -151,7 +151,7 @@ public class PathExpressionParser {
 		for (String pathex : partialListForQueries) {
 			String[] keyValue = new String[2];
 			Pattern p = Pattern
-					.compile("(ME|MEW|NL|ND|EL|EW)\\s?[:]\\s?(\\d+_\\d+|\\d+ \\d+ \\d+ \\d+ \\d+|\\d+)");
+					.compile("(MNE|MTEW|MEW||NL|ND|EL|EW)\\s?[:]\\s?(\\d+_\\d+|\\d+ \\d+ \\d+ \\d+ \\d+|\\d+)");
 			Matcher m = p.matcher(pathex);
 			while (m.find()) {
 				keyValue[0] = m.group(1);
