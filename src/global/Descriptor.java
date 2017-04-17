@@ -27,7 +27,7 @@ public class Descriptor {
 		return value[idx];
 	}
 
-	double equal(Descriptor desc) {
+	public double equal(Descriptor desc) {
 
 		for (int ind = 0; ind < value.length; ind++) {
 			if (value[ind] != desc.value[ind]) {
