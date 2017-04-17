@@ -62,6 +62,7 @@ public class PathExpressionQuery {
 		PathExpressionParser parsr = new PathExpressionParser();
 		List<AttrType[]> attrTypeList = new ArrayList<AttrType[]>();
 		List<Object[]> objExpList = new ArrayList<Object[]>();
+		
 		int type = parsr.pathExpressionQuery1Parser(objExpList, attrTypeList,
 				pathExpression,btf_node_label,nhfRef,ztf_node_desc);
 		
@@ -134,7 +135,7 @@ public class PathExpressionQuery {
 		List<AttrType[]> attrTypeList = new ArrayList<AttrType[]>();
 		List<Object[]> objExpList = new ArrayList<Object[]>();
 		int type = parsr.pathExpressionQuery2Parser(objExpList, attrTypeList,
-				pathExpression);
+				pathExpression, nhfRef,ztf_node_desc,btf_node_label);
 		PathExpression pathExp = new PathExpression();
 
 		NodeHeapfile nhf = new NodeHeapfile(nhfName);
