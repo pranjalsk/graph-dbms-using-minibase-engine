@@ -61,8 +61,10 @@ public class PathExpressionParser {
 		}
 
 		for (i = 0; i < nidlist.size(); i++) {
-			objectArray[0] = nidlist.get(i);
-			objExpList.add(objectArray);
+			Object[] finalObjectArray = new Object[n];
+			System.arraycopy(objectArray, 0, finalObjectArray, 0, n);
+			finalObjectArray[0] = nidlist.get(i);
+			objExpList.add(finalObjectArray);
 			attrTypeList.add(attrArray);
 		}
 		return type[0];
@@ -103,10 +105,11 @@ public class PathExpressionParser {
 				attrArray[i] = new AttrType(AttrType.attrInteger);
 			}
 		}
-
 		for (i = 0; i < nidlist.size(); i++) {
-			objectArray[0] = nidlist.get(i);
-			objExpList.add(objectArray);
+			Object[] finalObjectArray = new Object[n];
+			System.arraycopy(objectArray, 0, finalObjectArray, 0, n);
+			finalObjectArray[0] = nidlist.get(i);
+			objExpList.add(finalObjectArray);
 			attrTypeList.add(attrArray);
 		}
 		return type[0];

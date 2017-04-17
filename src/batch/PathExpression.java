@@ -247,12 +247,11 @@ public class PathExpression {
 			Exception {
 		
 		/***************************************/
-		EdgeHeapFile ehf = new EdgeHeapFile(ehfName);
+		/*EdgeHeapFile ehf = new EdgeHeapFile(ehfName);
 		BTreeFile btf_edge_source_label = new BTreeFile(indexEhfSourceNodeName,
 				AttrType.attrString, 32, 0);
 		EID eid = new EID();
 		Edge edge;
-		try {
 
 			EScan escan = ehf.openScan();
 			edge = escan.getNext(eid);
@@ -267,9 +266,8 @@ public class PathExpression {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		btf_edge_source_label.close();
+		btf_edge_source_label.close();*/
 		/***************************************/
-
 		NodeHeapfile nodeHeapFile = new NodeHeapfile(nhfName);
 		Node starNode = nodeHeapFile.getRecord((NID) expression[0]);
 		starNode.setHdr();
@@ -511,7 +509,7 @@ public class PathExpression {
 		tailNodeFile = new Heapfile("TailNodeFileForEdge");
 		while ((tu = inlj.get_next()) != null) {
 			tu.setHdr((short) 8, types, strSizes);
-			tu.print(types);
+//			tu.print(types);
 			RID rid = new RID();
 			rid.pageNo.pid = tu.getIntFld(3);
 			rid.slotNo = tu.getIntFld(4);

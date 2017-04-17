@@ -21,6 +21,7 @@ import iterator.EFileScan;
 import iterator.FileScan;
 import iterator.FileScanException;
 import iterator.FldSpec;
+import iterator.IndexNestedLoopsJoins;
 import iterator.InvalidRelation;
 import iterator.Iterator;
 import iterator.JoinsException;
@@ -63,7 +64,7 @@ public class PathExpressionQuery {
 		PathExpressionParser parsr = new PathExpressionParser();
 		List<AttrType[]> attrTypeList = new ArrayList<AttrType[]>();
 		List<Object[]> objExpList = new ArrayList<Object[]>();
-		
+
 		int type = parsr.pathExpressionQuery1Parser(objExpList, attrTypeList,
 				pathExpression, btf_node_label, nhfRef, ztf_node_desc);
 
@@ -136,9 +137,8 @@ public class PathExpressionQuery {
 		List<AttrType[]> attrTypeList = new ArrayList<AttrType[]>();
 		List<Object[]> objExpList = new ArrayList<Object[]>();
 		int type = parsr.pathExpressionQuery2Parser(objExpList, attrTypeList,
-				pathExpression, nhfRef,ztf_node_desc,btf_node_label);
+				pathExpression, nhfRef, ztf_node_desc, btf_node_label);
 		PathExpression pathExp = new PathExpression();
-
 		NodeHeapfile nhf = new NodeHeapfile(nhfName);
 		Heapfile pathExprQuery2Result = new Heapfile("pathExprQuery2Result");
 
@@ -153,12 +153,14 @@ public class PathExpressionQuery {
 			Node headNode = nhf.getRecord(headNID);
 			headNode.setHdr();
 			Node tailNode;
-			Tuple headTailPair = new Tuple();
-			headTailPair.setHdr((short) 2, new AttrType[] {
-					new AttrType(AttrType.attrString),
-					new AttrType(AttrType.attrString) }, new short[] {
-					(short) 32, (short) 32 });
+			Tuple headTailPair = null;
+
 			while ((tail = tailNodeIds.get_next()) != null) {
+				headTailPair = new Tuple();
+				headTailPair.setHdr((short) 2, new AttrType[] {
+						new AttrType(AttrType.attrString),
+						new AttrType(AttrType.attrString) }, new short[] {
+						(short) 32, (short) 32 });
 				tail.setHdr((short) 1, new AttrType[] { new AttrType(
 						AttrType.attrId) }, new short[] {});
 				NID tailNid = (NID) new NID(tail.getIDFld(1).pageNo,
@@ -167,6 +169,9 @@ public class PathExpressionQuery {
 				tailNode.setHdr();
 				headTailPair.setStrFld(1, headNode.getLabel());
 				headTailPair.setStrFld(2, tailNode.getLabel());
+
+				System.out.println(headNode.getLabel() + ":"
+						+ tailNode.getLabel());
 				pathExprQuery2Result.insertRecord(headTailPair
 						.getTupleByteArray());
 			}
@@ -283,8 +288,8 @@ public class PathExpressionQuery {
 					|| !(prevRes.getStrFld(1)
 							.equalsIgnoreCase(res.getStrFld(1)) && prevRes
 							.getStrFld(2).equalsIgnoreCase(res.getStrFld(2)))) {
+				prevRes = new Tuple(res);
 				res.print(type);
-				prevRes = res;
 			}
 		}
 
@@ -321,7 +326,7 @@ public class PathExpressionQuery {
 				numBuf);
 
 		Iterator am2 = getThirdConnectingEdge(objExpressions, attrTypes,
-				ehfName, am1, numBuf);
+				ehfName,indexEhfSourceNodeName, am1, numBuf);
 
 		AttrType[] types = new AttrType[7];
 		types[0] = new AttrType(AttrType.attrString);
@@ -518,7 +523,7 @@ public class PathExpressionQuery {
 	}
 
 	private Iterator getThirdConnectingEdge(Object[] objExpressions,
-			AttrType[] attrTypes, String ehfName, Iterator am1, int numBuf) {
+			AttrType[] attrTypes, String ehfName, String indexEhfSourceNodeName, Iterator am1, int numBuf) {
 
 		AttrType[] attrType = new AttrType[8];
 		attrType[0] = new AttrType(AttrType.attrInteger); // SrcNID.pageid
@@ -637,14 +642,17 @@ public class PathExpressionQuery {
 
 			efscan2 = new EFileScan(ehfName, attrType, s2_sizes, (short) 8, 8,
 					inputProjList, null);
-			sm = new NestedLoopsJoins(jtype, 8, s1_sizes, attrType, 8,
+			/*sm = new NestedLoopsJoins(jtype, 8, s1_sizes, attrType, 8,
 					s2_sizes, numBuf, am1, ehfName, expr,
-					null, outputProjList, outputProjList.length);
+					null, outputProjList, outputProjList.length);*/
 			/*
-			 * new (jtype, 8, s1_sizes, attrType, 8, s2_sizes, 8, 32, 7, 32,
+			 *sm =  new (jtype, 8, s1_sizes, attrType, 8, s2_sizes, 8, 32, 7, 32,
 			 * numBuf, am1, efscan2, false, false, order, expr, outputProjList,
 			 * outputProjList.length);
 			 */
+			sm = new IndexNestedLoopsJoins(jtype, 8, 8, s1_sizes, attrType, 8,
+					7, s2_sizes, (short) numBuf, am1, ehfName,
+					indexEhfSourceNodeName, inputProjList, expr, null, outputProjList, outputProjList.length);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -157,7 +157,7 @@ public class BatchInsert {
 
 	public List<NID> getNidFromDescriptor(String input, NodeHeapfile nhf,
 			ZTreeFile ztf_desc) throws Exception {
-		try {
+		/*try {
 			List<NID> nidlist = new ArrayList<NID>();
 			NScan newNscan = nhf.openScan();
 			ZTFileScan newScan = ztf_desc.new_scan(null, null);
@@ -190,6 +190,46 @@ public class BatchInsert {
 
 			newScan.DestroyBTreeFileScan();
 			newNscan.closescan();
+			return nidlist;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}*/
+		
+		try {
+			
+			Descriptor inputDesc = new Descriptor();
+			String[] descInput = input.trim().split(" ");
+			int[] values = new int[5];
+			for (int ctr = 0; ctr < 5; ctr++) {
+				values[ctr] = Integer.parseInt(descInput[ctr]);
+			}
+			inputDesc.set(values[0], values[1], values[2], values[3],
+					values[4]);
+			
+			List<NID> nidlist = new ArrayList<NID>();
+			//NScan newNscan = nhf.openScan();
+			ZTFileScan newScan = ztf_desc.new_scan(null, null);
+			KeyDataEntry newEntry = null;
+
+			while ((newEntry = newScan.get_next()) != null) {
+				LeafData newData = (LeafData) newEntry.data;
+				
+				RID newRid = newData.getData();
+				NID newNid = new NID(newRid.pageNo, newRid.slotNo);
+				Node newNode = nhf.getRecord(newNid);
+				newNode.setHdr();
+				
+				Descriptor temp = new Descriptor();
+				temp = newNode.getDesc();	
+				if (temp.equal(inputDesc)==1) {
+//					System.out.print(newNid+":");
+//					newNode.print();				// to check if we are sending right nodes
+					nidlist.add(newNid);
+				}
+			}
+
+			newScan.DestroyBTreeFileScan();
 			return nidlist;
 		} catch (Exception e) {
 			e.printStackTrace();

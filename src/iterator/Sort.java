@@ -846,9 +846,12 @@ public class Sort extends Iterator implements GlobalConst {
 	public void close() throws SortException, IOException {
 		// clean up
 		if (!closeFlag) {
-			for(int i = 0; i < i_buf.length;i++){
-				i_buf[i].close();
+			if(i_buf != null){
+				for(int i = 0; i < i_buf.length;i++){
+					i_buf[i].close();
+				}
 			}
+			
 			try {
 				_am.close();
 			} catch (Exception e) {
