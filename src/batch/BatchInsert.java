@@ -187,6 +187,8 @@ public class BatchInsert {
 			return null;
 		}		
 	}//getNidFromDescriptor
+	
+		
 
 }//BatchInsert
 

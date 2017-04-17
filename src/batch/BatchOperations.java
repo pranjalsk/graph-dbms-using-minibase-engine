@@ -233,7 +233,7 @@ public class BatchOperations {
 						BTreeFile btf_edge_weight = new BTreeFile("IndEdgeWeight_"+graphDBName);
 						BTreeFile btf_edge_src_label = new BTreeFile("IndEdgeSrcLabel_"+graphDBName);
 						BTreeFile btf_edge_dest_label = new BTreeFile("IndEdgeDestLabel_"+graphDBName);
-						
+						ZTreeFile ztf_node_desc = new ZTreeFile("zBTFile");
 						
 						newEdgeInsert.insertBatchEdge(ehf, nhf,btf_node_label, filePath);
 						System.out.println("Batch edge insertion done");
