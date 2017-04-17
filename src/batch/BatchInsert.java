@@ -2,13 +2,16 @@ package batch;
 
 import java.io.IOException;
 
+
+
 import diskmgr.Page;
 import edgeheap.*;
 import nodeheap.*;
 import global.*;
 import heap.*;
+import zindex.*;
+import zindex.DescriptorKey;
 import btree.*;
-
 public class BatchInsert {
 	/* Function to find the NID for a given Node label
 	 * We get the node heap file from the GraphDB instance; this is passed as argument
@@ -126,7 +129,7 @@ public class BatchInsert {
 			NID newnid;
 			RID newRid = new RID();
 			KeyClass key = new DescriptorKey(sourceDesc);
-			BTFileScan newScan =  new BTFileScan();
+			ZTFileScan newScan =  new ZTFileScan(key,key);
 					//btf_node.new_scan(key, key);	
 			KeyDataEntry newEntry = newScan.get_next();
 			if(newEntry !=null){
