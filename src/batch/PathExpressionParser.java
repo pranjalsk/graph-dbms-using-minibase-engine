@@ -143,10 +143,10 @@ public class PathExpressionParser {
 		//for (i = 1; i < n; i++) {
 		String input = pathExpression.get(1)[1].trim();
 		if (pathExpression.get(1)[0].equals("MNE")) {								
-			objectArray[1] = input+":MNE";				
+			objectArray[1] = "MNE:"+input;				
 			attrArray[1] = new AttrType(AttrType.attrInteger);
 		} else {
-			objectArray[1] = input+":MTEW";	
+			objectArray[1] = "MTEW:"+input;	
 			attrArray[1] = new AttrType(AttrType.attrInteger);
 		}
 		//}
