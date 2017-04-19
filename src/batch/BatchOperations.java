@@ -513,15 +513,15 @@ public class BatchOperations {
 									AttrType[] attr = new AttrType[]{new AttrType(0), new AttrType(5), new AttrType(0)};
 									new PathExpression().pathExpress1(expression, attr, gdb.nhf.get_fileName(), gdb.ehf.get_fileName(), 
 											"indexEhfSourceNodeName", gdb.btf_node_label.get_fileName(), (short)numBuf, nodeLabelLength);*/
-									String pathx = "PQ1a > NL:1/ND:13 38 2 18 45/ND:49 32 0 2 3/ND:44 22 26 37 10/ND:4 17 5 10 6/ND:33 38 17 34 39";
-									
+//									String pathx = "PQ1a > NL:1/ND:13 38 2 18 45/ND:49 32 0 2 3/ND:44 22 26 37 10/ND:4 17 5 10 6/ND:33 38 17 34 39";
+									String pathx = "PQ1a > ND:13 34 7 6 10/ND:13 34 7 6 10";
 									new PathExpressionQuery().pathExpressQuery1(pathx, nhf, ehf, btf_edge_src_label, btf_node_label, ztf_node_desc, (short)numBuf, nodeLabelLength);
 	 							}else if(qtype == 6){
 									/*Object[] expression = new Object[]{new NID(new PageId(43),8), new String("518_809"), new String("809_818"), new Integer(50)};
 									AttrType[] attr = new AttrType[]{new AttrType(0), new AttrType(0), new AttrType(0), new AttrType(1)};
 									new PathExpression().pathExpress2(expression, attr, gdb.nhf.get_fileName(), gdb.ehf.get_fileName(), 
 											"indexEhfSourceNodeName", gdb.btf_node_label.get_fileName(), (short)numBuf, nodeLabelLength);*/
-	 								String pathx = "PQ2a > ND:13 34 7 6 10/EW:50/EW:50/EW:50/EW:50";
+	 								String pathx = "PQ2b > ND:13 34 7 6 10/EW:50/EW:50/EW:50/EW:50";
 	 								new PathExpressionQuery().pathExpressQuery2(pathx, nhf, ehf, btf_edge_src_label, btf_node_label, ztf_node_desc, (short)numBuf, nodeLabelLength);
 
 								}else if(qtype == 7){

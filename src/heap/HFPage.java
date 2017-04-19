@@ -509,7 +509,6 @@ public class HFPage extends Page
       
       int i=curRid.slotNo;
       short length; 
-      
       // find the next non-empty slot
       for (i++; i < slotCnt;  i++)
 	{
