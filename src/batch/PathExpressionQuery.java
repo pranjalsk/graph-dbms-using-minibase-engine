@@ -74,7 +74,7 @@ public class PathExpressionQuery {
 		Heapfile pathExprQuery1Result = new Heapfile("pathExprQuery1Result");
 
 		for (int i = 0; i < objExpList.size(); i++) {
-			System.out.println("reached" + i);
+			
 			Object[] expression = objExpList.get(i);
 			AttrType[] attr = attrTypeList.get(i);
 			Iterator tailNodeIds = pathExp.pathExpress1(expression, attr,
@@ -104,22 +104,22 @@ public class PathExpressionQuery {
 			}
 			tailNodeIds.close();
 
-			switch (type) {
-			case 0:
-				System.out.println("type a");
-				typeA("pathExprQuery1Result");
-				break;
-			case 1:
-				System.out.println("type b");
-				typeB("pathExprQuery1Result", numBuf);
-				break;
-			case 2:
-				System.out.println("type c");
-				typeC("pathExprQuery1Result", numBuf);
-				break;
-			}
 		}
 
+		switch (type) {
+		case 0:
+			System.out.println("type a");
+			typeA("pathExprQuery1Result");
+			break;
+		case 1:
+			System.out.println("type b");
+			typeB("pathExprQuery1Result", numBuf);
+			break;
+		case 2:
+			System.out.println("type c");
+			typeC("pathExprQuery1Result", numBuf);
+			break;
+		}	
 	}
 
 	public void pathExpressQuery2(String pathExpression, NodeHeapfile nhfRef,
@@ -178,33 +178,35 @@ public class PathExpressionQuery {
 						AttrType.attrId) }, new short[] {});
 				NID tailNid = (NID) new NID(tail.getIDFld(1).pageNo,
 						tail.getIDFld(1).slotNo);
+//				System.out.println(tailNid);
 				tailNode = nhf.getRecord(tailNid);
 				tailNode.setHdr();
 				
 				headTailPair.setStrFld(1, headNode.getLabel());
 				headTailPair.setStrFld(2, tailNode.getLabel());
 
-				System.out.println(headNode.getLabel() + ":"
-						+ tailNode.getLabel());
+//				System.out.println(headNode.getLabel() + ":"
+//						+ tailNode.getLabel());
 				pathExprQuery2Result.insertRecord(headTailPair
 						.getTupleByteArray());
 			}
 			tailNodeIds.close();
 
-			switch (type) {
-			case 0:
-				System.out.println("type a");
-				typeA("pathExprQuery2Result");
-				break;
-			case 1:
-				System.out.println("type b");
-				typeB("pathExprQuery2Result", numBuf);
-				break;
-			case 2:
-				System.out.println("type c");
-				typeC("pathExprQuery2Result", numBuf);
-				break;
-			}
+			
+		}
+		switch (type) {
+		case 0:
+			System.out.println("type a");
+			typeA("pathExprQuery2Result");
+			break;
+		case 1:
+			System.out.println("type b");
+			typeB("pathExprQuery2Result", numBuf);
+			break;
+		case 2:
+			System.out.println("type c");
+			typeC("pathExprQuery2Result", numBuf);
+			break;
 		}
 	}
 
@@ -255,10 +257,10 @@ public class PathExpressionQuery {
 				(short) 2, (short) 2, proj_list, null);
 
 		Iterator tailNodesSort = new Sort(type, (short) 2, str_sizes,
-				resultScanner, 2, new TupleOrder(0), 32, numBuf);
+				resultScanner, 1, new TupleOrder(0), 32, numBuf);
 
 		Iterator headNodesSort = new Sort(type, (short) 2, str_sizes,
-				tailNodesSort, 1, new TupleOrder(0), 32, numBuf);
+				tailNodesSort, 2, new TupleOrder(0), 32, numBuf);
 
 		Tuple res;
 		while ((res = headNodesSort.get_next()) != null) {

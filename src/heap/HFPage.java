@@ -271,6 +271,7 @@ public class HFPage extends Page implements ConstSlot, GlobalConst {
 		type = valtype;
 		Convert.setShortValue(type, TYPE, data);
 	}
+<<<<<<< HEAD
 
 	/**
 	 * @return slotCnt used in this page
@@ -280,6 +281,42 @@ public class HFPage extends Page implements ConstSlot, GlobalConst {
 	public short getSlotCnt() throws IOException {
 		slotCnt = Convert.getShortValue(SLOT_CNT, data);
 		return slotCnt;
+=======
+      
+      if(i== slotCnt)
+	return null;
+      
+      // found a non-empty slot
+      
+      rid.slotNo = i;
+      curPage.pid= Convert.getIntValue(CUR_PAGE, data);
+      rid.pageNo.pid = curPage.pid;
+      
+      return rid;
+    }
+  
+  /**
+   * @return RID of next record on the page, null if no more 
+   * records exist on the page
+   * @param 	curRid	current record ID
+   * @exception  IOException I/O errors
+   * in C++ Status nextRecord (RID curRid, RID& nextRid)
+   */
+  public RID nextRecord (RID curRid) 
+    throws IOException 
+    {
+      RID rid = new RID();
+      slotCnt = Convert.getShortValue (SLOT_CNT, data);
+      
+      int i=curRid.slotNo;
+      short length; 
+      // find the next non-empty slot
+      for (i++; i < slotCnt;  i++)
+	{
+	  length = getSlotLength(i);
+	  if (length != EMPTY_SLOT)
+	    break;
+>>>>>>> 83e8297b4015c4e0b68bb741ea5609f2db36679f
 	}
 
 	/**
