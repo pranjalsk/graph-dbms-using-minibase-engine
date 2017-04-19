@@ -500,7 +500,7 @@ public class NHFPage extends Page implements ConstSlot, GlobalConst {
 	public NID nextRecord(NID curNid) throws IOException {
 		NID nid = new NID();
 		slotCnt = Convert.getShortValue(SLOT_CNT, data);
-
+	//	System.out.println("Node page changed **************");    
 		int i = curNid.slotNo;
 		short length;
 
@@ -596,7 +596,7 @@ public class NHFPage extends Page implements ConstSlot, GlobalConst {
 				&& (pageNo.pid == curPage.pid)) {
 
 			offset = getSlotOffset(slotNo);
-			Node node = new Node(data, offset, recLen);
+			Node node = new Node(data, offset, recLen);  //************
 			return node;
 		}
 

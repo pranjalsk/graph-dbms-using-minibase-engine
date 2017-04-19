@@ -121,6 +121,7 @@ class HFDriver extends TestDriver implements GlobalConst {
 				rec.name = "record" + i;
 
 				try {
+					System.out.println(rid.pageNo.pid+"-------"+rid.slotNo);
 					rid = f.insertRecord(rec.toByteArray());
 				} catch (Exception e) {
 					status = FAIL;

@@ -142,6 +142,7 @@ public class Convert {
 			value = instr.readUTF();
 		}catch(Exception e){
 			value = "";
+		//	System.out.println("Value set");
 		}
 
 		return value;

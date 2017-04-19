@@ -89,7 +89,7 @@ public class PathExpressionQuery {
 			headTailPair.setHdr((short) 2, new AttrType[] {
 					new AttrType(AttrType.attrString),
 					new AttrType(AttrType.attrString) }, new short[] {
-					(short) 32, (short) 32 });
+					(short) 32, (short) 32 });			
 			while ((tail = tailNodeIds.get_next()) != null) {
 				tail.setHdr((short) 1, new AttrType[] { new AttrType(
 						AttrType.attrId) }, new short[] {});
@@ -140,7 +140,9 @@ public class PathExpressionQuery {
 				pathExpression, nhfRef, ztf_node_desc, btf_node_label);
 		PathExpression pathExp = new PathExpression();
 		NodeHeapfile nhf = new NodeHeapfile(nhfName);
+		
 		Heapfile pathExprQuery2Result = new Heapfile("pathExprQuery2Result");
+		//DummyHeadTailPair hadTailPair = new DummyHeadTailPair(64);
 
 		for (int i = 0; i < objExpList.size(); i++) {
 			Object[] expression = objExpList.get(i);
@@ -151,22 +153,34 @@ public class PathExpressionQuery {
 			Tuple tail;
 			NID headNID = (NID) expression[0];
 			Node headNode = nhf.getRecord(headNID);
-			headNode.setHdr();
+			
 			Node tailNode;
-			Tuple headTailPair = null;
-
+			
 			while ((tail = tailNodeIds.get_next()) != null) {
-				headTailPair = new Tuple();
+				headNode.setHdr();
+				
+				Tuple headTailPair = new Tuple();
 				headTailPair.setHdr((short) 2, new AttrType[] {
 						new AttrType(AttrType.attrString),
 						new AttrType(AttrType.attrString) }, new short[] {
 						(short) 32, (short) 32 });
+				
+				int size = headTailPair.size();
+				headTailPair = new Tuple(size);
+
+				headTailPair.setHdr((short) 2, new AttrType[] {
+						new AttrType(AttrType.attrString),
+						new AttrType(AttrType.attrString) }, new short[] {
+						(short) 32, (short) 32 });			
+				
+								
 				tail.setHdr((short) 1, new AttrType[] { new AttrType(
 						AttrType.attrId) }, new short[] {});
 				NID tailNid = (NID) new NID(tail.getIDFld(1).pageNo,
 						tail.getIDFld(1).slotNo);
 				tailNode = nhf.getRecord(tailNid);
 				tailNode.setHdr();
+				
 				headTailPair.setStrFld(1, headNode.getLabel());
 				headTailPair.setStrFld(2, tailNode.getLabel());
 
