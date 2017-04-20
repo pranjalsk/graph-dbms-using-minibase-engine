@@ -20,7 +20,7 @@ public class BatchNodeInsert {
 		Descriptor desc= new Descriptor();
 		desc.set(value1, value2, value3, value4, value5);
 		Node node=makeNode(label, desc);
-		node.print();
+		//node.print();
 		nhf.insertNode(node.getNodeByteArray()); //failing here
  		}
 		catch(Exception ex)
