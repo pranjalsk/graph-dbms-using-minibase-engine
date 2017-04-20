@@ -551,7 +551,7 @@ public class BatchOperations {
 									eqi.query6(ehf, btf_edge_label, nhf,
 											edgeLabelLength, (short) numBuf);
 								}
-							} else if (index == 2) {
+							}/* else if (index == 2) {
 								IndexNestedJoinTest intest = new IndexNestedJoinTest();
 								if (qtype == 0) {
 									eqi.query0(ehf, btf_edge_label, nhf,
@@ -575,7 +575,7 @@ public class BatchOperations {
 											btf_node_label, edgeLabelLength,
 											(short) numBuf);
 								} else if (qtype == 5) {
-									/*
+									
 									 * Descriptor desc = new Descriptor();
 									 * desc.set(23, 30, 37, 8, 38); Object[]
 									 * expression = new Object[]{new NID(new
@@ -589,7 +589,7 @@ public class BatchOperations {
 									 * "indexEhfSourceNodeName",
 									 * gdb.btf_node_label.get_fileName(),
 									 * (short)numBuf, nodeLabelLength);
-									 */
+									 
 									// String pathx =
 									// "PQ1a > NL:1/ND:13 38 2 18 45/ND:49 32 0 2 3/ND:44 22 26 37 10/ND:4 17 5 10 6/ND:33 38 17 34 39";
 									String pathx = "PQ1a > ND:13 34 7 6 10/ND:13 34 7 6 10";
@@ -601,7 +601,7 @@ public class BatchOperations {
 													(short) numBuf,
 													nodeLabelLength);
 								} else if (qtype == 6) {
-									/*
+									
 									 * Object[] expression = new Object[]{new
 									 * NID(new PageId(43),8), new
 									 * String("518_809"), new String("809_818"),
@@ -615,7 +615,7 @@ public class BatchOperations {
 									 * "indexEhfSourceNodeName",
 									 * gdb.btf_node_label.get_fileName(),
 									 * (short)numBuf, nodeLabelLength);
-									 */
+									 
 									String pathx = "PQ2b > ND:13 34 7 6 10/EW:50/EW:50/EW:50/EW:50";
 									new PathExpressionQuery()
 											.pathExpressQuery2(pathx, nhf, ehf,
@@ -635,7 +635,7 @@ public class BatchOperations {
 											(short) numBuf, nodeLabelLength);
 
 								}
-							}
+							}*/
 							printStatistics(gdb, nhf, ehf);
 
 							// close all files
