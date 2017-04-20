@@ -36,7 +36,7 @@ public class BatchNodeDelete {
 			String newInput = "";
 			while ((newInput = br.readLine()) != null) {
 				String nodeLabel = newInput.trim();
-				BatchInsert batchinsert = new BatchInsert();
+				BatchMapperClass batchinsert = new BatchMapperClass();
 				boolean deleteStatus = false;
 				NID currentNid = new NID(); // To store a copy of the nid
 

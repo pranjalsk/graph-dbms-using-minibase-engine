@@ -25,7 +25,7 @@ public class BatchEdgeDelete {
 				String destinationLabel = inputAttributes[1];
 				String edgeLabel = inputAttributes[2];
 
-				BatchInsert batchinsert = new BatchInsert();
+				BatchMapperClass batchinsert = new BatchMapperClass();
 				NID sourceNID = batchinsert.getNidFromNodeLabel(sourceLabel,
 						nhf, btf_node);
 				NID destinationNID = batchinsert.getNidFromNodeLabel(

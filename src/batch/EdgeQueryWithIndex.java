@@ -163,7 +163,7 @@ public class EdgeQueryWithIndex {
 			while (node != null) {
 				node.setHdr();
 				nodeLabel = node.getLabel();
-				BatchInsert bInsert = new BatchInsert();
+				BatchMapperClass bInsert = new BatchMapperClass();
 				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, nhf,btf_node_label);
 				
 				
@@ -227,7 +227,7 @@ public class EdgeQueryWithIndex {
 			while (node != null) {
 				node.setHdr();
 				nodeLabel = node.getLabel();
-				BatchInsert bInsert = new BatchInsert();
+				BatchMapperClass bInsert = new BatchMapperClass();
 				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, nhf,btf_node_label);
 				
 				

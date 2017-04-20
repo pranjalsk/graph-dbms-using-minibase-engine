@@ -16,7 +16,7 @@ import zindex.*;
 import zindex.DescriptorKey;
 import btree.*;
 
-public class BatchInsert {
+public class BatchMapperClass {
 	/*
 	 * Function to find the NID for a given Node label We get the node heap file
 	 * from the GraphDB instance; this is passed as argument

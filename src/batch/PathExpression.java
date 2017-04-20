@@ -362,7 +362,7 @@ public class PathExpression {
 		Heapfile tailNodeFile = new Heapfile("TailNodeFile");
 		tailNodeFile.deleteFile();
 		tailNodeFile = new Heapfile("TailNodeFile");
-		BatchInsert bi = new BatchInsert();
+		BatchMapperClass bi = new BatchMapperClass();
 		BTreeFile btfNodeLabel = new BTreeFile(indexNodeLabelName);
 		while ((tu = am_outer.get_next()) != null) {
 			tu.setHdr((short) 2, types, strSizes);
