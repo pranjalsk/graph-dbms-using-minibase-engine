@@ -46,14 +46,6 @@ public class SystemDefs {
 			int maxlogsize, int bufpoolsize, String replacement_policy) {
 		
 		
-		if (!hs.contains(dbname)) {
-			hs.add(dbname);
-			MINIBASE_RESTART_FLAG = false;
-		}
-		else{
-			MINIBASE_RESTART_FLAG = true;
-		}
-		
 		boolean status = true;
 		JavabaseBM = null;
 		JavabaseDB = null;
