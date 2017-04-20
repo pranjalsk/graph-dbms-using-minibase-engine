@@ -22,7 +22,7 @@ public class BatchEdgeInsert {
 				String edgeLabel = inputAttributes[2];
 				int edgeWeight = Integer.parseInt(inputAttributes[3]);
 				
-				BatchInsert batchinsert = new BatchInsert();
+				BatchMapperClass batchinsert = new BatchMapperClass();
 				NID sourceNID = batchinsert.getNidFromNodeLabel(sourceLabel, nhf, btf_node);
 				NID destinationNID = batchinsert.getNidFromNodeLabel(destinationLabel, nhf,btf_node);
 				

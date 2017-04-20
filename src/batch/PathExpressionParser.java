@@ -24,7 +24,7 @@ public class PathExpressionParser {
 		List<String[]> pathExpression = splitPathExpression(inputPathExpression, type);
 
 		// Finding the list of NIDs corresponding to the headnode
-		BatchInsert batchinsert = new BatchInsert();
+		BatchMapperClass batchinsert = new BatchMapperClass();
 		String headnode = pathExpression.get(0)[1];
 		List<NID> nidlist = null;
 		if (headnode.matches("\\d+\\s?\\d+\\s?\\d+\\s?\\d+\\s?\\d+")) {
@@ -77,7 +77,7 @@ public class PathExpressionParser {
 		List<String[]> pathExpression = splitPathExpression(inputPathExpression, type);
 
 		// Finding the list of NIDs corresponding to the headnode
-		BatchInsert batchinsert = new BatchInsert();
+		BatchMapperClass batchinsert = new BatchMapperClass();
 		String headnode = pathExpression.get(0)[1];
 		List<NID> nidlist = null;
 		if (headnode.matches("\\d+\\s?\\d+\\s?\\d+\\s?\\d+\\s?\\d+")) {
@@ -122,7 +122,7 @@ public class PathExpressionParser {
 		List<String[]> pathExpression = splitPathExpression(inputPathExpression, type);
 
 		// Finding the list of NIDs corresponding to the headnode
-		BatchInsert batchinsert = new BatchInsert();
+		BatchMapperClass batchinsert = new BatchMapperClass();
 		String headnode = pathExpression.get(0)[1];
 		List<NID> nidlist = null;
 		if (headnode.matches("\\d+\\s?\\d+\\s?\\d+\\s?\\d+\\s?\\d+")) {

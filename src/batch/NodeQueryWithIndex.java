@@ -362,7 +362,7 @@ public class NodeQueryWithIndex {
 						+ " , " + nodeDescriptor.get(2) + " , "
 						+ nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4)
 						+ "]");
-				BatchInsert bInsert = new BatchInsert();
+				BatchMapperClass bInsert = new BatchMapperClass();
 				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, nhf, btf_node_label);
 
 				EdgeHeapFile tempIncomingEdgeFile = new EdgeHeapFile(null);
@@ -492,7 +492,7 @@ public class NodeQueryWithIndex {
 						+ " , " + nodeDescriptor.get(2) + " , "
 						+ nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4)
 						+ "]");
-				BatchInsert bInsert = new BatchInsert();
+				BatchMapperClass bInsert = new BatchMapperClass();
 				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, nhf, btf_node_label);
 
 				EdgeHeapFile tempIncomingEdgeFile = new EdgeHeapFile(null);
