@@ -251,8 +251,6 @@ public class BatchOperations {
 						// Insert records in Btree file
 						gdb.createBTNodeLabel(nhf, btf_node_label);
 
-						printStatistics(gdb, nhf, ehf);
-
 						System.out.println("Node label BT craeted");
 						btf_node_label.close();
 
@@ -261,6 +259,7 @@ public class BatchOperations {
 
 						ztf_node_desc.close();
 
+						printStatistics(gdb, nhf, ehf);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -289,7 +288,6 @@ public class BatchOperations {
 								filePath);
 						System.out.println("Batch edge insertion done");
 
-						printStatistics(gdb, nhf, ehf);
 
 						btf_node_label.close();
 
@@ -307,6 +305,7 @@ public class BatchOperations {
 						gdb.createBTEdgeDestLabel(ehf, btf_edge_dest_label);
 						btf_edge_dest_label.close();
 
+						printStatistics(gdb, nhf, ehf);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -338,7 +337,6 @@ public class BatchOperations {
 								btf_edge_src_label, btf_edge_dest_label,
 								filePath);
 
-						printStatistics(gdb, nhf, ehf);
 
 						// close all files
 						btf_node_label.close();
@@ -346,6 +344,7 @@ public class BatchOperations {
 						btf_edge_weight.close();
 						ztf_node_desc.close();
 
+						printStatistics(gdb, nhf, ehf);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -370,13 +369,12 @@ public class BatchOperations {
 						newEdgeDelete.deleteBatchEdge(ehf, nhf, btf_node_label,
 								btf_edge_label, btf_edge_weight, filePath);
 
-						printStatistics(gdb, nhf, ehf);
-
 						// close all files
 						btf_node_label.close();
 						btf_edge_label.close();
 						btf_edge_weight.close();
 
+						printStatistics(gdb, nhf, ehf);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -457,14 +455,13 @@ public class BatchOperations {
 								}
 							}
 
-							printStatistics(gdb, nhf, ehf);
-
 							// close all files
 							btf_node_label.close();
 							btf_edge_label.close();
 							btf_edge_weight.close();
 							ztf_node_desc.close();
 
+							printStatistics(gdb, nhf, ehf);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -636,7 +633,6 @@ public class BatchOperations {
 
 								}
 							}*/
-							printStatistics(gdb, nhf, ehf);
 
 							// close all files
 							btf_node_label.close();
@@ -644,6 +640,7 @@ public class BatchOperations {
 							btf_edge_weight.close();
 							// ztf_node_desc.close();
 
+							printStatistics(gdb, nhf, ehf);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -703,7 +700,6 @@ public class BatchOperations {
 									(short) numBuf, nodeLabelLength);
 						}
 
-						printStatistics(gdb, nhf, ehf);
 
 						// close all files
 						btf_node_label.close();
@@ -711,6 +707,7 @@ public class BatchOperations {
 						btf_edge_weight.close();
 						// ztf_node_desc.close();
 
+						printStatistics(gdb, nhf, ehf);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}

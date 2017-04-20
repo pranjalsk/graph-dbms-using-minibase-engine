@@ -4,8 +4,8 @@ import edgeheap.EdgeHeapFile;
 import global.AttrOperator;
 import global.AttrType;
 import global.NID;
-import global.PageId;
 import global.TupleOrder;
+import heap.FieldNumberOutOfBoundException;
 import heap.HFBufMgrException;
 import heap.HFDiskMgrException;
 import heap.HFException;
@@ -31,7 +31,6 @@ import iterator.PredEvalException;
 import iterator.RelSpec;
 import iterator.Sort;
 import iterator.SortException;
-import iterator.SortMerge;
 import iterator.TupleUtilsException;
 import iterator.UnknowAttrType;
 import iterator.UnknownKeyTypeException;
@@ -49,6 +48,193 @@ import nodeheap.Node;
 import nodeheap.NodeHeapfile;
 
 public class PathExpressionQuery {
+
+	/*
+	 * public void pathExpressQuery1(String pathExpression, NodeHeapfile nhfRef,
+	 * EdgeHeapFile ehfRef, BTreeFile btf_edge_src_label, BTreeFile
+	 * btf_node_label, ZTreeFile ztf_node_desc, short numBuf, short
+	 * nodeLabelLength) throws InvalidSlotNumberException,
+	 * InvalidTupleSizeException, Exception {
+	 * 
+	 * String nhfName = nhfRef.get_fileName(); String ehfName =
+	 * ehfRef.get_fileName(); String indexEhfSourceNodeName =
+	 * btf_edge_src_label.get_fileName(); String indexNodeLabelName =
+	 * btf_node_label.get_fileName();
+	 * 
+	 * PathExpressionParser parsr = new PathExpressionParser(); List<AttrType[]>
+	 * attrTypeList = new ArrayList<AttrType[]>(); List<Object[]> objExpList =
+	 * new ArrayList<Object[]>();
+	 * 
+	 * int type = parsr.pathExpressionQuery1Parser(objExpList, attrTypeList,
+	 * pathExpression, btf_node_label, nhfRef, ztf_node_desc);
+	 * 
+	 * PathExpression pathExp = new PathExpression();
+	 * 
+	 * NodeHeapfile nhf = new NodeHeapfile(nhfName); Heapfile
+	 * pathExprQuery1Result = new Heapfile("pathExprQuery1Result");
+	 * 
+	 * for (int i = 0; i < objExpList.size(); i++) {
+	 * 
+	 * Object[] expression = objExpList.get(i); AttrType[] attr =
+	 * attrTypeList.get(i); Iterator tailNodeIds =
+	 * pathExp.pathExpress1(expression, attr, nhfName, ehfName,
+	 * indexEhfSourceNodeName, indexNodeLabelName, numBuf, nodeLabelLength);
+	 * Tuple tail; NID headNID = (NID) expression[0]; Node headNode =
+	 * nhf.getRecord(headNID); headNode.setHdr(); Node tailNode; Tuple
+	 * headTailPair = new Tuple(); headTailPair.setHdr((short) 2, new AttrType[]
+	 * { new AttrType(AttrType.attrString), new AttrType(AttrType.attrString) },
+	 * new short[] { (short) 32, (short) 32 }); while ((tail =
+	 * tailNodeIds.get_next()) != null) { tail.setHdr((short) 1, new AttrType[]
+	 * { new AttrType( AttrType.attrId) }, new short[] {}); NID tailNid = new
+	 * NID(tail.getIDFld(1).pageNo, tail.getIDFld(1).slotNo); tailNode =
+	 * nhf.getRecord(tailNid); tailNode.setHdr(); headTailPair.setStrFld(1,
+	 * headNode.getLabel()); headTailPair.setStrFld(2, tailNode.getLabel());
+	 * pathExprQuery1Result.insertRecord(headTailPair .getTupleByteArray()); }
+	 * tailNodeIds.close();
+	 * 
+	 * }
+	 * 
+	 * switch (type) { case 0: System.out.println("type a");
+	 * typeA("pathExprQuery1Result"); break; case 1:
+	 * System.out.println("type b"); typeB("pathExprQuery1Result", numBuf);
+	 * break; case 2: System.out.println("type c");
+	 * typeC("pathExprQuery1Result", numBuf); break; } }
+	 * 
+	 * public void pathExpressQuery2(String pathExpression, NodeHeapfile nhfRef,
+	 * EdgeHeapFile ehfRef, BTreeFile btf_edge_src_label, BTreeFile
+	 * btf_node_label, ZTreeFile ztf_node_desc, short numBuf, short
+	 * nodeLabelLength) throws InvalidSlotNumberException,
+	 * InvalidTupleSizeException, Exception {
+	 * 
+	 * String nhfName = nhfRef.get_fileName(); String ehfName =
+	 * ehfRef.get_fileName(); String indexEhfSourceNodeName =
+	 * btf_edge_src_label.get_fileName(); String indexNodeLabelName =
+	 * btf_node_label.get_fileName();
+	 * 
+	 * PathExpressionParser parsr = new PathExpressionParser(); List<AttrType[]>
+	 * attrTypeList = new ArrayList<AttrType[]>(); List<Object[]> objExpList =
+	 * new ArrayList<Object[]>(); int type =
+	 * parsr.pathExpressionQuery2Parser(objExpList, attrTypeList,
+	 * pathExpression, nhfRef, ztf_node_desc, btf_node_label); PathExpression
+	 * pathExp = new PathExpression(); NodeHeapfile nhf = new
+	 * NodeHeapfile(nhfName);
+	 * 
+	 * Heapfile pathExprQuery2Result = new Heapfile("pathExprQuery2Result");
+	 * //DummyHeadTailPair hadTailPair = new DummyHeadTailPair(64);
+	 * 
+	 * for (int i = 0; i < objExpList.size(); i++) { Object[] expression =
+	 * objExpList.get(i); AttrType[] attr = attrTypeList.get(i); Iterator
+	 * tailNodeIds = pathExp.pathExpress2(expression, attr, nhfName, ehfName,
+	 * indexEhfSourceNodeName, indexNodeLabelName, numBuf, nodeLabelLength);
+	 * Tuple tail; NID headNID = (NID) expression[0]; Node headNode =
+	 * nhf.getRecord(headNID);
+	 * 
+	 * Node tailNode;
+	 * 
+	 * while ((tail = tailNodeIds.get_next()) != null) { headNode.setHdr();
+	 * 
+	 * Tuple headTailPair = new Tuple(); headTailPair.setHdr((short) 2, new
+	 * AttrType[] { new AttrType(AttrType.attrString), new
+	 * AttrType(AttrType.attrString) }, new short[] { (short) 32, (short) 32 });
+	 * 
+	 * int size = headTailPair.size(); headTailPair = new Tuple(size);
+	 * 
+	 * headTailPair.setHdr((short) 2, new AttrType[] { new
+	 * AttrType(AttrType.attrString), new AttrType(AttrType.attrString) }, new
+	 * short[] { (short) 32, (short) 32 });
+	 * 
+	 * 
+	 * tail.setHdr((short) 1, new AttrType[] { new AttrType( AttrType.attrId) },
+	 * new short[] {}); NID tailNid = (NID) new NID(tail.getIDFld(1).pageNo,
+	 * tail.getIDFld(1).slotNo); // System.out.println(tailNid); tailNode =
+	 * nhf.getRecord(tailNid); tailNode.setHdr();
+	 * 
+	 * headTailPair.setStrFld(1, headNode.getLabel()); headTailPair.setStrFld(2,
+	 * tailNode.getLabel());
+	 * 
+	 * // System.out.println(headNode.getLabel() + ":" // +
+	 * tailNode.getLabel()); pathExprQuery2Result.insertRecord(headTailPair
+	 * .getTupleByteArray()); } tailNodeIds.close();
+	 * 
+	 * 
+	 * } switch (type) { case 0: System.out.println("type a");
+	 * typeA("pathExprQuery2Result"); break; case 1:
+	 * System.out.println("type b"); typeB("pathExprQuery2Result", numBuf);
+	 * break; case 2: System.out.println("type c");
+	 * typeC("pathExprQuery2Result", numBuf); break; } }
+	 * 
+	 * private void typeA(String fileName) throws JoinsException,
+	 * IndexException, InvalidTupleSizeException, InvalidTypeException,
+	 * PageNotReadException, PredEvalException, SortException, LowMemException,
+	 * UnknowAttrType, UnknownKeyTypeException, Exception { Heapfile
+	 * pathExprQuery1Result = new Heapfile(fileName); AttrType[] type = new
+	 * AttrType[2]; type[0] = new AttrType(AttrType.attrString); type[1] = new
+	 * AttrType(AttrType.attrString); short[] str_sizes = new short[2];
+	 * str_sizes[0] = (short) 32; str_sizes[1] = (short) 32; FldSpec[] proj_list
+	 * = new FldSpec[2]; proj_list[0] = new FldSpec(new RelSpec(RelSpec.outer),
+	 * 1); proj_list[1] = new FldSpec(new RelSpec(RelSpec.outer), 2);
+	 * 
+	 * Iterator resultScanner = new FileScan(fileName, type, str_sizes, (short)
+	 * 2, (short) 2, proj_list, null);
+	 * 
+	 * Tuple res; while ((res = resultScanner.get_next()) != null) {
+	 * res.setHdr((short) 2, type, str_sizes); res.print(type); }
+	 * 
+	 * resultScanner.close(); pathExprQuery1Result.deleteFile(); }
+	 * 
+	 * private void typeB(String fileName, int numBuf) throws JoinsException,
+	 * IndexException, InvalidTupleSizeException, InvalidTypeException,
+	 * PageNotReadException, PredEvalException, SortException, LowMemException,
+	 * UnknowAttrType, UnknownKeyTypeException, Exception { Heapfile
+	 * pathExprQuery1Result = new Heapfile(fileName); AttrType[] type = new
+	 * AttrType[2]; type[0] = new AttrType(AttrType.attrString); type[1] = new
+	 * AttrType(AttrType.attrString); short[] str_sizes = new short[2];
+	 * str_sizes[0] = (short) 32; str_sizes[1] = (short) 32; FldSpec[] proj_list
+	 * = new FldSpec[2]; proj_list[0] = new FldSpec(new RelSpec(RelSpec.outer),
+	 * 1); proj_list[1] = new FldSpec(new RelSpec(RelSpec.outer), 2);
+	 * 
+	 * Iterator resultScanner = new FileScan(fileName, type, str_sizes, (short)
+	 * 2, (short) 2, proj_list, null);
+	 * 
+	 * Iterator tailNodesSort = new Sort(type, (short) 2, str_sizes,
+	 * resultScanner, 1, new TupleOrder(0), 32, numBuf);
+	 * 
+	 * Iterator headNodesSort = new Sort(type, (short) 2, str_sizes,
+	 * tailNodesSort, 2, new TupleOrder(0), 32, numBuf);
+	 * 
+	 * Tuple res; while ((res = headNodesSort.get_next()) != null) {
+	 * res.setHdr((short) 2, type, str_sizes); res.print(type); }
+	 * 
+	 * headNodesSort.close(); pathExprQuery1Result.deleteFile(); }
+	 * 
+	 * private void typeC(String fileName, int numBuf) throws JoinsException,
+	 * IndexException, InvalidTupleSizeException, InvalidTypeException,
+	 * PageNotReadException, PredEvalException, SortException, LowMemException,
+	 * UnknowAttrType, UnknownKeyTypeException, Exception { Heapfile
+	 * pathExprQuery1Result = new Heapfile(fileName); AttrType[] type = new
+	 * AttrType[2]; type[0] = new AttrType(AttrType.attrString); type[1] = new
+	 * AttrType(AttrType.attrString); short[] str_sizes = new short[2];
+	 * str_sizes[0] = (short) 32; str_sizes[1] = (short) 32; FldSpec[] proj_list
+	 * = new FldSpec[2]; proj_list[0] = new FldSpec(new RelSpec(RelSpec.outer),
+	 * 1); proj_list[1] = new FldSpec(new RelSpec(RelSpec.outer), 2);
+	 * 
+	 * Iterator resultScanner = new FileScan(fileName, type, str_sizes, (short)
+	 * 2, (short) 2, proj_list, null);
+	 * 
+	 * Iterator tailNodesSort = new Sort(type, (short) 2, str_sizes,
+	 * resultScanner, 2, new TupleOrder(0), 32, numBuf);
+	 * 
+	 * Iterator headNodesSort = new Sort(type, (short) 2, str_sizes,
+	 * tailNodesSort, 1, new TupleOrder(0), 32, numBuf);
+	 * 
+	 * Tuple prevRes = null; Tuple res; while ((res = headNodesSort.get_next())
+	 * != null) { res.setHdr((short) 2, type, str_sizes); if (prevRes == null ||
+	 * !(prevRes.getStrFld(1) .equalsIgnoreCase(res.getStrFld(1)) && prevRes
+	 * .getStrFld(2).equalsIgnoreCase(res.getStrFld(2)))) { prevRes = new
+	 * Tuple(res); res.print(type); } }
+	 * 
+	 * headNodesSort.close(); pathExprQuery1Result.deleteFile(); }
+	 */
 
 	public void pathExpressQuery1(String pathExpression, NodeHeapfile nhfRef,
 			EdgeHeapFile ehfRef, BTreeFile btf_edge_src_label,
@@ -74,7 +260,7 @@ public class PathExpressionQuery {
 		Heapfile pathExprQuery1Result = new Heapfile("pathExprQuery1Result");
 
 		for (int i = 0; i < objExpList.size(); i++) {
-			
+
 			Object[] expression = objExpList.get(i);
 			AttrType[] attr = attrTypeList.get(i);
 			Iterator tailNodeIds = pathExp.pathExpress1(expression, attr,
@@ -85,20 +271,31 @@ public class PathExpressionQuery {
 			Node headNode = nhf.getRecord(headNID);
 			headNode.setHdr();
 			Node tailNode;
-			Tuple headTailPair = new Tuple();
-			headTailPair.setHdr((short) 2, new AttrType[] {
-					new AttrType(AttrType.attrString),
-					new AttrType(AttrType.attrString) }, new short[] {
-					(short) 32, (short) 32 });			
+			Tuple headTailPair = null;
 			while ((tail = tailNodeIds.get_next()) != null) {
+				headTailPair = new Tuple();
+				headTailPair.setHdr((short) 3, new AttrType[] {
+						new AttrType(AttrType.attrString),
+						new AttrType(AttrType.attrString),
+						new AttrType(AttrType.attrString) }, new short[] {
+						(short) 32, (short) 32, (short) 32 });
 				tail.setHdr((short) 1, new AttrType[] { new AttrType(
 						AttrType.attrId) }, new short[] {});
 				NID tailNid = new NID(tail.getIDFld(1).pageNo,
 						tail.getIDFld(1).slotNo);
+				if (tailNid == null
+						|| (tailNid.pageNo.pid == -1 && tailNid.slotNo == -1)) {
+					break;
+				}
 				tailNode = nhf.getRecord(tailNid);
 				tailNode.setHdr();
-				headTailPair.setStrFld(1, headNode.getLabel());
-				headTailPair.setStrFld(2, tailNode.getLabel());
+
+				String headLabel = headNode.getLabel();
+				String tailLabel = tailNode.getLabel();
+				String headTailLabel = headLabel + tailLabel;
+				headTailPair.setStrFld(1, headLabel);
+				headTailPair.setStrFld(2, tailLabel);
+				headTailPair.setStrFld(3, headTailLabel);
 				pathExprQuery1Result.insertRecord(headTailPair
 						.getTupleByteArray());
 			}
@@ -119,7 +316,7 @@ public class PathExpressionQuery {
 			System.out.println("type c");
 			typeC("pathExprQuery1Result", numBuf);
 			break;
-		}	
+		}
 	}
 
 	public void pathExpressQuery2(String pathExpression, NodeHeapfile nhfRef,
@@ -140,9 +337,9 @@ public class PathExpressionQuery {
 				pathExpression, nhfRef, ztf_node_desc, btf_node_label);
 		PathExpression pathExp = new PathExpression();
 		NodeHeapfile nhf = new NodeHeapfile(nhfName);
-		
+
 		Heapfile pathExprQuery2Result = new Heapfile("pathExprQuery2Result");
-		//DummyHeadTailPair hadTailPair = new DummyHeadTailPair(64);
+		// DummyHeadTailPair hadTailPair = new DummyHeadTailPair(64);
 
 		for (int i = 0; i < objExpList.size(); i++) {
 			Object[] expression = objExpList.get(i);
@@ -153,46 +350,46 @@ public class PathExpressionQuery {
 			Tuple tail;
 			NID headNID = (NID) expression[0];
 			Node headNode = nhf.getRecord(headNID);
-			
+
 			Node tailNode;
-			
+
 			while ((tail = tailNodeIds.get_next()) != null) {
 				headNode.setHdr();
-				
-				Tuple headTailPair = new Tuple();
-				headTailPair.setHdr((short) 2, new AttrType[] {
-						new AttrType(AttrType.attrString),
-						new AttrType(AttrType.attrString) }, new short[] {
-						(short) 32, (short) 32 });
-				
-				int size = headTailPair.size();
-				headTailPair = new Tuple(size);
 
-				headTailPair.setHdr((short) 2, new AttrType[] {
+				Tuple headTailPair = new Tuple();
+				headTailPair.setHdr((short) 3, new AttrType[] {
+						new AttrType(AttrType.attrString),
 						new AttrType(AttrType.attrString),
 						new AttrType(AttrType.attrString) }, new short[] {
-						(short) 32, (short) 32 });			
-				
-								
+						(short) 32, (short) 32, (short) 32 });
+
 				tail.setHdr((short) 1, new AttrType[] { new AttrType(
 						AttrType.attrId) }, new short[] {});
 				NID tailNid = (NID) new NID(tail.getIDFld(1).pageNo,
 						tail.getIDFld(1).slotNo);
-//				System.out.println(tailNid);
+				if (tailNid == null
+						|| (tailNid.pageNo.pid == -1 && tailNid.slotNo == -1)) {
+					break;
+				}
+
+				// System.out.println(tailNid);
 				tailNode = nhf.getRecord(tailNid);
 				tailNode.setHdr();
-				
-				headTailPair.setStrFld(1, headNode.getLabel());
-				headTailPair.setStrFld(2, tailNode.getLabel());
 
-//				System.out.println(headNode.getLabel() + ":"
-//						+ tailNode.getLabel());
+				String headLabel = headNode.getLabel();
+				String tailLabel = tailNode.getLabel();
+				String headTailLabel = headLabel + tailLabel;
+				headTailPair.setStrFld(1, headLabel);
+				headTailPair.setStrFld(2, tailLabel);
+				headTailPair.setStrFld(3, headTailLabel);
+
+				// System.out.println(headNode.getLabel() + ":"
+				// + tailNode.getLabel());
 				pathExprQuery2Result.insertRecord(headTailPair
 						.getTupleByteArray());
 			}
 			tailNodeIds.close();
 
-			
 		}
 		switch (type) {
 		case 0:
@@ -214,103 +411,115 @@ public class PathExpressionQuery {
 			InvalidTupleSizeException, InvalidTypeException,
 			PageNotReadException, PredEvalException, SortException,
 			LowMemException, UnknowAttrType, UnknownKeyTypeException, Exception {
-		Heapfile pathExprQuery1Result = new Heapfile(fileName);
-		AttrType[] type = new AttrType[2];
+		Heapfile pathExprQueryResult = new Heapfile(fileName);
+		AttrType[] outtype = new AttrType[2];
+		outtype[0] = new AttrType(AttrType.attrString);
+		outtype[1] = new AttrType(AttrType.attrString);
+		short[] out_str_sizes = new short[2];
+		out_str_sizes[0] = (short) 32;
+		out_str_sizes[1] = (short) 32;
+
+		AttrType[] type = new AttrType[3];
 		type[0] = new AttrType(AttrType.attrString);
 		type[1] = new AttrType(AttrType.attrString);
-		short[] str_sizes = new short[2];
+		type[2] = new AttrType(AttrType.attrString);
+		short[] str_sizes = new short[3];
 		str_sizes[0] = (short) 32;
 		str_sizes[1] = (short) 32;
+		str_sizes[2] = (short) 32;
 		FldSpec[] proj_list = new FldSpec[2];
 		proj_list[0] = new FldSpec(new RelSpec(RelSpec.outer), 1);
 		proj_list[1] = new FldSpec(new RelSpec(RelSpec.outer), 2);
 
 		Iterator resultScanner = new FileScan(fileName, type, str_sizes,
-				(short) 2, (short) 2, proj_list, null);
+				(short) 3, (short) 2, proj_list, null);
 
 		Tuple res;
 		while ((res = resultScanner.get_next()) != null) {
-			res.setHdr((short) 2, type, str_sizes);
-			res.print(type);
+			res.setHdr((short) 2, outtype, out_str_sizes);
+			res.print(outtype);
 		}
 
 		resultScanner.close();
-		pathExprQuery1Result.deleteFile();
+		pathExprQueryResult.deleteFile();
 	}
 
 	private void typeB(String fileName, int numBuf) throws JoinsException,
 			IndexException, InvalidTupleSizeException, InvalidTypeException,
 			PageNotReadException, PredEvalException, SortException,
 			LowMemException, UnknowAttrType, UnknownKeyTypeException, Exception {
-		Heapfile pathExprQuery1Result = new Heapfile(fileName);
-		AttrType[] type = new AttrType[2];
+		Heapfile pathExprQueryResult = new Heapfile(fileName);
+		AttrType[] type = new AttrType[3];
 		type[0] = new AttrType(AttrType.attrString);
 		type[1] = new AttrType(AttrType.attrString);
-		short[] str_sizes = new short[2];
+		type[2] = new AttrType(AttrType.attrString);
+		short[] str_sizes = new short[3];
 		str_sizes[0] = (short) 32;
 		str_sizes[1] = (short) 32;
-		FldSpec[] proj_list = new FldSpec[2];
+		str_sizes[2] = (short) 32;
+		FldSpec[] proj_list = new FldSpec[3];
 		proj_list[0] = new FldSpec(new RelSpec(RelSpec.outer), 1);
 		proj_list[1] = new FldSpec(new RelSpec(RelSpec.outer), 2);
+		proj_list[2] = new FldSpec(new RelSpec(RelSpec.outer), 3);
 
 		Iterator resultScanner = new FileScan(fileName, type, str_sizes,
-				(short) 2, (short) 2, proj_list, null);
+				(short) 3, (short) 3, proj_list, null);
 
-		Iterator tailNodesSort = new Sort(type, (short) 2, str_sizes,
-				resultScanner, 1, new TupleOrder(0), 32, numBuf);
-
-		Iterator headNodesSort = new Sort(type, (short) 2, str_sizes,
-				tailNodesSort, 2, new TupleOrder(0), 32, numBuf);
+		Iterator sort = new Sort(type, (short) 3, str_sizes, resultScanner, 3,
+				new TupleOrder(0), 32, numBuf);
 
 		Tuple res;
-		while ((res = headNodesSort.get_next()) != null) {
-			res.setHdr((short) 2, type, str_sizes);
-			res.print(type);
+		while ((res = sort.get_next()) != null) {
+			res.setHdr((short) 3, type, str_sizes);
+			System.out.println("[" + res.getStrFld(1) + "," + res.getStrFld(2)
+					+ "]");
 		}
 
-		headNodesSort.close();
-		pathExprQuery1Result.deleteFile();
+		sort.close();
+		pathExprQueryResult.deleteFile();
 	}
 
 	private void typeC(String fileName, int numBuf) throws JoinsException,
 			IndexException, InvalidTupleSizeException, InvalidTypeException,
 			PageNotReadException, PredEvalException, SortException,
 			LowMemException, UnknowAttrType, UnknownKeyTypeException, Exception {
-		Heapfile pathExprQuery1Result = new Heapfile(fileName);
-		AttrType[] type = new AttrType[2];
+		Heapfile pathExprQueryResult = new Heapfile(fileName);
+
+		AttrType[] type = new AttrType[3];
 		type[0] = new AttrType(AttrType.attrString);
 		type[1] = new AttrType(AttrType.attrString);
-		short[] str_sizes = new short[2];
+		type[2] = new AttrType(AttrType.attrString);
+		short[] str_sizes = new short[3];
 		str_sizes[0] = (short) 32;
 		str_sizes[1] = (short) 32;
-		FldSpec[] proj_list = new FldSpec[2];
+		str_sizes[2] = (short) 32;
+		FldSpec[] proj_list = new FldSpec[3];
 		proj_list[0] = new FldSpec(new RelSpec(RelSpec.outer), 1);
 		proj_list[1] = new FldSpec(new RelSpec(RelSpec.outer), 2);
+		proj_list[2] = new FldSpec(new RelSpec(RelSpec.outer), 3);
 
 		Iterator resultScanner = new FileScan(fileName, type, str_sizes,
-				(short) 2, (short) 2, proj_list, null);
+				(short) 3, (short) 3, proj_list, null);
 
-		Iterator tailNodesSort = new Sort(type, (short) 2, str_sizes,
-				resultScanner, 2, new TupleOrder(0), 32, numBuf);
-
-		Iterator headNodesSort = new Sort(type, (short) 2, str_sizes,
-				tailNodesSort, 1, new TupleOrder(0), 32, numBuf);
+		Iterator sort = new Sort(type, (short) 3, str_sizes, resultScanner, 3,
+				new TupleOrder(0), 32, numBuf);
 
 		Tuple prevRes = null;
 		Tuple res;
-		while ((res = headNodesSort.get_next()) != null) {
-			res.setHdr((short) 2, type, str_sizes);
+		while ((res = sort.get_next()) != null) {
+			res.setHdr((short) 3, type, str_sizes);
 			if (prevRes == null
 					|| !(prevRes.getStrFld(1)
 							.equalsIgnoreCase(res.getStrFld(1)) && prevRes
 							.getStrFld(2).equalsIgnoreCase(res.getStrFld(2)))) {
 				prevRes = new Tuple(res);
-				res.print(type);
+				System.out.println("[" + res.getStrFld(1) + ","
+						+ res.getStrFld(2) + "]");
 			}
 		}
 
-		headNodesSort.close();
-		pathExprQuery1Result.deleteFile();
+		sort.close();
+		pathExprQueryResult.deleteFile();
 	}
 
 	public void triangleQuery(String trianglePathExpression, String nhfName,
@@ -326,7 +535,6 @@ public class PathExpressionQuery {
 		Object[] objExpressions = new Object[3];
 		int type = parsr.triangleQueryParser(objExpressions, attrTypes,
 				trianglePathExpression);
-		PathExpression pathExp = new PathExpression();
 
 		/*************************/
 		/*
@@ -374,21 +582,22 @@ public class PathExpressionQuery {
 		s1_sizes[4] = 32;
 		s1_sizes[5] = 32;
 
-		AttrType[] types_2 = new AttrType[7];
+		AttrType[] types_2 = new AttrType[4];
 		types_2[0] = new AttrType(AttrType.attrString);
 		types_2[1] = new AttrType(AttrType.attrString);
 		types_2[2] = new AttrType(AttrType.attrString);
-		short s2_sizes[] = new short[3];
+		types_2[3] = new AttrType(AttrType.attrString);
+		short s2_sizes[] = new short[4];
 		s2_sizes[0] = 32;
 		s2_sizes[1] = 32;
 		s2_sizes[2] = 32;
+		s2_sizes[3] = 32;
 
 		Tuple finalTrio = new Tuple();
 		Tuple tu;
-		// int count = 0;
 		while ((tu = am2.get_next()) != null) {
 			tu.setHdr((short) 7, types, s1_sizes);
-			finalTrio.setHdr((short) 3, types_2, s2_sizes);
+			finalTrio.setHdr((short) 4, types_2, s2_sizes);
 			String node1 = tu.getStrFld(5);
 			String node2 = tu.getStrFld(6);
 			String node3 = tu.getStrFld(7);
@@ -396,19 +605,156 @@ public class PathExpressionQuery {
 			finalTrio.setStrFld(1, node1);
 			finalTrio.setStrFld(2, node2);
 			finalTrio.setStrFld(3, node3);
-			System.out.println(node1 + ":" + node2 + ":" + node3);
+			finalTrio.setStrFld(4, node1 + node2 + node3);
+//			System.out.println(node1 + ":" + node2 + ":" + node3);
 			triangleQueryResult.insertRecord(finalTrio.getTupleByteArray());
 
-			/*
-			 * tu.setHdr((short)8, types, s1_sizes);
-			 * 
-			 * count++;
-			 * System.out.println(tu.getStrFld(3)+":"+tu.getStrFld(4)+":"
-			 * +tu.getStrFld(8));
-			 */
 		}
-		// System.out.println(count);
+
 		am2.close();
+
+		switch (type) {
+		case 0:
+			System.out.println("type a");
+			triangletypeA("triangleQueryResult");
+			break;
+		case 1:
+			System.out.println("type b");
+			triangletypeB("triangleQueryResult", numBuf);
+			break;
+		case 2:
+			System.out.println("type c");
+			triangletypeC("triangleQueryResult", numBuf);
+			break;
+		}
+	}
+
+	private void triangletypeC(String fileName, short numBuf)
+			throws JoinsException, IndexException, InvalidTupleSizeException,
+			InvalidTypeException, PageNotReadException, PredEvalException,
+			SortException, LowMemException, UnknowAttrType,
+			UnknownKeyTypeException, Exception {
+		Heapfile triExprQueryResult = new Heapfile(fileName);
+
+		AttrType[] type = new AttrType[4];
+		type[0] = new AttrType(AttrType.attrString);
+		type[1] = new AttrType(AttrType.attrString);
+		type[2] = new AttrType(AttrType.attrString);
+		type[3] = new AttrType(AttrType.attrString);
+		short[] str_sizes = new short[4];
+		str_sizes[0] = (short) 32;
+		str_sizes[1] = (short) 32;
+		str_sizes[2] = (short) 32;
+		str_sizes[3] = (short) 32;
+		FldSpec[] proj_list = new FldSpec[4];
+		proj_list[0] = new FldSpec(new RelSpec(RelSpec.outer), 1);
+		proj_list[1] = new FldSpec(new RelSpec(RelSpec.outer), 2);
+		proj_list[2] = new FldSpec(new RelSpec(RelSpec.outer), 3);
+		proj_list[3] = new FldSpec(new RelSpec(RelSpec.outer), 4);
+
+		Iterator resultScanner = new FileScan(fileName, type, str_sizes,
+				(short) 4, (short) 4, proj_list, null);
+
+		Iterator sort = new Sort(type, (short) 4, str_sizes, resultScanner, 4,
+				new TupleOrder(0), 32, numBuf);
+
+		Tuple prevRes = null;
+		Tuple res;
+		while ((res = sort.get_next()) != null) {
+			res.setHdr((short) 4, type, str_sizes);
+			if (prevRes == null
+					|| !(prevRes.getStrFld(1)
+							.equalsIgnoreCase(res.getStrFld(1)) && prevRes
+							.getStrFld(2).equalsIgnoreCase(res.getStrFld(2)) && prevRes
+							.getStrFld(3).equalsIgnoreCase(res.getStrFld(3)))) {
+				prevRes = new Tuple(res);
+				System.out.println("[" + res.getStrFld(1) + ", " + res.getStrFld(2)
+						+ ", " + res.getStrFld(3) + "]");
+			}
+		}
+
+		sort.close();
+		triExprQueryResult.deleteFile();
+	}
+
+	private void triangletypeB(String fileName, short numBuf)
+			throws JoinsException, IndexException, PageNotReadException,
+			PredEvalException, LowMemException, UnknowAttrType,
+			UnknownKeyTypeException, FieldNumberOutOfBoundException, Exception {
+		Heapfile triExprQueryResult = new Heapfile(fileName);
+		AttrType[] type = new AttrType[4];
+		type[0] = new AttrType(AttrType.attrString);
+		type[1] = new AttrType(AttrType.attrString);
+		type[2] = new AttrType(AttrType.attrString);
+		type[3] = new AttrType(AttrType.attrString);
+		short[] str_sizes = new short[4];
+		str_sizes[0] = (short) 32;
+		str_sizes[1] = (short) 32;
+		str_sizes[2] = (short) 32;
+		str_sizes[3] = (short) 32;
+		FldSpec[] proj_list = new FldSpec[4];
+		proj_list[0] = new FldSpec(new RelSpec(RelSpec.outer), 1);
+		proj_list[1] = new FldSpec(new RelSpec(RelSpec.outer), 2);
+		proj_list[2] = new FldSpec(new RelSpec(RelSpec.outer), 3);
+		proj_list[3] = new FldSpec(new RelSpec(RelSpec.outer), 4);
+
+		Iterator resultScanner = new FileScan(fileName, type, str_sizes,
+				(short) 4, (short) 4, proj_list, null);
+
+		Iterator sort = new Sort(type, (short) 4, str_sizes, resultScanner, 4,
+				new TupleOrder(0), 32, numBuf);
+
+		Tuple res;
+		while ((res = sort.get_next()) != null) {
+			res.setHdr((short) 4, type, str_sizes);
+			System.out.println("[" + res.getStrFld(1) + ", " + res.getStrFld(2)
+					+ ", " + res.getStrFld(3) + "]");
+		}
+
+		sort.close();
+		triExprQueryResult.deleteFile();
+	}
+
+	private void triangletypeA(String fileName) throws JoinsException,
+			IndexException, PageNotReadException, PredEvalException,
+			SortException, LowMemException, UnknowAttrType,
+			UnknownKeyTypeException, Exception {
+		Heapfile triExprQueryResult = new Heapfile(fileName);
+		AttrType[] outtype = new AttrType[3];
+		outtype[0] = new AttrType(AttrType.attrString);
+		outtype[1] = new AttrType(AttrType.attrString);
+		outtype[2] = new AttrType(AttrType.attrString);
+		short[] out_str_sizes = new short[3];
+		out_str_sizes[0] = (short) 32;
+		out_str_sizes[1] = (short) 32;
+		out_str_sizes[2] = (short) 32;
+
+		AttrType[] type = new AttrType[4];
+		type[0] = new AttrType(AttrType.attrString);
+		type[1] = new AttrType(AttrType.attrString);
+		type[2] = new AttrType(AttrType.attrString);
+		type[3] = new AttrType(AttrType.attrString);
+		short[] str_sizes = new short[4];
+		str_sizes[0] = (short) 32;
+		str_sizes[1] = (short) 32;
+		str_sizes[2] = (short) 32;
+		str_sizes[3] = (short) 32;
+		FldSpec[] proj_list = new FldSpec[3];
+		proj_list[0] = new FldSpec(new RelSpec(RelSpec.outer), 1);
+		proj_list[1] = new FldSpec(new RelSpec(RelSpec.outer), 2);
+		proj_list[2] = new FldSpec(new RelSpec(RelSpec.outer), 3);
+
+		Iterator resultScanner = new FileScan(fileName, type, str_sizes,
+				(short) 4, (short) 3, proj_list, null);
+
+		Tuple res;
+		while ((res = resultScanner.get_next()) != null) {
+			res.setHdr((short) 3, outtype, out_str_sizes);
+			res.print(outtype);
+		}
+
+		resultScanner.close();
+		triExprQueryResult.deleteFile();
 	}
 
 	private Iterator getTriNodeEdgePair(Object[] objExpressions,
@@ -665,17 +1011,18 @@ public class PathExpressionQuery {
 
 			efscan2 = new EFileScan(ehfName, attrType, s2_sizes, (short) 8, 8,
 					inputProjList, null);
-			
-			 /*sm = new NestedLoopsJoins(jtype, 8, s1_sizes, attrType, 8,
-			 s2_sizes, numBuf, am1, ehfName, expr, null, outputProjList,
-			 outputProjList.length);*/
-			 
 
-			
-			 /*sm = new SortMerge(jtype, 8, s1_sizes, attrType, 8, s2_sizes, 8,
-			 32, 7, 32, numBuf, am1, efscan2, false, false, order, expr,
-			 outputProjList, outputProjList.length);*/
-			 
+			/*
+			 * sm = new NestedLoopsJoins(jtype, 8, s1_sizes, attrType, 8,
+			 * s2_sizes, numBuf, am1, ehfName, expr, null, outputProjList,
+			 * outputProjList.length);
+			 */
+
+			/*
+			 * sm = new SortMerge(jtype, 8, s1_sizes, attrType, 8, s2_sizes, 8,
+			 * 32, 7, 32, numBuf, am1, efscan2, false, false, order, expr,
+			 * outputProjList, outputProjList.length);
+			 */
 
 			sm = new IndexNestedLoopsJoins(jtype, 8, 8, s1_sizes, attrType, 8,
 					7, s2_sizes, (short) numBuf, am1, ehfName,
