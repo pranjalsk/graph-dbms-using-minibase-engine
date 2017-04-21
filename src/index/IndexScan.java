@@ -121,6 +121,25 @@ public class IndexScan extends Iterator {
 			}
 
 			break;
+		case IndexType.Z_Index:
+			// error check the select condition
+			// must be of the type: value op symbol || symbol op value
+			// but not symbol op symbol || value op value
+			try {
+				indFile = new ZTreeFile(indName);
+			} catch (Exception e) {
+				throw new IndexException(e,
+						"IndexScan.java: BTreeFile exceptions caught from BTreeFile constructor");
+			}
+
+			try {
+				indScan = (ZTFileScan) IndexUtils.ZTree_scan(selects, indFile);
+			} catch (Exception e) {
+				throw new IndexException(e,
+						"IndexScan.java: BTreeFile exceptions caught from IndexUtils.BTree_scan().");
+			}
+
+			break;
 		case IndexType.None:
 		default:
 			throw new UnknownIndexTypeException(

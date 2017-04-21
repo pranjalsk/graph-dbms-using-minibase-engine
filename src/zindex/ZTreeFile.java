@@ -235,6 +235,9 @@ public class ZTreeFile extends IndexFile implements GlobalConst {
 
 	}
 
+	public String get_fileName(){
+		return zBTFile.get_fileName();
+	}
 	public void close() throws PageUnpinnedException,
 			InvalidFrameNumberException, HashEntryNotFoundException,
 			ReplacerException {

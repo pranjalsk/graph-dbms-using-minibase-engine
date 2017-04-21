@@ -1,5 +1,6 @@
 package batch;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,7 @@ import edgeheap.Edge;
 import edgeheap.EdgeHeapFile;
 import btree.BTFileScan;
 import btree.BTreeFile;
+import bufmgr.PageNotReadException;
 import global.AttrOperator;
 import global.AttrType;
 import global.Descriptor;
@@ -19,13 +21,29 @@ import global.EID;
 import global.IndexType;
 import global.NID;
 import global.TupleOrder;
+import heap.FieldNumberOutOfBoundException;
+import heap.InvalidTupleSizeException;
+import heap.InvalidTypeException;
 import heap.Tuple;
+import index.IndexException;
+import index.IndexScan;
 import index.NodeIndexScan;
+import index.UnknownIndexTypeException;
 import iterator.CondExpr;
 import iterator.FldSpec;
+import iterator.Iterator;
+import iterator.JoinsException;
+import iterator.LowMemException;
 import iterator.NFileScan;
+import iterator.NestedLoopException;
+import iterator.NestedLoopsJoins;
+import iterator.PredEvalException;
 import iterator.RelSpec;
 import iterator.Sort;
+import iterator.SortException;
+import iterator.TupleUtilsException;
+import iterator.UnknowAttrType;
+import iterator.UnknownKeyTypeException;
 import nodeheap.NScan;
 import nodeheap.Node;
 import nodeheap.NodeHeapfile;
@@ -317,14 +335,24 @@ public class NodeQueryWithIndex {
 	 *            Number of Buffers
 	 * @param targetLabelNode
 	 *            Node Label
+	 * @throws Exception
+	 * @throws UnknownKeyTypeException
+	 * @throws UnknowAttrType
+	 * @throws LowMemException
+	 * @throws SortException
+	 * @throws PredEvalException
+	 * @throws TupleUtilsException
+	 * @throws PageNotReadException
+	 * @throws JoinsException
 	 */
 	public void query4(NodeHeapfile nhf, BTreeFile btf_node_label,
 			EdgeHeapFile ehf, short nodeLabelLength, short numBuf,
-			String targetLabelNode) {
-		System.out.println("query1");
-
+			String targetLabelNode) throws JoinsException,
+			PageNotReadException, TupleUtilsException, PredEvalException,
+			SortException, LowMemException, UnknowAttrType,
+			UnknownKeyTypeException, Exception {
 		String nodeHeapFileName = nhf.get_fileName();
-		String nodeIndexFileName = btf_node_label.get_fileName();
+
 		AttrType[] attrType = new AttrType[2];
 		short[] stringSize = new short[1];
 		stringSize[0] = nodeLabelLength;
@@ -342,90 +370,87 @@ public class NodeQueryWithIndex {
 		expr[0].type1 = new AttrType(AttrType.attrString);
 		expr[0].operand2.symbol = new FldSpec(new RelSpec(RelSpec.outer), 1);
 		expr[0].operand1.string = targetLabelNode;
+		expr[0].next = null;
 		expr[1] = null;
-		IndexType indType = new IndexType(1);
-		Node node = new Node();
-		try {
-			NodeIndexScan nIscan = new NodeIndexScan(indType, nodeHeapFileName,
-					nodeIndexFileName, attrType, stringSize, 2, 2, projlist,
-					expr, 1, false);
-			node = nIscan.get_next();
-			String nodeLabel;
-			Descriptor nodeDescriptor;
 
-			while (node != null) {
-				node.setHdr();
-				nodeLabel = node.getLabel();
-				nodeDescriptor = node.getDesc();
-				System.out.println("Label: " + nodeLabel + " , Descriptor: ["
-						+ nodeDescriptor.get(0) + " , " + nodeDescriptor.get(1)
-						+ " , " + nodeDescriptor.get(2) + " , "
-						+ nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4)
-						+ "]");
-				BatchMapperClass bInsert = new BatchMapperClass();
-				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, nhf, btf_node_label);
+		Iterator nIscan = new IndexScan(new IndexType(IndexType.B_Index),
+				nodeHeapFileName, btf_node_label.get_fileName(), attrType,
+				stringSize, 2, 2, projlist, expr, 1, false);
 
-				EdgeHeapFile tempIncomingEdgeFile = new EdgeHeapFile(null);
-				EdgeHeapFile tempOutgoingEdgeFile = new EdgeHeapFile(null);
+		String edgeHeapFileName = ehf.get_fileName();
+		AttrType[] edgeattrType = new AttrType[8];
+		short[] edgestringSize = new short[3];
+		edgestringSize[0] = nodeLabelLength;
+		edgestringSize[1] = nodeLabelLength;
+		edgestringSize[2] = nodeLabelLength;
+		edgeattrType[0] = new AttrType(AttrType.attrInteger);
+		edgeattrType[1] = new AttrType(AttrType.attrInteger);
+		edgeattrType[2] = new AttrType(AttrType.attrInteger);
+		edgeattrType[3] = new AttrType(AttrType.attrInteger);
+		edgeattrType[4] = new AttrType(AttrType.attrString);
+		edgeattrType[5] = new AttrType(AttrType.attrInteger);
+		edgeattrType[6] = new AttrType(AttrType.attrString);
+		edgeattrType[7] = new AttrType(AttrType.attrString);
 
-				EID eid = new EID();
-				Edge edge;
-				try {
+		FldSpec[] outprojlist = new FldSpec[5];
+		RelSpec innerrel = new RelSpec(RelSpec.innerRel);
+		RelSpec outerrel = new RelSpec(RelSpec.outer);
+		outprojlist[0] = new FldSpec(outerrel, 1);
+		outprojlist[1] = new FldSpec(outerrel, 2);
+		outprojlist[2] = new FldSpec(innerrel, 5);
+		outprojlist[3] = new FldSpec(innerrel, 7);
+		outprojlist[4] = new FldSpec(innerrel, 8);
 
-					NID sourceNID, destinationNID;
-					EScan escan = ehf.openScan();
-					edge = escan.getNext(eid);
-					String edgeLabel;
+		CondExpr orExp = new CondExpr();
+		orExp = new CondExpr();
+		orExp.next = null;
+		orExp.op = new AttrOperator(AttrOperator.aopEQ);
+		orExp.type1 = new AttrType(AttrType.attrSymbol);
+		orExp.type2 = new AttrType(AttrType.attrSymbol);
+		orExp.operand1.symbol = new FldSpec(new RelSpec(RelSpec.outer), 1);
+		orExp.operand2.symbol = new FldSpec(new RelSpec(RelSpec.innerRel), 8);
 
-					while (edge != null) {
-						edge.setHdr();
-						edgeLabel = edge.getLabel();
-						sourceNID = edge.getSource();
-						destinationNID = edge.getDestination();
+		CondExpr[] outFilter = new CondExpr[2];
+		outFilter[0] = new CondExpr();
+		outFilter[0].next = orExp;
+		outFilter[0].op = new AttrOperator(AttrOperator.aopEQ);
+		outFilter[0].type1 = new AttrType(AttrType.attrSymbol);
+		outFilter[0].type2 = new AttrType(AttrType.attrSymbol);
+		outFilter[0].operand1.symbol = new FldSpec(new RelSpec(RelSpec.outer),
+				1);
+		outFilter[0].operand2.symbol = new FldSpec(
+				new RelSpec(RelSpec.innerRel), 7);
 
-						if(nodeNID.equals(sourceNID)){
-							tempOutgoingEdgeFile.insertEdge(edge.getEdgeByteArray());
-						}
-						else if(nodeNID.equals(destinationNID)){
-							tempIncomingEdgeFile.insertEdge(edge.getEdgeByteArray());
-						}
+		Iterator am = new NestedLoopsJoins(attrType, 2, stringSize,
+				edgeattrType, 8, edgestringSize, numBuf, nIscan,
+				edgeHeapFileName, outFilter, null, outprojlist, 5);
 
-						edge = escan.getNext(eid);
-					}
-					escan.closescan();
-					
-					EScan incoming_edge_scan = tempIncomingEdgeFile.openScan();
-					EScan outgoing_edge_scan = tempOutgoingEdgeFile.openScan();
-					
-					edge = incoming_edge_scan.getNext(eid);
-					System.out.println("Incoming Edges:");
-					while (edge != null) {
-						edge.setHdr();
-						System.out.println(edge.getLabel());
-						edge = incoming_edge_scan.getNext(eid);
-					}
-					incoming_edge_scan.closescan();
-					edge = outgoing_edge_scan.getNext(eid);
-					System.out.println("Outgoing Edges:");
-					while (edge != null) {
-						edge.setHdr();
-						System.out.println(edge.getLabel());
-						edge = outgoing_edge_scan.getNext(eid);
-					}
-					outgoing_edge_scan.closescan();
-					
-					tempIncomingEdgeFile.deleteFile();
-					tempOutgoingEdgeFile.deleteFile();
-					
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				node = nIscan.get_next();
+		AttrType[] types = new AttrType[5];
+		types[0] = new AttrType(AttrType.attrString);
+		types[1] = new AttrType(AttrType.attrDesc);
+		types[2] = new AttrType(AttrType.attrString);
+		types[3] = new AttrType(AttrType.attrString);
+		types[4] = new AttrType(AttrType.attrString);
+		short[] strSizes = new short[4];
+		strSizes[0] = nodeLabelLength;
+		strSizes[1] = nodeLabelLength;
+		strSizes[2] = nodeLabelLength;
+		strSizes[3] = nodeLabelLength;
+		Tuple tu;
+		while ((tu = am.get_next()) != null) {
+			tu.setHdr((short) 5, types, strSizes);
+			if (tu.getStrFld(1).equalsIgnoreCase(tu.getStrFld(5))) {
+				System.out.println("Node label: " + tu.getStrFld(1)
+						+ " Descriptor: [" + tu.getDescFld(2)
+						+ "] Incoming edge: " + tu.getStrFld(3));
+			} else {
+				System.out.println("Node label: " + tu.getStrFld(1)
+						+ " Descriptor: [" + tu.getDescFld(2)
+						+ "] Outgoing edge: " + tu.getStrFld(3));
 			}
-			nIscan.close();
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
+		nIscan.close();
+		am.close();
 	}
 
 	/**
@@ -446,13 +471,25 @@ public class NodeQueryWithIndex {
 	 *            Target Descriptor
 	 * @param distance
 	 *            Target Distance
+	 * @throws Exception
+	 * @throws FieldNumberOutOfBoundException
+	 * @throws UnknownKeyTypeException
+	 * @throws UnknowAttrType
+	 * @throws LowMemException
+	 * @throws SortException
+	 * @throws PredEvalException
+	 * @throws TupleUtilsException
+	 * @throws PageNotReadException
+	 * @throws JoinsException
 	 */
-	public void query5(NodeHeapfile nhf, ZTreeFile ztf_Descriptor, BTreeFile btf_node_label,
-			EdgeHeapFile ehf, short nodeLabelLength, short numBuf,
-			Descriptor targetDescriptor, double distance) {
-
+	public void query5(NodeHeapfile nhf, ZTreeFile ztf_Descriptor,
+			BTreeFile btf_node_label, EdgeHeapFile ehf, short nodeLabelLength,
+			short numBuf, Descriptor targetDescriptor, double distance)
+			throws JoinsException, PageNotReadException, TupleUtilsException,
+			PredEvalException, SortException, LowMemException, UnknowAttrType,
+			UnknownKeyTypeException, FieldNumberOutOfBoundException, Exception {
 		String nodeHeapFileName = nhf.get_fileName();
-		String nodeIndexFileName = "";
+
 		AttrType[] attrType = new AttrType[2];
 		short[] stringSize = new short[1];
 		stringSize[0] = nodeLabelLength;
@@ -473,87 +510,83 @@ public class NodeQueryWithIndex {
 		expr[0].operand1.attrDesc = targetDescriptor;
 		expr[1] = null;
 
-		IndexType indType = new IndexType(3);
-		Node node = new Node();
-		try {
-			NodeIndexScan nIscan = new NodeIndexScan(indType, nodeHeapFileName,
-					nodeIndexFileName, attrType, stringSize, 2, 2, projlist,
-					expr, 1, false);
-			node = nIscan.get_next();
-			String nodeLabel;
-			Descriptor nodeDescriptor;
+		Iterator nIscan = new IndexScan(new IndexType(IndexType.Z_Index),
+				nodeHeapFileName, ztf_Descriptor.get_fileName(), attrType,
+				stringSize, 2, 2, projlist, expr, 2, false);
 
-			while (node != null) {
-				node.setHdr();
-				nodeLabel = node.getLabel();
-				nodeDescriptor = node.getDesc();
-				System.out.println("Label: " + nodeLabel + " , Descriptor: ["
-						+ nodeDescriptor.get(0) + " , " + nodeDescriptor.get(1)
-						+ " , " + nodeDescriptor.get(2) + " , "
-						+ nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4)
-						+ "]");
-				BatchMapperClass bInsert = new BatchMapperClass();
-				NID nodeNID = bInsert.getNidFromNodeLabel(nodeLabel, nhf, btf_node_label);
+		String edgeHeapFileName = ehf.get_fileName();
+		AttrType[] edgeattrType = new AttrType[8];
+		short[] edgestringSize = new short[3];
+		edgestringSize[0] = nodeLabelLength;
+		edgestringSize[1] = nodeLabelLength;
+		edgestringSize[2] = nodeLabelLength;
+		edgeattrType[0] = new AttrType(AttrType.attrInteger);
+		edgeattrType[1] = new AttrType(AttrType.attrInteger);
+		edgeattrType[2] = new AttrType(AttrType.attrInteger);
+		edgeattrType[3] = new AttrType(AttrType.attrInteger);
+		edgeattrType[4] = new AttrType(AttrType.attrString);
+		edgeattrType[5] = new AttrType(AttrType.attrInteger);
+		edgeattrType[6] = new AttrType(AttrType.attrString);
+		edgeattrType[7] = new AttrType(AttrType.attrString);
 
-				EdgeHeapFile tempIncomingEdgeFile = new EdgeHeapFile(null);
-				EdgeHeapFile tempOutgoingEdgeFile = new EdgeHeapFile(null);
+		FldSpec[] outprojlist = new FldSpec[5];
+		RelSpec innerrel = new RelSpec(RelSpec.innerRel);
+		RelSpec outerrel = new RelSpec(RelSpec.outer);
+		outprojlist[0] = new FldSpec(outerrel, 1);
+		outprojlist[1] = new FldSpec(outerrel, 2);
+		outprojlist[2] = new FldSpec(innerrel, 5);
+		outprojlist[3] = new FldSpec(innerrel, 7);
+		outprojlist[4] = new FldSpec(innerrel, 8);
 
-				EID eid = new EID();
-				Edge edge;
-				try {
+		CondExpr orExp = new CondExpr();
+		orExp = new CondExpr();
+		orExp.next = null;
+		orExp.op = new AttrOperator(AttrOperator.aopEQ);
+		orExp.type1 = new AttrType(AttrType.attrSymbol);
+		orExp.type2 = new AttrType(AttrType.attrSymbol);
+		orExp.operand1.symbol = new FldSpec(new RelSpec(RelSpec.outer), 1);
+		orExp.operand2.symbol = new FldSpec(new RelSpec(RelSpec.innerRel), 8);
 
-					NID sourceNID, destinationNID;
-					EScan escan = ehf.openScan();
-					edge = escan.getNext(eid);
-					String edgeLabel;
+		CondExpr[] outFilter = new CondExpr[2];
+		outFilter[0] = new CondExpr();
+		outFilter[0].next = orExp;
+		outFilter[0].op = new AttrOperator(AttrOperator.aopEQ);
+		outFilter[0].type1 = new AttrType(AttrType.attrSymbol);
+		outFilter[0].type2 = new AttrType(AttrType.attrSymbol);
+		outFilter[0].operand1.symbol = new FldSpec(new RelSpec(RelSpec.outer),
+				1);
+		outFilter[0].operand2.symbol = new FldSpec(
+				new RelSpec(RelSpec.innerRel), 7);
 
-					while (edge != null) {
-						edge.setHdr();
-						edgeLabel = edge.getLabel();
-						sourceNID = edge.getSource();
-						destinationNID = edge.getDestination();
+		Iterator am = new NestedLoopsJoins(attrType, 2, stringSize,
+				edgeattrType, 8, edgestringSize, numBuf, nIscan,
+				edgeHeapFileName, outFilter, null, outprojlist, 5);
 
-						if(nodeNID.equals(sourceNID)){
-							tempOutgoingEdgeFile.insertEdge(edge.getEdgeByteArray());
-						}
-						else if(nodeNID.equals(destinationNID)){
-							tempIncomingEdgeFile.insertEdge(edge.getEdgeByteArray());
-						}
-
-						edge = escan.getNext(eid);
-					}
-					escan.closescan();
-
-					EScan incoming_edge_scan = tempIncomingEdgeFile.openScan();
-					EScan outgoing_edge_scan = tempOutgoingEdgeFile.openScan();
-					
-					edge = incoming_edge_scan.getNext(eid);
-					System.out.println("Incoming Edges:");
-					while (edge != null) {
-						edge.setHdr();
-						System.out.println(edge.getLabel());
-						edge = incoming_edge_scan.getNext(eid);
-					}
-					incoming_edge_scan.closescan();
-					edge = outgoing_edge_scan.getNext(eid);
-					System.out.println("Outgoing Edges:");
-					while (edge != null) {
-						edge.setHdr();
-						System.out.println(edge.getLabel());
-						edge = outgoing_edge_scan.getNext(eid);
-					}
-					outgoing_edge_scan.closescan();
-					
-					tempIncomingEdgeFile.deleteFile();
-					tempOutgoingEdgeFile.deleteFile();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				node = nIscan.get_next();
+		AttrType[] types = new AttrType[5];
+		types[0] = new AttrType(AttrType.attrString);
+		types[1] = new AttrType(AttrType.attrDesc);
+		types[2] = new AttrType(AttrType.attrString);
+		types[3] = new AttrType(AttrType.attrString);
+		types[4] = new AttrType(AttrType.attrString);
+		short[] strSizes = new short[4];
+		strSizes[0] = nodeLabelLength;
+		strSizes[1] = nodeLabelLength;
+		strSizes[2] = nodeLabelLength;
+		strSizes[3] = nodeLabelLength;
+		Tuple tu;
+		while ((tu = am.get_next()) != null) {
+			tu.setHdr((short) 5, types, strSizes);
+			if (tu.getStrFld(1).equalsIgnoreCase(tu.getStrFld(5))) {
+				System.out.println("Node label: " + tu.getStrFld(1)
+						+ " Descriptor: [" + tu.getDescFld(2)
+						+ "] Incoming edge: " + tu.getStrFld(3));
+			} else {
+				System.out.println("Node label: " + tu.getStrFld(1)
+						+ " Descriptor: [" + tu.getDescFld(2)
+						+ "] Outgoing edge: " + tu.getStrFld(3));
 			}
-			nIscan.close();
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
+		nIscan.close();
+		am.close();
 	}
 }

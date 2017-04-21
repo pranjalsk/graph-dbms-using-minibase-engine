@@ -50,6 +50,6 @@ public class Descriptor {
 	}
 	
 	public String toString(){
-		return new String(value[0]+":"+value[1]+":"+value[2]+":"+value[3]+":"+value[4]);
+		return new String(value[0]+","+value[1]+","+value[2]+","+value[3]+","+value[4]);
 	}
 }
