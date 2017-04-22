@@ -33,7 +33,14 @@ public class PathExpressionParser {
 			nidlist = new ArrayList<NID>();
 			nidlist.add(batchinsert.getNidFromNodeLabel(headnode, nhf, btf_node));
 		}
-
+		
+		
+		if(nidlist.get(0).pageNo.pid == -1 && nidlist.get(0).slotNo == -1) {
+			objExpList.add(null);
+			attrTypeList.add(null);
+			return type[0];
+		}
+		
 		int i;
 		int n = pathExpression.size();
 
@@ -86,7 +93,14 @@ public class PathExpressionParser {
 			nidlist = new ArrayList<NID>();
 			nidlist.add(batchinsert.getNidFromNodeLabel(headnode, nhf, btf_node));
 		}
-
+		
+		
+		if(nidlist.get(0).pageNo.pid == -1 && nidlist.get(0).slotNo == -1) {
+			objExpList.add(null);
+			attrTypeList.add(null);
+			return type[0];
+		}
+		
 		int i;
 		int n = pathExpression.size();
 
@@ -130,6 +144,12 @@ public class PathExpressionParser {
 		} else {
 			nidlist = new ArrayList<NID>();
 			nidlist.add(batchinsert.getNidFromNodeLabel(headnode, nhf, btf_node));
+		}		
+		
+		if(nidlist.get(0).pageNo.pid == -1 && nidlist.get(0).slotNo == -1) {
+			objExpList.add(null);
+			attrTypeList.add(null);
+			return type[0];
 		}
 
 		int i;

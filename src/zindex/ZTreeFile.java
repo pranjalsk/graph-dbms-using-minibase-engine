@@ -12,6 +12,7 @@ import btree.BTreeFile;
 import btree.ConstructPageException;
 import btree.ConvertException;
 import btree.DeleteFashionException;
+import btree.DeleteFileEntryException;
 import btree.DeleteRecException;
 import btree.FreePageException;
 import btree.GetFileEntryException;
@@ -243,5 +244,8 @@ public class ZTreeFile extends IndexFile implements GlobalConst {
 			ReplacerException {
 		zBTFile.close();
 	}
+	 public void destroyFile() throws IteratorException, UnpinPageException, FreePageException, DeleteFileEntryException, ConstructPageException, PinPageException, IOException{
+		 zBTFile.destroyFile();
+	 }
 
 }
