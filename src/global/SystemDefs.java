@@ -97,6 +97,7 @@ public class SystemDefs {
 														// database
 			try {
 				JavabaseDB.openDB(dbname);
+				System.out.println("Open existing db");
 			} catch (Exception e) {
 				System.err.println("" + e);
 				e.printStackTrace();
@@ -104,6 +105,7 @@ public class SystemDefs {
 			}
 		} else {
 			try {
+				System.out.println("Open new db");
 				JavabaseDB.openDB(dbname, num_pgs);
 				JavabaseBM.flushAllPages();
 				
