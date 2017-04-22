@@ -359,9 +359,7 @@ public class PathExpression {
 		types[0] = new AttrType(AttrType.attrString);
 		types[1] = new AttrType(AttrType.attrDesc);
 
-		Heapfile tailNodeFile = new Heapfile("TailNodeFile");
-		tailNodeFile.deleteFile();
-		tailNodeFile = new Heapfile("TailNodeFile");
+		Heapfile tailNodeFile = new Heapfile("TailNodeFileForPQ1");
 		BatchMapperClass bi = new BatchMapperClass();
 		BTreeFile btfNodeLabel = new BTreeFile(indexNodeLabelName);
 		while ((tu = am_outer.get_next()) != null) {
@@ -389,7 +387,7 @@ public class PathExpression {
 		FldSpec[] projlist = new FldSpec[1];
 		projlist[0] = new FldSpec(new RelSpec(RelSpec.outer), 1);
 
-		Iterator tail_iterator = new FileScan("TailNodeFile", atrType,
+		Iterator tail_iterator = new FileScan("TailNodeFileForPQ1", atrType,
 				str_sizes, (short) 1, 1, projlist, null);
 		/*
 		 * Tuple t; while((t = tail_iterator.get_next()) != null){
@@ -827,12 +825,9 @@ public class PathExpression {
 		types[6] = new AttrType(AttrType.attrString); // SrcLabel
 		types[7] = new AttrType(AttrType.attrString); // DestLabel
 
-		Heapfile tailNodeFile = new Heapfile("TailNodeFileForEdge");
-		tailNodeFile.deleteFile();
-		tailNodeFile = new Heapfile("TailNodeFileForEdge");
+		Heapfile tailNodeFile = new Heapfile("TailNodeFileForPQ2");
 		while ((tu = inlj.get_next()) != null) {
 			tu.setHdr((short) 8, types, strSizes);
-			// tu.print(types);
 			RID rid = new RID();
 			rid.pageNo.pid = tu.getIntFld(3);
 			rid.slotNo = tu.getIntFld(4);
@@ -841,10 +836,7 @@ public class PathExpression {
 					AttrType.attrId) }, new short[] {});
 			tail.setIDFld(1, rid);
 			tailNodeFile.insertRecord(tail.getTupleByteArray());
-			// System.out.println(rid+"Node Label: " + tu.getStrFld(8));
 		}
-		// System.out.println("-------------------");
-		// ****************************//*
 		inlj.close();
 		am_outer.close();
 
@@ -856,7 +848,7 @@ public class PathExpression {
 		FldSpec[] projlist = new FldSpec[1];
 		projlist[0] = new FldSpec(new RelSpec(RelSpec.outer), 1);
 
-		Iterator tail_iterator = new FileScan("TailNodeFileForEdge", atrType,
+		Iterator tail_iterator = new FileScan("TailNodeFileForPQ2", atrType,
 				str_sizes, (short) 1, 1, projlist, null);
 
 		/*
