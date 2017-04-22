@@ -143,11 +143,11 @@ public class PathExpressionParser {
 		//for (i = 1; i < n; i++) {
 		String input = pathExpression.get(1)[1].trim();
 		if (pathExpression.get(1)[0].equals("MNE")) {								
-			objectArray[1] = "MNE:"+input;				
+			objectArray[1] = Integer.parseInt(input);				
 			attrArray[1] = new AttrType(AttrType.attrInteger);
 		} else {
-			objectArray[1] = "MTEW:"+input;	
-			attrArray[1] = new AttrType(AttrType.attrInteger);
+			objectArray[1] = Integer.parseInt(input);	
+			attrArray[1] = new AttrType(AttrType.attrString);
 		}
 		//}
 		for (i = 0; i < nidlist.size(); i++) {
@@ -157,7 +157,6 @@ public class PathExpressionParser {
 			objExpList.add(finalObjectArray);
 			attrTypeList.add(attrArray);
 		}
-		// ObjectArray is [[NID1, 10:MNE],[NID2, 15:MTEW]...]
 		return type[0];
 	}
 	
