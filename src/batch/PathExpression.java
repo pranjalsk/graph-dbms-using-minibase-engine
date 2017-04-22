@@ -37,6 +37,7 @@ import iterator.FileScan;
 import iterator.FldSpec;
 import iterator.IndexNestedLoopsJoins;
 import iterator.Iterator;
+import iterator.NFileScan;
 import iterator.RelSpec;
 import iterator.SortMerge;
 
@@ -153,7 +154,7 @@ public class PathExpression {
 			FldSpec[] outer_projlist = new FldSpec[2];
 			outer_projlist[0] = new FldSpec(inner_relation, 1);
 			outer_projlist[1] = new FldSpec(inner_relation, 2);
-			
+
 			t2_str_sizes = new short[2];
 			t2_str_sizes[0] = nodeLabelLength;
 			in2 = new AttrType[2];
@@ -477,16 +478,753 @@ public class PathExpression {
 
 	public Iterator pathExpress3_2(Object[] expression, String nhfName,
 			String ehfName, String indexEhfSourceNodeName,
-			String indexNodeLabelName, short numBuf, short nodeLabelLength) {
-		// TODO Auto-generated method stub
-		return null;
+			String indexNodeLabelName, short numBuf, short nodeLabelLength)
+			throws InvalidSlotNumberException, InvalidTupleSizeException,
+			Exception {
+		// Get a reference to the node heap file
+		NodeHeapfile nodeHeapFile = new NodeHeapfile(nhfName);
+
+		// Get the Node corresponding to the start NID in the path expression
+		Node starNode = nodeHeapFile.getRecord((NID) expression[0]);
+		starNode.setHdr();
+
+		// Get the maximum number of edges in the pat
+		int maxTotalEdgeWeight = (Integer) expression[1];
+
+		// Delete TailWeightBoundNodeFile if it exists
+		Heapfile tailNodeFile = new Heapfile("TailNodeFileForPQ3");
+
+		// Iterator on TailWeightBoundNodeFile: Reads only the NID of all the
+		// Nodes in TailWeightBoundNodeFile
+		short[] str_sizes = new short[0];
+
+		AttrType[] atrType = new AttrType[1];
+		atrType[0] = new AttrType(AttrType.attrId);
+
+		FldSpec[] tailNodeprojlist = new FldSpec[1];
+		tailNodeprojlist[0] = new FldSpec(new RelSpec(RelSpec.outer), 1);
+
+		// Declare a reference to TempTailBoundNodeFile
+		EdgeHeapFile tempTailEdgeFile = null;
+
+		// Iterator on TempTailBoundNodeFile: Reads the SourceNodeLabel and
+		// DestinationNodeLabel of all the Tuples in TempTailBoundNodeFile
+		short[] tempStrSizes = new short[3];
+		tempStrSizes[0] = nodeLabelLength;
+		tempStrSizes[1] = nodeLabelLength;
+		tempStrSizes[2] = nodeLabelLength;
+
+		AttrType[] tempTypes = new AttrType[8];
+		tempTypes[0] = new AttrType(AttrType.attrInteger);
+		tempTypes[1] = new AttrType(AttrType.attrInteger);
+		tempTypes[2] = new AttrType(AttrType.attrInteger);
+		tempTypes[3] = new AttrType(AttrType.attrInteger);
+		tempTypes[4] = new AttrType(AttrType.attrString);
+		tempTypes[5] = new AttrType(AttrType.attrInteger);
+		tempTypes[6] = new AttrType(AttrType.attrString);
+		tempTypes[7] = new AttrType(AttrType.attrString);
+
+		BatchMapperClass bi = new BatchMapperClass();
+		BTreeFile btfNodeLabel = new BTreeFile(indexNodeLabelName);
+
+		Tuple tu, temptu;
+
+		// Prepare an initial scan on the NodeHeapFile
+		// The scan results will serve as records for the outer relation of the
+		// join operation
+
+		short[] outer_Iterator_str_sizes = new short[1];
+		outer_Iterator_str_sizes[0] = nodeLabelLength;
+
+		AttrType[] in1_outer_Iterator = new AttrType[2];
+		in1_outer_Iterator[0] = new AttrType(AttrType.attrString);
+		in1_outer_Iterator[1] = new AttrType(AttrType.attrDesc);
+
+		FldSpec[] outer_Iterator_projlist = new FldSpec[2];
+		outer_Iterator_projlist[0] = new FldSpec(new RelSpec(RelSpec.outer), 1);
+		outer_Iterator_projlist[1] = new FldSpec(new RelSpec(RelSpec.outer), 2);
+
+		CondExpr[] out_filter_outer_Iterator = new CondExpr[2];
+		out_filter_outer_Iterator[0] = new CondExpr();
+		out_filter_outer_Iterator[0].op = new AttrOperator(AttrOperator.aopEQ);
+		out_filter_outer_Iterator[0].type2 = new AttrType(AttrType.attrSymbol);
+		out_filter_outer_Iterator[0].type1 = new AttrType(AttrType.attrString);
+		out_filter_outer_Iterator[0].operand2.symbol = new FldSpec(new RelSpec(
+				RelSpec.outer), 1);
+		out_filter_outer_Iterator[0].operand1.string = starNode.getLabel();
+		out_filter_outer_Iterator[1] = null;
+
+		Iterator am_outer = new FileScan(nhfName, in1_outer_Iterator,
+				outer_Iterator_str_sizes, (short) 2, 2,
+				outer_Iterator_projlist, out_filter_outer_Iterator);
+
+		IndexNestedLoopsJoins inlj = null;
+		String tempTailEdgeFileName = null;
+
+		short[] t2_str_sizes = new short[3];
+		t2_str_sizes[0] = 32;
+		t2_str_sizes[1] = 32;
+		t2_str_sizes[2] = 32;
+		AttrType[] in2 = new AttrType[8];
+		in2[0] = new AttrType(AttrType.attrInteger);
+		in2[1] = new AttrType(AttrType.attrInteger);
+		in2[2] = new AttrType(AttrType.attrInteger);
+		in2[3] = new AttrType(AttrType.attrInteger);
+		in2[4] = new AttrType(AttrType.attrString);
+		in2[5] = new AttrType(AttrType.attrInteger);
+		in2[6] = new AttrType(AttrType.attrString);
+		in2[7] = new AttrType(AttrType.attrString);
+
+		FldSpec[] inner_projlist = new FldSpec[8];
+		RelSpec outer = new RelSpec(RelSpec.outer);
+		inner_projlist[0] = new FldSpec(outer, 1);
+		inner_projlist[1] = new FldSpec(outer, 2);
+		inner_projlist[2] = new FldSpec(outer, 3);
+		inner_projlist[3] = new FldSpec(outer, 4);
+		inner_projlist[4] = new FldSpec(outer, 5);
+		inner_projlist[5] = new FldSpec(outer, 6);
+		inner_projlist[6] = new FldSpec(outer, 7);
+		inner_projlist[7] = new FldSpec(outer, 8);
+
+		RelSpec inner_relation = new RelSpec(RelSpec.innerRel);
+		RelSpec outer_relation = new RelSpec(RelSpec.outer);
+
+		FldSpec[] proj_list = new FldSpec[8];
+		proj_list[0] = new FldSpec(inner_relation, 1); // Source Node Page No.
+		proj_list[1] = new FldSpec(inner_relation, 2); // Source Node Slot No.
+		proj_list[2] = new FldSpec(inner_relation, 3); // Destination Node Page
+														// No.
+		proj_list[3] = new FldSpec(inner_relation, 4); // Destination Node Slot
+														// No.
+		proj_list[4] = new FldSpec(inner_relation, 5); // Edge Label
+		proj_list[5] = new FldSpec(inner_relation, 6); // Edge Weight
+		proj_list[6] = new FldSpec(inner_relation, 7); // Source Node Label
+		proj_list[7] = new FldSpec(inner_relation, 8); // Destination Node Label
+
+		FldSpec[] temp_proj_list = new FldSpec[8];
+		temp_proj_list[0] = new FldSpec(outer_relation, 1); // Source Node Page
+															// No.
+		temp_proj_list[1] = new FldSpec(outer_relation, 2); // Source Node Slot
+															// No.
+		temp_proj_list[2] = new FldSpec(outer_relation, 3); // Destination Node
+															// Page No.
+		temp_proj_list[3] = new FldSpec(outer_relation, 4); // Destination Node
+															// Slot No.
+		temp_proj_list[4] = new FldSpec(outer_relation, 5); // Edge Label
+		temp_proj_list[5] = new FldSpec(outer_relation, 6); // Edge Weight
+		temp_proj_list[6] = new FldSpec(outer_relation, 7); // Source Node Label
+		temp_proj_list[7] = new FldSpec(outer_relation, 8); // Destination Node
+															// Label
+
+		int i = 0;
+		do {
+			if (i != 0) {
+				// System.out.println("i: "+i);
+				short[] t1_str_sizes = new short[3];
+				t1_str_sizes[0] = 32;
+				t1_str_sizes[1] = 32;
+				t1_str_sizes[2] = 32;
+
+				AttrType[] in1 = new AttrType[8];
+				in1[0] = new AttrType(AttrType.attrInteger);
+				in1[1] = new AttrType(AttrType.attrInteger);
+				in1[2] = new AttrType(AttrType.attrInteger);
+				in1[3] = new AttrType(AttrType.attrInteger);
+				in1[4] = new AttrType(AttrType.attrString);
+				in1[5] = new AttrType(AttrType.attrInteger);
+				in1[6] = new AttrType(AttrType.attrString);
+				in1[7] = new AttrType(AttrType.attrString);
+
+				out_filter_outer_Iterator = null;
+				CondExpr[] rightFilter = new CondExpr[2];
+				rightFilter[0] = new CondExpr();
+				rightFilter[0].op = new AttrOperator(AttrOperator.aopGE);
+				rightFilter[0].type1 = new AttrType(AttrType.attrSymbol);
+				rightFilter[0].type2 = new AttrType(AttrType.attrSymbol);
+				rightFilter[0].operand1.symbol = new FldSpec(new RelSpec(
+						RelSpec.outer), 6); // temporary file
+				rightFilter[0].operand2.symbol = new FldSpec(new RelSpec(
+						RelSpec.innerRel), 6); // edgeheap file
+				rightFilter[1] = null;
+
+				proj_list[0] = new FldSpec(inner_relation, 1); // Source Node
+																// Page No.
+				proj_list[1] = new FldSpec(inner_relation, 2); // Source Node
+																// Slot No.
+				proj_list[2] = new FldSpec(inner_relation, 3); // Destination
+																// Node Page
+																// No.
+				proj_list[3] = new FldSpec(outer_relation, 6); // Destination
+																// Node Slot
+																// No.
+				proj_list[4] = new FldSpec(inner_relation, 5); // Edge Label
+				proj_list[5] = new FldSpec(inner_relation, 6); // Edge Weight
+				proj_list[6] = new FldSpec(inner_relation, 7); // Source Node
+																// Label
+				proj_list[7] = new FldSpec(inner_relation, 8); // Destination
+																// Node Label
+
+				try {
+					inlj = new IndexNestedLoopsJoins(in1, 8, 8, t1_str_sizes,
+							in2, 8, 7, t2_str_sizes, numBuf, am_outer, ehfName,
+							indexEhfSourceNodeName, inner_projlist,
+							rightFilter, null, proj_list, 8);
+				} catch (Exception e) {
+					System.err
+							.println("*** Error preparing for nested_loop_join");
+					System.err.println("" + e);
+					e.printStackTrace();
+					Runtime.getRuntime().exit(1);
+
+				}
+
+				tempTailEdgeFileName = "TempTailEdgeFile" + i;
+				tempTailEdgeFile = new EdgeHeapFile(tempTailEdgeFileName);
+				tempTailEdgeFile.deleteFile();
+				tempTailEdgeFile = new EdgeHeapFile(tempTailEdgeFileName);
+
+				if ((temptu = inlj.get_next()) != null) {
+					temptu.setHdr((short) 8, tempTypes, tempStrSizes);
+					// System.out.println("Node Label: " + temptu.getStrFld(8));
+					Tuple tail = new Tuple();
+					Edge tempTail = new Edge();
+					// System.err.println("Prior to Edge Updation for Node : "+temptu.getStrFld(8));
+					// System.out.println("Source Node Label: " +
+					// temptu.getStrFld(7)+" , Destination Node Label: "+temptu.getStrFld(8)+" , Edge Weight: "+temptu.getIntFld(6)
+					// +" , Left Edge Weight: "+temptu.getIntFld(4));
+					RID rid = (RID) (bi.getNidFromNodeLabel(
+							temptu.getStrFld(8), nodeHeapFile, btfNodeLabel));
+
+					/*
+					 * if (rid == null) System.out.println("RID is null"); else
+					 * System.out.println("RID Page No. : " + rid.pageNo +
+					 * " , RID Slot No. : " + rid.slotNo);
+					 */
+					tail.setHdr((short) 1, new AttrType[] { new AttrType(
+							AttrType.attrId) }, new short[] {});
+					tail.setIDFld(1, rid);
+					tailNodeFile.insertRecord(tail.getTupleByteArray());
+
+					tempTail.setHdr();
+					tempTail.setSourceLabel(temptu.getStrFld(7));
+					tempTail.setDestLabel(temptu.getStrFld(8));
+					tempTail.setLabel(temptu.getStrFld(5));
+					tempTail.setWeight(temptu.getIntFld(4)
+							- temptu.getIntFld(6));
+					/*
+					 * System.err.println("After Edge Updation for Node : "+temptu
+					 * .getStrFld(8));
+					 * System.out.println("Edge Source Node Label: "
+					 * +tempTail.getStrFld(7)+
+					 * " , Edge Destination Node Label: "+tempTail.getStrFld(8)+
+					 * " , Revised Edge Weight: "+tempTail.getIntFld(6)+
+					 * " , Left Edge Weight: "+tempTail.getIntFld(4));
+					 */
+					tempTailEdgeFile.insertEdge(tempTail.getTupleByteArray());
+
+					while ((temptu = inlj.get_next()) != null) {
+						temptu.setHdr((short) 8, tempTypes, tempStrSizes);
+						// System.out.println("Node Label: " +
+						// temptu.getStrFld(8));
+						tail = new Tuple();
+						tempTail = new Edge();
+
+						/*
+						 * System.err.println("Prior to Edge Updation for Node : "
+						 * +temptu.getStrFld(8));
+						 * System.out.println("Source Node Label: " +
+						 * temptu.getStrFld(7)+
+						 * " , Destination Node Label: "+temptu.getStrFld(8)+
+						 * " , Edge Weight: "+temptu.getIntFld(6) +
+						 * " , Left Edge Weight: "+temptu.getIntFld(4));
+						 */
+						rid = (RID) (bi
+								.getNidFromNodeLabel(temptu.getStrFld(8),
+										nodeHeapFile, btfNodeLabel));
+						// System.out.println(rid.pageNo.pid+":"+rid.slotNo);
+
+						/*
+						 * if (rid == null) System.out.println("RID is null");
+						 * else System.out.println("RID Page No. : " +
+						 * rid.pageNo + " , RID Slot No. : " + rid.slotNo);
+						 */
+						tail.setHdr((short) 1, new AttrType[] { new AttrType(
+								AttrType.attrId) }, new short[] {});
+						tail.setIDFld(1, rid);
+						tailNodeFile.insertRecord(tail.getTupleByteArray());
+
+						tempTail.setHdr();
+						tempTail.setSourceLabel(temptu.getStrFld(7));
+						tempTail.setDestLabel(temptu.getStrFld(8));
+						tempTail.setLabel(temptu.getStrFld(5));
+						tempTail.setWeight(temptu.getIntFld(4)
+								- temptu.getIntFld(6));
+						/*
+						 * System.err.println("After Edge Updation for Node : "+
+						 * temptu.getStrFld(8));
+						 * System.out.println("Edge Source Node Label: "
+						 * +tempTail.getStrFld(7)+
+						 * " , Edge Destination Node Label: "
+						 * +tempTail.getStrFld(8)+
+						 * " , Revised Edge Weight: "+tempTail.getIntFld(6)+
+						 * " , Left Edge Weight: "+tempTail.getIntFld(4));
+						 */
+						tempTailEdgeFile.insertEdge(tempTail
+								.getTupleByteArray());
+					}
+					i++;
+				} else
+					break;
+
+			} else if (i == 0) {
+				// System.out.println("i: " + i);
+
+				short[] t1_str_sizes = new short[1];
+				t1_str_sizes[0] = nodeLabelLength;
+
+				AttrType[] in1 = new AttrType[2];
+				in1[0] = new AttrType(AttrType.attrString);
+				in1[1] = new AttrType(AttrType.attrDesc);
+
+				CondExpr[] rightFilter = new CondExpr[2];
+				rightFilter[0] = new CondExpr();
+				rightFilter[0].op = new AttrOperator(AttrOperator.aopLE);
+				rightFilter[0].type1 = new AttrType(AttrType.attrSymbol);
+				rightFilter[0].type2 = new AttrType(AttrType.attrInteger);
+				rightFilter[0].operand1.symbol = new FldSpec(new RelSpec(
+						RelSpec.outer), 6);
+				rightFilter[0].operand2.integer = maxTotalEdgeWeight;
+				rightFilter[1] = null;
+
+				try {
+					inlj = new IndexNestedLoopsJoins(in1, 2, 1, t1_str_sizes,
+							in2, 8, 7, t2_str_sizes, numBuf, am_outer, ehfName,
+							indexEhfSourceNodeName, inner_projlist, null,
+							rightFilter, proj_list, 8);
+				} catch (Exception e) {
+					System.err
+							.println("*** Error preparing for nested_loop_join");
+					System.err.println("" + e);
+					e.printStackTrace();
+					Runtime.getRuntime().exit(1);
+				}
+
+				tempTailEdgeFileName = "TempTailEdgeFile" + i;
+				tempTailEdgeFile = new EdgeHeapFile(tempTailEdgeFileName);
+				tempTailEdgeFile.deleteFile();
+				tempTailEdgeFile = new EdgeHeapFile(tempTailEdgeFileName);
+
+				if ((temptu = inlj.get_next()) != null) {
+					temptu.setHdr((short) 8, tempTypes, tempStrSizes);
+					// System.out.println("Node Label: " + temptu.getStrFld(8));
+					Tuple tail = new Tuple();
+					Edge tempTail = new Edge();
+
+					/*
+					 * System.err.println("Prior to Edge Updation for Node : "+
+					 * temptu.getStrFld(8));
+					 * System.out.println("Source Node Label: " +
+					 * temptu.getStrFld(7)+
+					 * " , Destination Node Label: "+temptu.getStrFld(8)+
+					 * " , Edge Weight: "+temptu.getIntFld(6));
+					 */
+					RID rid = (RID) (bi.getNidFromNodeLabel(
+							temptu.getStrFld(8), nodeHeapFile, btfNodeLabel));
+					// System.out.println(rid.pageNo.pid+":"+rid.slotNo);
+
+					/*
+					 * if (rid == null) System.out.println("RID is null"); else
+					 * System.out.println("RID Page No. : " + rid.pageNo +
+					 * " , RID Slot No. : " + rid.slotNo);
+					 */
+					tail.setHdr((short) 1, new AttrType[] { new AttrType(
+							AttrType.attrId) }, new short[] {});
+					tail.setIDFld(1, rid);
+					tailNodeFile.insertRecord(tail.getTupleByteArray());
+
+					tempTail.setHdr();
+					tempTail.setSourceLabel(temptu.getStrFld(7));
+					tempTail.setDestLabel(temptu.getStrFld(8));
+					tempTail.setLabel(temptu.getStrFld(5));
+					tempTail.setWeight(maxTotalEdgeWeight - temptu.getIntFld(6));
+					// tempTail.setIntFld(4, maxTotalEdgeWeight -
+					// temptu.getIntFld(6));
+					/*
+					 * System.err.println("After Edge Updation for Node : "+temptu
+					 * .getStrFld(8));
+					 * System.out.println("Edge Source Node Label: "
+					 * +tempTail.getStrFld(7)+
+					 * " , Edge Destination Node Label: "+tempTail.getStrFld(8)+
+					 * " , Revised Edge Weight: "+tempTail.getIntFld(6)+
+					 * " , Left Edge Weight: "+tempTail.getIntFld(4));
+					 */
+					tempTailEdgeFile.insertEdge(tempTail.getTupleByteArray());
+
+					while ((temptu = inlj.get_next()) != null) {
+						temptu.setHdr((short) 8, tempTypes, tempStrSizes);
+						// System.out.println("Node Label: " +
+						// temptu.getStrFld(8));
+						tail = new Tuple();
+						tempTail = new Edge();
+
+						/*
+						 * System.err.println("Prior to Edge Updation for Node : "
+						 * +temptu.getStrFld(8));
+						 * System.out.println("Source Node Label: " +
+						 * temptu.getStrFld(7)+
+						 * " , Destination Node Label: "+temptu.getStrFld(8)+
+						 * " , Edge Weight: "+temptu.getIntFld(6));
+						 */
+						rid = (RID) (bi
+								.getNidFromNodeLabel(temptu.getStrFld(8),
+										nodeHeapFile, btfNodeLabel));
+						// System.out.println(rid.pageNo.pid+":"+rid.slotNo);
+
+						/*
+						 * if (rid == null) System.out.println("RID is null");
+						 * else System.out.println("RID Page No. : " +
+						 * rid.pageNo + " , RID Slot No. : " + rid.slotNo);
+						 */
+						tail.setHdr((short) 1, new AttrType[] { new AttrType(
+								AttrType.attrId) }, new short[] {});
+						tail.setIDFld(1, rid);
+						tailNodeFile.insertRecord(tail.getTupleByteArray());
+
+						tempTail.setHdr();
+						tempTail.setSourceLabel(temptu.getStrFld(7));
+						tempTail.setDestLabel(temptu.getStrFld(8));
+						tempTail.setLabel(temptu.getStrFld(5));
+						tempTail.setWeight(maxTotalEdgeWeight
+								- temptu.getIntFld(6));
+						// tempTail.setIntFld(4, maxTotalEdgeWeight -
+						// temptu.getIntFld(6));
+						/*
+						 * System.err.println("After Edge Updation for Node : "+
+						 * temptu.getStrFld(8));
+						 * System.out.println("Edge Source Node Label: "
+						 * +tempTail.getStrFld(7)+
+						 * " , Edge Destination Node Label: "
+						 * +tempTail.getStrFld(8)+
+						 * " , Revised Edge Weight: "+tempTail.getIntFld(6)+
+						 * " , Left Edge Weight: "+tempTail.getIntFld(4));
+						 */
+						tempTailEdgeFile.insertEdge(tempTail
+								.getTupleByteArray());
+					}
+					i++;
+				} else
+					break;
+
+			}
+
+			inlj.close();
+			am_outer.close();
+			proj_list[0] = new FldSpec(outer_relation, 1); // Node Label
+			proj_list[1] = new FldSpec(outer_relation, 2); // Descriptor
+			am_outer = new EFileScan(tempTailEdgeFileName, tempTypes,
+					tempStrSizes, (short) 8, 8, temp_proj_list, null);
+			/*
+			 * Tuple temp; while((temp = am_outer.get_next()) != null){
+			 * temp.setHdr((short)8, tempTypes, tempStrSizes);
+			 * System.out.println("Edge Source Node Label: "+temp.getStrFld(7)+
+			 * " , Edge Destination Node Label: "+temp.getStrFld(8)
+			 * +" , Revised Edge Weight: "+temp.getIntFld(4)
+			 * +" , Edge Weight: "+temp.getIntFld(6)); }
+			 */
+
+		} while (true);
+		btfNodeLabel.close();
+		inlj.close();
+		am_outer.close();
+
+		for (int j = 0; j <= i; j++) {
+
+			tempTailEdgeFileName = "TempTailEdgeFile" + i;
+			tempTailEdgeFile = new EdgeHeapFile(tempTailEdgeFileName);
+			tempTailEdgeFile.deleteFile();
+
+		}
+		Iterator tail_iterator = new FileScan("TailNodeFileForPQ3", atrType,
+				str_sizes, (short) 1, 1, tailNodeprojlist, null);
+		/*Tuple t;
+		while ((t = tail_iterator.get_next()) != null) {
+			t.setHdr((short) 1, atrType, str_sizes);
+			RID rid = t.getIDFld(1);
+			System.out.println(rid.pageNo.pid + ":" + rid.slotNo);
+			t.print(atrType);
+		}*/
+
+		return tail_iterator;
 	}
 
 	public Iterator pathExpress3_1(Object[] expression, String nhfName,
 			String ehfName, String indexEhfSourceNodeName,
-			String indexNodeLabelName, short numBuf, short nodeLabelLength) {
-		// TODO Auto-generated method stub
-		return null;
+			String indexNodeLabelName, short numBuf, short nodeLabelLength)
+			throws InvalidSlotNumberException, InvalidTupleSizeException,
+			Exception {
+		// Get a reference to the node heap file
+		NodeHeapfile nodeHeapFile = new NodeHeapfile(nhfName);
+
+		// Get the Node corresponding to the start NID in the path expression
+		Node starNode = nodeHeapFile.getRecord((NID) expression[0]);
+		starNode.setHdr();
+
+		// Get the maximum number of edges in the pat
+		int maxNumberOfEdges = (Integer) expression[1];
+
+		// Delete TailBoundEdgeNodeFile if it exists
+		Heapfile tailNodeFile = new Heapfile("TailNodeFileForPQ3");
+
+		// Iterator on TailBoundEdgeNodeFile: Reads only the NID of all the
+		// Nodes in TailBoundEdgeNodeFile
+		short[] str_sizes = new short[0];
+
+		AttrType[] atrType = new AttrType[1];
+		atrType[0] = new AttrType(AttrType.attrId);
+
+		FldSpec[] tailNodeprojlist = new FldSpec[1];
+		tailNodeprojlist[0] = new FldSpec(new RelSpec(RelSpec.outer), 1);
+
+		// Declare a reference to TempTailBoundNodeFile
+		NodeHeapfile tempTailNodeFile;
+		String tempTailNodeFileName;
+		// Iterator on TempTailBoundNodeFile: Reads the NodeLabel and Descriptor
+		// of all the Tuples in TempTailBoundNodeFile
+		short[] tempStrSizes = new short[1];
+		tempStrSizes[0] = nodeLabelLength;
+
+		AttrType[] tempTypes = new AttrType[2];
+		tempTypes[0] = new AttrType(AttrType.attrString); // Node Label
+		tempTypes[1] = new AttrType(AttrType.attrDesc); // Descriptor
+
+		BatchMapperClass bi = new BatchMapperClass();
+		BTreeFile btfNodeLabel = new BTreeFile(indexNodeLabelName);
+
+		Tuple tu, temptu;
+
+		// Prepare an initial scan on the NodeHeapFile
+		// The scan results will serve as records for the outer relation of the
+		// join operation
+
+		short[] outer_Iterator_str_sizes = new short[1];
+		outer_Iterator_str_sizes[0] = nodeLabelLength;
+
+		AttrType[] in1_outer_Iterator = new AttrType[2];
+		in1_outer_Iterator[0] = new AttrType(AttrType.attrString);
+		in1_outer_Iterator[1] = new AttrType(AttrType.attrDesc);
+
+		FldSpec[] outer_Iterator_projlist = new FldSpec[2];
+		outer_Iterator_projlist[0] = new FldSpec(new RelSpec(RelSpec.outer), 1);
+		outer_Iterator_projlist[1] = new FldSpec(new RelSpec(RelSpec.outer), 2);
+
+		CondExpr[] out_filter_outer_Iterator = new CondExpr[2];
+		out_filter_outer_Iterator[0] = new CondExpr();
+		out_filter_outer_Iterator[0].op = new AttrOperator(AttrOperator.aopEQ);
+		out_filter_outer_Iterator[0].type2 = new AttrType(AttrType.attrSymbol);
+		out_filter_outer_Iterator[0].type1 = new AttrType(AttrType.attrString);
+		out_filter_outer_Iterator[0].operand2.symbol = new FldSpec(new RelSpec(
+				RelSpec.outer), 1);
+		out_filter_outer_Iterator[0].operand1.string = starNode.getLabel();
+		out_filter_outer_Iterator[1] = null;
+
+		Iterator am_outer = new FileScan(nhfName, in1_outer_Iterator,
+				outer_Iterator_str_sizes, (short) 2, 2,
+				outer_Iterator_projlist, out_filter_outer_Iterator);
+
+		IndexNestedLoopsJoins inlj = null;
+		short[] t1_str_sizes, t2_str_sizes;
+		AttrType[] in1;
+		for (int i = 0; i < maxNumberOfEdges; i++) {
+			// System.out.println("i: " + i);
+
+			// Iterator Settings for EdgeHeapFile
+			t2_str_sizes = new short[3];
+			t2_str_sizes[0] = 32;
+			t2_str_sizes[1] = nodeLabelLength;
+			t2_str_sizes[2] = nodeLabelLength;
+
+			AttrType[] in2 = new AttrType[8];
+			in2[0] = new AttrType(AttrType.attrInteger); // Source Node Page No.
+			in2[1] = new AttrType(AttrType.attrInteger); // Source Node Slot No.
+			in2[2] = new AttrType(AttrType.attrInteger); // Destination Node
+															// Page No.
+			in2[3] = new AttrType(AttrType.attrInteger); // Destination Node
+															// Slot No.
+			in2[4] = new AttrType(AttrType.attrString); // Edge Label
+			in2[5] = new AttrType(AttrType.attrInteger); // Edge Weight
+			in2[6] = new AttrType(AttrType.attrString); // Source Node Label
+			in2[7] = new AttrType(AttrType.attrString); // Destination Node
+														// Label
+
+			FldSpec[] inner_projlist = new FldSpec[8];
+			RelSpec outer = new RelSpec(RelSpec.outer);
+			inner_projlist[0] = new FldSpec(outer, 1); // Source Node Page No.
+			inner_projlist[1] = new FldSpec(outer, 2); // Source Node Slot No.
+			inner_projlist[2] = new FldSpec(outer, 3); // Destination Node Page
+														// No.
+			inner_projlist[3] = new FldSpec(outer, 4); // Destination Node Slot
+														// No.
+			inner_projlist[4] = new FldSpec(outer, 5); // Edge Label
+			inner_projlist[5] = new FldSpec(outer, 6); // Edge Weight
+			inner_projlist[6] = new FldSpec(outer, 7); // Source Node Label
+			inner_projlist[7] = new FldSpec(outer, 8); // Destination Node Label
+
+			RelSpec inner_relation = new RelSpec(RelSpec.innerRel);
+			RelSpec outer_relation = new RelSpec(RelSpec.outer);
+
+			// Projections after the first Join Operation
+			FldSpec[] proj_list = new FldSpec[8];
+			proj_list[0] = new FldSpec(inner_relation, 1); // Source Node Page
+															// No.
+			proj_list[1] = new FldSpec(inner_relation, 2); // Source Node Slot
+															// No.
+			proj_list[2] = new FldSpec(inner_relation, 3); // Destination Node
+															// Page No.
+			proj_list[3] = new FldSpec(inner_relation, 4); // Destination Node
+															// Slot No.
+			proj_list[4] = new FldSpec(inner_relation, 5); // Edge Weight
+			proj_list[5] = new FldSpec(inner_relation, 6); // Edge Weight
+			proj_list[6] = new FldSpec(inner_relation, 7); // Source Node Label
+			proj_list[7] = new FldSpec(inner_relation, 8); // Destination Node
+															// Label
+
+			// In the initial run : LHS -> Iterator over Nodes , RHS -> Iterator
+			// over Edges
+
+			try {
+				in1 = new AttrType[2];
+				in1[0] = new AttrType(AttrType.attrString);
+				in1[1] = new AttrType(AttrType.attrDesc);
+
+				t1_str_sizes = new short[1];
+				t1_str_sizes[0] = nodeLabelLength;
+
+				inlj = new IndexNestedLoopsJoins(in1, 2, 1, t1_str_sizes, in2,
+						8, 7, t2_str_sizes, numBuf, am_outer, ehfName,
+						indexEhfSourceNodeName, inner_projlist, null, null,
+						proj_list, 8);
+
+			} catch (Exception e) {
+				System.err.println("*** Error preparing for nested_loop_join");
+				System.err.println("" + e);
+				e.printStackTrace();
+				Runtime.getRuntime().exit(1);
+			}
+
+			in1 = new AttrType[8];
+			in1[0] = new AttrType(AttrType.attrInteger);
+			in1[1] = new AttrType(AttrType.attrInteger);
+			in1[2] = new AttrType(AttrType.attrInteger);
+			in1[3] = new AttrType(AttrType.attrInteger);
+			in1[4] = new AttrType(AttrType.attrString);
+			in1[5] = new AttrType(AttrType.attrInteger);
+			in1[6] = new AttrType(AttrType.attrString);
+			in1[7] = new AttrType(AttrType.attrString);
+
+			t1_str_sizes = new short[3];
+			t1_str_sizes[0] = nodeLabelLength;
+			t1_str_sizes[1] = nodeLabelLength;
+			t1_str_sizes[2] = nodeLabelLength;
+
+			t2_str_sizes = new short[1];
+			t2_str_sizes[0] = nodeLabelLength;
+			in2 = new AttrType[2];
+			in2[0] = new AttrType(AttrType.attrString);
+			in2[1] = new AttrType(AttrType.attrDesc);
+
+			inner_projlist = new FldSpec[2];
+			inner_projlist[0] = new FldSpec(outer_relation, 1);
+			inner_projlist[1] = new FldSpec(outer_relation, 2);
+
+			// Projections after the second Join Operation
+			proj_list[0] = new FldSpec(inner_relation, 1); // Node Label
+			proj_list[1] = new FldSpec(inner_relation, 2); // Descriptor
+
+			try {
+				am_outer = new IndexNestedLoopsJoins(in1, 8, 8, t1_str_sizes,
+						in2, 2, 1, t2_str_sizes, numBuf, inlj, nhfName,
+						indexNodeLabelName, inner_projlist, null, null,
+						proj_list, 2);
+			} catch (Exception e) {
+				System.err.println("*** Error preparing for nested_loop_join");
+				System.err.println("" + e);
+				e.printStackTrace();
+				Runtime.getRuntime().exit(1);
+			}
+			tempTailNodeFileName = "TempTailNodeFile" + i;
+			tempTailNodeFile = new NodeHeapfile(tempTailNodeFileName);
+			tempTailNodeFile.deleteFile();
+			tempTailNodeFile = new NodeHeapfile(tempTailNodeFileName);
+
+			while ((temptu = am_outer.get_next()) != null) {
+				temptu.setHdr((short) 2, tempTypes, tempStrSizes);
+				Tuple tail = new Tuple();
+				Node tempTail = new Node();
+
+				// System.out.println("Label: " + temptu.getStrFld(1));
+				RID rid = (RID) (bi.getNidFromNodeLabel(temptu.getStrFld(1),
+						nodeHeapFile, btfNodeLabel));
+
+				/*
+				 * if (rid == null) System.out.println("RID is null"); else
+				 * System.out.println("RID Page No. : " + rid.pageNo +
+				 * " , RID Slot No. : " + rid.slotNo);
+				 */
+				tail.setHdr((short) 1, new AttrType[] { new AttrType(
+						AttrType.attrId) }, new short[] {});
+				tail.setIDFld(1, rid);
+				tailNodeFile.insertRecord(tail.getTupleByteArray());
+
+				tempTail.setHdr();
+				tempTail.setLabel(temptu.getStrFld(1));
+				tempTail.setDesc(temptu.getDescFld(2));
+
+				tempTailNodeFile.insertNode(temptu.getTupleByteArray());
+			}
+
+			// btfNodeLabel.close();
+			inlj.close();
+			am_outer.close();
+
+			proj_list[0] = new FldSpec(outer_relation, 1); // Node Label
+			proj_list[1] = new FldSpec(outer_relation, 2); // Descriptor
+			am_outer = new NFileScan(tempTailNodeFileName, tempTypes,
+					tempStrSizes, (short) 2, 2, proj_list, null);
+
+		}
+		// ****************************//*
+
+		while ((tu = am_outer.get_next()) != null) {
+			tu.setHdr((short) 2, tempTypes, tempStrSizes);
+			Tuple tail = new Tuple();
+			RID rid = (RID) (bi.getNidFromNodeLabel(tu.getStrFld(1),
+					nodeHeapFile, btfNodeLabel));
+			tail.setHdr((short) 1, new AttrType[] { new AttrType(
+					AttrType.attrId) }, new short[] {});
+			tail.setIDFld(1, rid);
+			tailNodeFile.insertRecord(tail.getTupleByteArray());
+		}
+		// ****************************//*
+		btfNodeLabel.close();
+		inlj.close();
+		am_outer.close();
+		for (int i = 0; i < maxNumberOfEdges; i++) {
+
+			String tempTailEdgeFileName = "TempTailEdgeFile" + i;
+			EdgeHeapFile tempTailEdgeFile = new EdgeHeapFile(tempTailEdgeFileName);
+			tempTailEdgeFile.deleteFile();
+
+		}
+		Iterator tail_iterator = new FileScan("TailNodeFileForPQ3", atrType,
+				str_sizes, (short) 1, 1, tailNodeprojlist, null);
+		/*Tuple t;
+		while ((t = tail_iterator.get_next()) != null) {
+			t.setHdr((short) 1, atrType, str_sizes);
+			RID rid = t.getIDFld(1);
+			t.print(atrType);
+		}*/
+
+		return tail_iterator;
 	}
 
 }
