@@ -157,47 +157,8 @@ public class BatchMapperClass {
 
 	public List<NID> getNidFromDescriptor(String input, NodeHeapfile nhf,
 			ZTreeFile ztf_desc) throws Exception {
-		/*try {
-			List<NID> nidlist = new ArrayList<NID>();
-			NScan newNscan = nhf.openScan();
-			ZTFileScan newScan = ztf_desc.new_scan(null, null);
-			KeyDataEntry newEntry = newScan.get_next();
-
-			while (newEntry != null) {
-				LeafData newData = (LeafData) newEntry.data;
-				RID newRid = newData.getData();
-				NID newNid = new NID(newRid.pageNo, newRid.slotNo);
-				Node newNode = newNscan.getNext(newNid);
-				if (newNode == null) {
-					break;
-				}
-				newNode.setHdr();
-				Descriptor inputDesc = new Descriptor();
-				String[] descInput = input.trim().split(" ");
-				int[] values = new int[5];
-				for (int ctr = 0; ctr < 5; ctr++) {
-					values[ctr] = Integer.parseInt(descInput[ctr]);
-				}
-				inputDesc.set(values[0], values[1], values[2], values[3],
-						values[4]);
-				Descriptor temp = new Descriptor();
-				temp = newNode.getDesc();	
-				if (temp.equal(inputDesc)==1) {
-					//newNode.print();				// to check if we are sending right nodes
-					nidlist.add(newNid);
-				}
-			}
-
-			newScan.DestroyBTreeFileScan();
-			newNscan.closescan();
-			return nidlist;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}*/
 		
 		try {
-			
 			Descriptor inputDesc = new Descriptor();
 			String[] descInput = input.trim().split(" ");
 			int[] values = new int[5];
@@ -230,7 +191,11 @@ public class BatchMapperClass {
 			}
 
 			newScan.DestroyBTreeFileScan();
+			if(nidlist.size() == 0)
+				nidlist.add(new NID(new PageId(-1), -1));
+			
 			return nidlist;
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;

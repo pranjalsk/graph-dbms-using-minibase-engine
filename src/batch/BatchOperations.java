@@ -687,9 +687,10 @@ public class BatchOperations {
 
 						} else if (qtype == 3) {
 							
-							//TODO
-							// pathexpressionquery3
-							
+							pq.pathExpressQuery3(pathexp, nhf, ehf,
+									btf_edge_src_label, btf_node_label,
+									ztf_node_desc, (short) numBuf,
+									nodeLabelLength);							
 
 						} else if (qtype == 4) {
 
