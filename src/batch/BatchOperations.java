@@ -76,7 +76,7 @@ public class BatchOperations {
 			BufferedReader br = new BufferedReader(new InputStreamReader(
 					System.in));
 			System.out.println("\n\t\tList of Operations");
-			System.out.println("-------------------------------------------------------------------");
+			System.out.println("--------------------------------------------------------------------");
 			System.out.println("1) batchnodeinsert <file_path> <GraphDB_name>");
 			System.out.println("2) batchedgeinsert <file_path> <GraphDB_name>");
 			System.out.println("3) batchnodedelete <file_path> <GraphDB_name>");
