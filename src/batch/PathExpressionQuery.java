@@ -299,8 +299,10 @@ public class PathExpressionQuery {
 				pathExprQuery1Result.insertRecord(headTailPair
 						.getTupleByteArray());
 			}
+			
 			tailNodeIds.close();
-
+			Heapfile tailNodeFile = new Heapfile("TailNodeFileForPQ1");
+			tailNodeFile.deleteFile();
 		}
 
 		switch (type) {
@@ -339,7 +341,6 @@ public class PathExpressionQuery {
 		NodeHeapfile nhf = new NodeHeapfile(nhfName);
 
 		Heapfile pathExprQuery2Result = new Heapfile("pathExprQuery2Result");
-		// DummyHeadTailPair hadTailPair = new DummyHeadTailPair(64);
 
 		for (int i = 0; i < objExpList.size(); i++) {
 			Object[] expression = objExpList.get(i);
@@ -389,6 +390,8 @@ public class PathExpressionQuery {
 						.getTupleByteArray());
 			}
 			tailNodeIds.close();
+			Heapfile tailNodeFile = new Heapfile("TailNodeFileForPQ2");
+			tailNodeFile.deleteFile();
 
 		}
 		switch (type) {
