@@ -235,8 +235,8 @@ public class PathExpressionQuery {
 		List<AttrType[]> attrTypeList = new ArrayList<AttrType[]>();
 		List<Object[]> objExpList = new ArrayList<Object[]>();
 
-		int type = parsr.pathExpressionQuery1Parser(objExpList, attrTypeList,
-				pathExpression, btf_node_label, nhfRef, ztf_node_desc);
+		int type = parsr.pathExpressionQuery3Parser(objExpList, attrTypeList,
+				pathExpression, nhfRef, ztf_node_desc, btf_node_label);
 
 		PathExpression pathExp = new PathExpression();
 
@@ -245,13 +245,12 @@ public class PathExpressionQuery {
 		
 		boolean isMaxWtBound = false;
 		AttrType[] dummyAttr = attrTypeList.get(0);
-		if(dummyAttr[1].attrType == AttrType.attrInteger){
+		if(dummyAttr[1].attrType == AttrType.attrString){
 			isMaxWtBound = true;
 		}
 		for (int i = 0; i < objExpList.size(); i++) {
 
 			Object[] expression = objExpList.get(i);
-			AttrType[] attr = attrTypeList.get(i);
 			Iterator tailNodeIds = null;
 			if(isMaxWtBound){
 				tailNodeIds = pathExp.pathExpress3_2(expression, 

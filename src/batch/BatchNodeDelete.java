@@ -57,8 +57,12 @@ public class BatchNodeDelete {
 				deleteStatus = nhf.deleteRecord(newNid);
 				NID nidToDel = new NID();
 				nidToDel.copyNid(currentNid);
+<<<<<<< HEAD
 				nidlist.add(nidToDel);
 			
+=======
+				nidlist.add(currentNid);
+>>>>>>> 0e615b15da5c813240b0df9931757dbd01278f7b
 
 				// Delete all edges associated with the node
 				/*EID newEid = new EID();
@@ -101,7 +105,10 @@ public class BatchNodeDelete {
 				ztfNodeDesc.Delete(descKey, nidToDel);
 				btfNodeLbl.Delete(lblKey, nidToDel);
 			}//end-while
+<<<<<<< HEAD
 			//System.out.println(nidlist);
+=======
+>>>>>>> 0e615b15da5c813240b0df9931757dbd01278f7b
 			
 			//Deleting the edges of the deleted nodes
 			EID newEid = new EID();
@@ -129,9 +136,13 @@ public class BatchNodeDelete {
 				
 				NID sourceNID = newEdge.getSource();
 				NID destinationNID = newEdge.getDestination();
+<<<<<<< HEAD
 			//	System.out.println(sourceNID+ " "+ destinationNID);
 				if(checkIfContains(nidlist, sourceNID) || checkIfContains(nidlist, destinationNID)) {
 					//System.out.println("reached inside if ");
+=======
+				if(nidlist.contains(sourceNID) || nidlist.contains(destinationNID)) {
+>>>>>>> 0e615b15da5c813240b0df9931757dbd01278f7b
 					deleteStatus = ehf.deleteRecord(newEid);
 					btfEdgeLabl.Delete(edgelblKey, currentEid);
 					btfEdgeWt.Delete(edgeWtKey, currentEid);
