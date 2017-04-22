@@ -24,6 +24,28 @@ public class SystemDefs {
 	public SystemDefs(String dbname, int num_pgs, int bufpoolsize,
 			String replacement_policy) {
 		int logsize;
+		
+		String real_logname = new String(dbname);
+		String real_dbname = new String(dbname);
+
+		if (num_pgs == 0) {
+			logsize = 500;
+		} else {
+			logsize = 3 * num_pgs;
+		}
+
+		if (replacement_policy == null) {
+			replacement_policy = new String("Clock");
+		}
+
+		init(real_dbname, real_logname, num_pgs, logsize, bufpoolsize,
+				replacement_policy);
+	}
+	
+	public SystemDefs(String dbname, int num_pgs, int bufpoolsize,
+			String replacement_policy, boolean flag) {
+		int logsize;
+		MINIBASE_RESTART_FLAG = flag;
 
 		String real_logname = new String(dbname);
 		String real_dbname = new String(dbname);
@@ -84,7 +106,7 @@ public class SystemDefs {
 			try {
 				JavabaseDB.openDB(dbname, num_pgs);
 				JavabaseBM.flushAllPages();
-				MINIBASE_RESTART_FLAG = true;
+				
 			} catch (Exception e) {
 				System.err.println("" + e);
 				e.printStackTrace();

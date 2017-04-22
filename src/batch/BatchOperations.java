@@ -1,9 +1,12 @@
 package batch;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -66,6 +69,8 @@ public class BatchOperations {
 		graphDBName = sc.next();
 		initGraphDB(graphDBName);
 		GraphDB gdb = new GraphDB(0, graphDBName);
+		System.out.println(SystemDefs.MINIBASE_RESTART_FLAG);
+		
 
 		/*
 		 * Menu Driven Program (CUI for Batch operations) Enter the task name of
@@ -656,46 +661,22 @@ public class BatchOperations {
 
 	}
 
-	public static void initGraphDB(String db_name) {
+	public static void initGraphDB(String db_name) throws IOException {
 
-		dbpath = "/tmp/" + db_name + System.getProperty("user.name")
+		String home = System.getProperty("user.home");
+		dbpath = home+ "/dbs/" + db_name + System.getProperty("user.name")
 				+ ".minibase-db";
-		logpath = "/tmp/" + db_name + System.getProperty("user.name")
-				+ ".minibase-log";
 
-		SystemDefs sysdef = new SystemDefs(dbpath, 10000, 500, "Clock");
-		// Kill anything that might be hanging around
-		String newdbpath;
-		String newlogpath;
-		String remove_logcmd;
-		String remove_dbcmd;
-		String remove_cmd = "/bin/rm -rf ";
-
-		newdbpath = dbpath;
-		newlogpath = logpath;
-
-		remove_logcmd = remove_cmd + logpath;
-		remove_dbcmd = remove_cmd + dbpath;
-
-		// Commands here is very machine dependent. We assume
-		// user are on UNIX system here
-		try {
-			Runtime.getRuntime().exec(remove_logcmd);
-			Runtime.getRuntime().exec(remove_dbcmd);
-		} catch (IOException e) {
-			System.err.println("IO error: " + e);
+		boolean flag = true;
+		try{
+			RandomAccessFile fp =new RandomAccessFile(dbpath, "r");
+			fp.close();
+		}
+		catch(Exception e){
+			flag = false;
 		}
 
-		//
-		// remove_logcmd = remove_cmd + newlogpath;
-		// remove_dbcmd = remove_cmd + newdbpath;
-		//
-		// try {
-		// Runtime.getRuntime().exec(remove_logcmd);
-		// Runtime.getRuntime().exec(remove_dbcmd);
-		// } catch (IOException e) {
-		// System.err.println("IO error: " + e);
-		// }
-
+		SystemDefs sysdef = new SystemDefs(dbpath, 10000, 500, "Clock", flag);	
+	
 	}
 }
