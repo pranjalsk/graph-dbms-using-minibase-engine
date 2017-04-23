@@ -180,11 +180,19 @@ public class BatchMapperClass {
 			while ((newEntry = newScan.get_next()) != null) {
 				LeafData newData = (LeafData) newEntry.data;				
 				RID newRid = newData.getData();
-				Tuple t = new Tuple();
-				t.setHdr((short)1, new AttrType[] {new AttrType(AttrType.attrId)}, new short[] {});
-				t.setIDFld(1, newRid);
-				newhf.insertRecord(t.getTupleByteArray());
-				flag = true;
+				
+				NID newNid = new NID(newRid.pageNo, newRid.slotNo);
+				Node newNode = nhf.getRecord(newNid);
+				newNode.setHdr();
+				
+				Descriptor temp = newNode.getDesc();
+				if (temp.equal(inputDesc)==1) {
+					Tuple t = new Tuple();
+					t.setHdr((short)1, new AttrType[] {new AttrType(AttrType.attrId)}, new short[] {});
+					t.setIDFld(1, newRid);
+					newhf.insertRecord(t.getTupleByteArray());
+					flag = true;
+				}				
 			}
 
 			newScan.DestroyBTreeFileScan();
