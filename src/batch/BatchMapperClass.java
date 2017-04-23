@@ -12,6 +12,10 @@ import edgeheap.*;
 import nodeheap.*;
 import global.*;
 import heap.*;
+import iterator.FileScan;
+import iterator.FldSpec;
+import iterator.Iterator;
+import iterator.RelSpec;
 import zindex.*;
 import zindex.DescriptorKey;
 import btree.*;
@@ -155,7 +159,7 @@ public class BatchMapperClass {
 //		}
 //	}
 
-	public List<NID> getNidFromDescriptor(String input, NodeHeapfile nhf,
+	public Iterator getNidFromDescriptor(String input, NodeHeapfile nhf,
 			ZTreeFile ztf_desc) throws Exception {
 		
 		try {
@@ -167,34 +171,42 @@ public class BatchMapperClass {
 			}
 			inputDesc.set(values[0], values[1], values[2], values[3],
 					values[4]);
-			
-			List<NID> nidlist = new ArrayList<NID>();
-			//NScan newNscan = nhf.openScan();
+
+			Heapfile newhf = new Heapfile("NIDheapfile");
+			boolean flag = false;
 			ZTFileScan newScan = ztf_desc.new_scan(null, null);
 			KeyDataEntry newEntry = null;
 
 			while ((newEntry = newScan.get_next()) != null) {
-				LeafData newData = (LeafData) newEntry.data;
-				
+				LeafData newData = (LeafData) newEntry.data;				
 				RID newRid = newData.getData();
-				NID newNid = new NID(newRid.pageNo, newRid.slotNo);
-				Node newNode = nhf.getRecord(newNid);
-				newNode.setHdr();
-				
-				Descriptor temp = new Descriptor();
-				temp = newNode.getDesc();	
-				if (temp.equal(inputDesc)==1) {
-//					System.out.print(newNid+":");
-//					newNode.print();				// to check if we are sending right nodes
-					nidlist.add(newNid);
-				}
+				Tuple t = new Tuple();
+				t.setHdr((short)1, new AttrType[] {new AttrType(AttrType.attrId)}, new short[] {});
+				t.setIDFld(1, newRid);
+				newhf.insertRecord(t.getTupleByteArray());
+				flag = true;
 			}
 
 			newScan.DestroyBTreeFileScan();
-			if(nidlist.size() == 0)
-				nidlist.add(new NID(new PageId(-1), -1));
+			if(!flag){
+				RID newRID = new RID(new PageId(-1), -1);
+				Tuple t = new Tuple();
+				t.setHdr((short)1, new AttrType[] {new AttrType(AttrType.attrId)}, new short[] {});
+				t.setIDFld(1, newRID);
+				newhf.insertRecord(t.getTupleByteArray());
+			}
+			short[] str_sizes = new short[0];
 			
-			return nidlist;
+			AttrType[] atrType = new AttrType[1];
+			atrType[0] = new AttrType(AttrType.attrId);
+
+			FldSpec[] projlist = new FldSpec[1];
+			projlist[0] = new FldSpec(new RelSpec(RelSpec.outer), 1);
+
+			Iterator iter = new FileScan("NIDheapfile", atrType,
+					str_sizes, (short) 1, 1, projlist, null);
+
+			return iter;
 			
 		} catch (Exception e) {
 			e.printStackTrace();

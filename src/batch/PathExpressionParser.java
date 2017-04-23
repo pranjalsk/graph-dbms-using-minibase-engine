@@ -3,20 +3,28 @@ package batch;
 import global.AttrType;
 import global.Descriptor;
 import global.NID;
+import global.PageId;
+import global.RID;
+import heap.Heapfile;
+import heap.Tuple;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import iterator.FileScan;
+import iterator.FldSpec;
+import iterator.Iterator;
+import iterator.RelSpec;
 import zindex.ZTreeFile;
 import btree.BTreeFile;
 import nodeheap.NodeHeapfile;
 
 public class PathExpressionParser {
 
-	public int pathExpressionQuery1Parser(List<Object[]> objExpList,
-			List<AttrType[]> attrTypeList, String inputPathExpression,
+	public int pathExpressionQuery1Parser(Iterator niditer, Object[] objExpList,
+			AttrType[] attrTypeList, String inputPathExpression,
 			BTreeFile btf_node, NodeHeapfile nhf, ZTreeFile ztf_desc)
 			throws Exception {
 		int [] type = new int[1];
@@ -26,59 +34,67 @@ public class PathExpressionParser {
 		// Finding the list of NIDs corresponding to the headnode
 		BatchMapperClass batchinsert = new BatchMapperClass();
 		String headnode = pathExpression.get(0)[1];
-		List<NID> nidlist = null;
+
+		/* Check if the NN is a string label or descriptor
+		 * Set iterator over the NIDs returned by the BatchMapper class
+		 */
 		if (headnode.matches("\\d+\\s?\\d+\\s?\\d+\\s?\\d+\\s?\\d+")) {
-			nidlist = batchinsert.getNidFromDescriptor(headnode, nhf, ztf_desc); 
+			niditer = batchinsert.getNidFromDescriptor(headnode, nhf, ztf_desc); 
 		} else {
-			nidlist = new ArrayList<NID>();
-			nidlist.add(batchinsert.getNidFromNodeLabel(headnode, nhf, btf_node));
+			NID newnid = batchinsert.getNidFromNodeLabel(headnode, nhf, btf_node);
+			Heapfile newhf = new Heapfile("NIDheapfile");
+			RID newrid = new RID(new PageId(newnid.pageNo.pid), newnid.slotNo);
+			Tuple newtuple = new Tuple();
+			newtuple.setHdr((short)1, new AttrType[] {new AttrType(AttrType.attrId)}, new short[] {});
+			newtuple.setIDFld(1, newrid);
+			newhf.insertRecord(newtuple.getTupleByteArray());
+			short[] str_sizes = new short[0];
+			
+			AttrType[] atrType = new AttrType[1];
+			atrType[0] = new AttrType(AttrType.attrId);
+
+			FldSpec[] projlist = new FldSpec[1];
+			projlist[0] = new FldSpec(new RelSpec(RelSpec.outer), 1);
+
+			niditer = new FileScan("NIDheapfile", atrType,
+					str_sizes, (short) 1, 1, projlist, null);
 		}
 		
-		
-		if(nidlist.get(0).pageNo.pid == -1 && nidlist.get(0).slotNo == -1) {
-			objExpList.add(null);
-			attrTypeList.add(null);
-			return type[0];
-		}
+
 		
 		int i;
 		int n = pathExpression.size();
 
-		Object[] objectArray = new Object[n];
-		AttrType[] attrArray = new AttrType[n];
+		objExpList = new Object[n];
+		attrTypeList = new AttrType[n];
 
-		objectArray[0] = null;
-		attrArray[0] = new AttrType(AttrType.attrInteger);
+		objExpList[0] = null;
+		attrTypeList[0] = new AttrType(AttrType.attrId);
+		
+		
 		for (i = 1; i < n; i++) {
 			String input = pathExpression.get(i)[1];
 			if (input.matches("\\d+\\s?\\d+\\s?\\d+\\s?\\d+\\s?\\d+")) {
 				String[] descInput = input.trim().split(" ");
-				objectArray[i] = new Descriptor();
+				objExpList[i] = new Descriptor();
 				int[] values = new int[5];
 				for (int ctr = 0; ctr < 5; ctr++) {
 					values[ctr] = Integer.parseInt(descInput[ctr]);
 				}
-				((Descriptor) objectArray[i]).set(values[0], values[1],
+				((Descriptor) objExpList[i]).set(values[0], values[1],
 						values[2], values[3], values[4]);
-				attrArray[i] = new AttrType(AttrType.attrDesc);
+				attrTypeList[i] = new AttrType(AttrType.attrDesc);
 			} else {
-				objectArray[i] = input.trim();
-				attrArray[i] = new AttrType(AttrType.attrString);
+				objExpList[i] = input.trim();
+				attrTypeList[i] = new AttrType(AttrType.attrString);
 			}
 		}
 
-		for (i = 0; i < nidlist.size(); i++) {
-			Object[] finalObjectArray = new Object[n];
-			System.arraycopy(objectArray, 0, finalObjectArray, 0, n);
-			finalObjectArray[0] = nidlist.get(i);
-			objExpList.add(finalObjectArray);
-			attrTypeList.add(attrArray);
-		}
 		return type[0];
 	}
 
-	public int pathExpressionQuery2Parser(List<Object[]> objExpList,
-			List<AttrType[]> attrTypeList, String inputPathExpression, NodeHeapfile nhf, ZTreeFile ztf_desc, BTreeFile btf_node) throws Exception {
+	public int pathExpressionQuery2Parser(Iterator niditer, Object[] objExpList,
+			AttrType[] attrTypeList, String inputPathExpression, NodeHeapfile nhf, ZTreeFile ztf_desc, BTreeFile btf_node) throws Exception {
 		int [] type = new int[1];
 		
 		List<String[]> pathExpression = splitPathExpression(inputPathExpression, type);
@@ -86,51 +102,55 @@ public class PathExpressionParser {
 		// Finding the list of NIDs corresponding to the headnode
 		BatchMapperClass batchinsert = new BatchMapperClass();
 		String headnode = pathExpression.get(0)[1];
-		List<NID> nidlist = null;
+		
+		/* Check if the NN is a string label or descriptor
+		 * Set iterator over the NIDs returned by the BatchMapper class
+		 */
 		if (headnode.matches("\\d+\\s?\\d+\\s?\\d+\\s?\\d+\\s?\\d+")) {
-			nidlist = batchinsert.getNidFromDescriptor(headnode, nhf, ztf_desc); 
+			niditer = batchinsert.getNidFromDescriptor(headnode, nhf, ztf_desc); 
 		} else {
-			nidlist = new ArrayList<NID>();
-			nidlist.add(batchinsert.getNidFromNodeLabel(headnode, nhf, btf_node));
-		}
-		
-		
-		if(nidlist.get(0).pageNo.pid == -1 && nidlist.get(0).slotNo == -1) {
-			objExpList.add(null);
-			attrTypeList.add(null);
-			return type[0];
+			NID newnid = batchinsert.getNidFromNodeLabel(headnode, nhf, btf_node);
+			Heapfile newhf = new Heapfile("NIDheapfile");
+			RID newrid = new RID(new PageId(newnid.pageNo.pid), newnid.slotNo);
+			Tuple newtuple = new Tuple();
+			newtuple.setHdr((short)1, new AttrType[] {new AttrType(AttrType.attrId)}, new short[] {});
+			newtuple.setIDFld(1, newrid);
+			newhf.insertRecord(newtuple.getTupleByteArray());
+			short[] str_sizes = new short[0];
+			
+			AttrType[] atrType = new AttrType[1];
+			atrType[0] = new AttrType(AttrType.attrId);
+
+			FldSpec[] projlist = new FldSpec[1];
+			projlist[0] = new FldSpec(new RelSpec(RelSpec.outer), 1);
+
+			niditer = new FileScan("NIDheapfile", atrType,
+					str_sizes, (short) 1, 1, projlist, null);
 		}
 		
 		int i;
 		int n = pathExpression.size();
 
-		Object[] objectArray = new Object[n];
-		AttrType[] attrArray = new AttrType[n];
+		objExpList = new Object[n];
+		attrTypeList = new AttrType[n];
 
-		objectArray[0] = null;
-		attrArray[0] = new AttrType(AttrType.attrInteger);
+		objExpList[0] = null;
+		attrTypeList[0] = new AttrType(AttrType.attrId);
 		for (i = 1; i < n; i++) {
 			String input = pathExpression.get(i)[1].trim();
 			if (pathExpression.get(i)[0].equals("EL")) {								
-				objectArray[i] = input;				
-				attrArray[i] = new AttrType(AttrType.attrString);
+				objExpList[i] = input;				
+				attrTypeList[i] = new AttrType(AttrType.attrString);
 			} else {
-				objectArray[i] = Integer.parseInt(input);
-				attrArray[i] = new AttrType(AttrType.attrInteger);
+				objExpList[i] = Integer.parseInt(input);
+				attrTypeList[i] = new AttrType(AttrType.attrInteger);
 			}
-		}
-		for (i = 0; i < nidlist.size(); i++) {
-			Object[] finalObjectArray = new Object[n];
-			System.arraycopy(objectArray, 0, finalObjectArray, 0, n);
-			finalObjectArray[0] = nidlist.get(i);
-			objExpList.add(finalObjectArray);
-			attrTypeList.add(attrArray);
 		}
 		return type[0];
 	}
 
-	public int pathExpressionQuery3Parser(List<Object[]> objExpList,
-			List<AttrType[]> attrTypeList, String inputPathExpression, NodeHeapfile nhf, ZTreeFile ztf_desc, BTreeFile btf_node) throws Exception {
+	public int pathExpressionQuery3Parser(Iterator niditer, Object[] objExpList,
+			AttrType[] attrTypeList, String inputPathExpression, NodeHeapfile nhf, ZTreeFile ztf_desc, BTreeFile btf_node) throws Exception {
 		int [] type = new int[1];
 		
 		List<String[]> pathExpression = splitPathExpression(inputPathExpression, type);
@@ -138,45 +158,47 @@ public class PathExpressionParser {
 		// Finding the list of NIDs corresponding to the headnode
 		BatchMapperClass batchinsert = new BatchMapperClass();
 		String headnode = pathExpression.get(0)[1];
-		List<NID> nidlist = null;
-		if (headnode.matches("\\d+\\s?\\d+\\s?\\d+\\s?\\d+\\s?\\d+")) {
-			nidlist = batchinsert.getNidFromDescriptor(headnode, nhf, ztf_desc); 
-		} else {
-			nidlist = new ArrayList<NID>();
-			nidlist.add(batchinsert.getNidFromNodeLabel(headnode, nhf, btf_node));
-		}		
 		
-		if(nidlist.get(0).pageNo.pid == -1 && nidlist.get(0).slotNo == -1) {
-			objExpList.add(null);
-			attrTypeList.add(null);
-			return type[0];
+		/* Check if the NN is a string label or descriptor
+		 * Set iterator over the NIDs returned by the BatchMapper class
+		 */
+		if (headnode.matches("\\d+\\s?\\d+\\s?\\d+\\s?\\d+\\s?\\d+")) {
+			niditer = batchinsert.getNidFromDescriptor(headnode, nhf, ztf_desc); 
 		}
+		else {
+			NID newnid = batchinsert.getNidFromNodeLabel(headnode, nhf, btf_node);
+			Heapfile newhf = new Heapfile("NIDheapfile");
+			RID newrid = new RID(new PageId(newnid.pageNo.pid), newnid.slotNo);
+			Tuple newtuple = new Tuple();
+			newtuple.setHdr((short)1, new AttrType[] {new AttrType(AttrType.attrId)}, new short[] {});
+			newtuple.setIDFld(1, newrid);
+			newhf.insertRecord(newtuple.getTupleByteArray());
+			short[] str_sizes = new short[0];
+			
+			AttrType[] atrType = new AttrType[1];
+			atrType[0] = new AttrType(AttrType.attrId);
 
-		int i;
-		//int n = pathExpression.size();
+			FldSpec[] projlist = new FldSpec[1];
+			projlist[0] = new FldSpec(new RelSpec(RelSpec.outer), 1);
 
-		Object[] objectArray = new Object[2];
-		AttrType[] attrArray = new AttrType[2];
+			niditer = new FileScan("NIDheapfile", atrType,
+					str_sizes, (short) 1, 1, projlist, null);
+		}		
 
-		objectArray[0] = null;
-		attrArray[0] = new AttrType(AttrType.attrInteger);
-		//for (i = 1; i < n; i++) {
+		objExpList = new Object[2];
+		attrTypeList = new AttrType[2];
+
+		objExpList[0] = null;
+		attrTypeList[0] = new AttrType(AttrType.attrId);
 		String input = pathExpression.get(1)[1].trim();
 		if (pathExpression.get(1)[0].equals("MNE")) {								
-			objectArray[1] = Integer.parseInt(input);				
-			attrArray[1] = new AttrType(AttrType.attrInteger);
-		} else {
-			objectArray[1] = Integer.parseInt(input);	
-			attrArray[1] = new AttrType(AttrType.attrString);
+			objExpList[1] = Integer.parseInt(input);				
+			attrTypeList[1] = new AttrType(AttrType.attrInteger);
 		}
-		//}
-		for (i = 0; i < nidlist.size(); i++) {
-			Object[] finalObjectArray = new Object[2];
-			System.arraycopy(objectArray, 0, finalObjectArray, 0, 2);
-			finalObjectArray[0] = nidlist.get(i);
-			objExpList.add(finalObjectArray);
-			attrTypeList.add(attrArray);
-		}
+		else {
+			objExpList[1] = Integer.parseInt(input);	
+			attrTypeList[1] = new AttrType(AttrType.attrString);
+		}		
 		return type[0];
 	}
 	
@@ -239,5 +261,4 @@ public class PathExpressionParser {
 		}
 		return map;
 	}
-
 }
