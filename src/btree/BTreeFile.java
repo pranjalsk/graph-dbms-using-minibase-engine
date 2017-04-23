@@ -1042,7 +1042,7 @@ public class BTreeFile extends IndexFile
       KeyDataEntry curEntry;
       
       pageno = headerPage.get_rootId();
-      
+      //System.out.println("pageno: "+pageno.pid);
       if (pageno.pid == INVALID_PAGE){        // no pages in the BTREE
         pageLeaf = null;                // should be handled by 
         // startrid =INVALID_PAGEID ;             // the caller
@@ -1074,7 +1074,7 @@ public class BTreeFile extends IndexFile
 	}
 	
 	unpinPage(pageno);
-	
+	//System.out.println("prevpageno: "+prevpageno.pid);
 	pageno = prevpageno;
 	page=pinPage(pageno);
 	sortPage=new BTSortedPage(page, headerPage.get_keyType()); 
@@ -1100,7 +1100,7 @@ public class BTreeFile extends IndexFile
 	  // oops, no more records, so set this scan to indicate this.
 	  return null;
 	}
-	
+	//System.out.println("nextpageno: "+nextpageno.pid);
 	pageno = nextpageno; 
 	pageLeaf=  new BTLeafPage( pinPage(pageno), headerPage.get_keyType());    
 	curEntry=pageLeaf.getFirst(startrid);

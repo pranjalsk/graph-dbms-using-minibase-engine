@@ -6,12 +6,14 @@ import nodeheap.*;
 import heap.*;
 
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.HashSet;
 
 import zindex.DescriptorKey;
 import zindex.ZTreeFile;
 
 import btree.*;
+
 
 
 public class GraphDB extends DB {
@@ -26,6 +28,9 @@ public class GraphDB extends DB {
 	public BTreeFile btf_edge_src_label;
 	public BTreeFile btf_edge_dest_label;
 	public int type;
+	public String dbpath;
+	public SystemDefs sysdef;
+	
 	
 	/**
 	 *  Creates a new database of the db_name passed as argument 
@@ -63,6 +68,24 @@ public class GraphDB extends DB {
 			HFDiskMgrException, IOException, GetFileEntryException,
 			ConstructPageException, AddFileEntryException, KeyTooLongException, KeyNotMatchException, LeafInsertRecException, IndexInsertRecException, UnpinPageException, PinPageException, NodeNotMatchException, ConvertException, DeleteRecException, IndexSearchException, IteratorException, LeafDeleteException, InsertException, InvalidTupleSizeException, heap.FieldNumberOutOfBoundException {
 
+		super();
+		
+		String home = System.getProperty("user.home");
+		dbpath = home+ "/dbs/" + graphDBName + System.getProperty("user.name")
+				+ ".minibase-db";
+
+		boolean flag = true;
+		try{
+			RandomAccessFile fp1 =new RandomAccessFile(dbpath, "r");
+			fp1.close();
+		}
+		catch(Exception e){
+			flag = false;
+		}
+
+		sysdef = new SystemDefs(dbpath, 10000, 500, "Clock", flag);	
+		
+		
 		this.type = type;
 		
 		int keyTypeString = AttrType.attrString;

@@ -10,9 +10,9 @@ public class DB implements GlobalConst {
 
 	private static final int bits_per_page = MAX_SPACE * 8;
 	
-	private RandomAccessFile fp;
-	private int num_pages;
-	private String name;
+	public RandomAccessFile fp;
+	public int num_pages;
+	public String name;
 	/**
 	 * Open the database with the given name.
 	 * 
@@ -154,7 +154,7 @@ public class DB implements GlobalConst {
 	 */
 	public void read_page(PageId pageno, Page apage)
 			throws InvalidPageNumberException, FileIOException, IOException {
-
+		//System.out.println("num_pages: "+num_pages);
 		if ((pageno.pid < 0) || (pageno.pid >= num_pages))
 			throw new InvalidPageNumberException(null, "BAD_PAGE_NUMBER");
 

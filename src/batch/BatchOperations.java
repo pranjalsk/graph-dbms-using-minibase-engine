@@ -67,16 +67,10 @@ public class BatchOperations {
 		Scanner sc = new Scanner(System.in);
 		System.out.println("Enter Graph DB name:");
 		graphDBName = sc.next();
-		initGraphDB(graphDBName);
-		GraphDB gdb = new GraphDB(0, graphDBName);
+		//initGraphDB(graphDBName);
+		gdb = new GraphDB(0, graphDBName);
 		System.out.println(SystemDefs.MINIBASE_RESTART_FLAG);
 		
-
-		/*
-		 * Menu Driven Program (CUI for Batch operations) Enter the task name of
-		 * your choice Enter the input file path Enter the GraphDB name Call the
-		 * appropriate class methods according to the task number
-		 */
 		do {
 			BufferedReader br = new BufferedReader(new InputStreamReader(
 					System.in));
@@ -89,6 +83,7 @@ public class BatchOperations {
 			System.out.println("5) nodequery <GraphDB_name> <buffersize> <qtype> <index>");
 			System.out.println("6) edgequery <GraphDB_name> <buffersize> <qtype> <index>");
 			System.out.println("7) pathquery <GraphDB_name> <buffersize> <PathExpressionString>");
+			System.out.println("8) Exit");
 			System.out.println("--------------------------------------------------------------------");
 			
 			String commandLineInvocation = br.readLine().trim();
@@ -98,6 +93,7 @@ public class BatchOperations {
 			int taskNumber = 0;
 
 			if (taskName.equalsIgnoreCase("exit")) {
+				//gdb.sysdef.JavabaseDB.closeDB();
 				System.exit(0);
 			} else {
 
@@ -627,6 +623,8 @@ public class BatchOperations {
 						btf_node_label.close();
 						btf_edge_label.close();
 						btf_edge_weight.close();
+						btf_edge_src_label.close();
+						btf_edge_dest_label.close();
 						// ztf_node_desc.close();
 
 						printStatistics(gdb, nhf, ehf);
