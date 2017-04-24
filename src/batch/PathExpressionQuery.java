@@ -128,8 +128,9 @@ public class PathExpressionQuery {
 			tailNodeIds.close();
 			Heapfile tailNodeFile = new Heapfile("TailNodeFileForPQ1");
 			tailNodeFile.deleteFile();
+			
 		}
-		sourceNIDs.close();
+		parsr.niditer.close();
 		Heapfile sourceNIDfile = new Heapfile("NIDheapfile");
 		sourceNIDfile.deleteFile();
 		switch (type) {

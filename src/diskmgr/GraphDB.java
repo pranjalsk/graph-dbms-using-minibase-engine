@@ -13,6 +13,10 @@ import zindex.DescriptorKey;
 import zindex.ZTreeFile;
 
 import btree.*;
+import bufmgr.HashEntryNotFoundException;
+import bufmgr.InvalidFrameNumberException;
+import bufmgr.PageUnpinnedException;
+import bufmgr.ReplacerException;
 
 
 
@@ -63,10 +67,14 @@ public class GraphDB extends DB {
 	 * @throws InsertException
 	 * @throws InvalidTupleSizeException
 	 * @throws heap.FieldNumberOutOfBoundException
+	 * @throws ReplacerException 
+	 * @throws HashEntryNotFoundException 
+	 * @throws InvalidFrameNumberException 
+	 * @throws PageUnpinnedException 
 	 */
 	public GraphDB(int type, String graphDBName) throws HFException, HFBufMgrException,
 			HFDiskMgrException, IOException, GetFileEntryException,
-			ConstructPageException, AddFileEntryException, KeyTooLongException, KeyNotMatchException, LeafInsertRecException, IndexInsertRecException, UnpinPageException, PinPageException, NodeNotMatchException, ConvertException, DeleteRecException, IndexSearchException, IteratorException, LeafDeleteException, InsertException, InvalidTupleSizeException, heap.FieldNumberOutOfBoundException {
+			ConstructPageException, AddFileEntryException, KeyTooLongException, KeyNotMatchException, LeafInsertRecException, IndexInsertRecException, UnpinPageException, PinPageException, NodeNotMatchException, ConvertException, DeleteRecException, IndexSearchException, IteratorException, LeafDeleteException, InsertException, InvalidTupleSizeException, heap.FieldNumberOutOfBoundException, PageUnpinnedException, InvalidFrameNumberException, HashEntryNotFoundException, ReplacerException {
 
 		super();
 		
@@ -99,6 +107,7 @@ public class GraphDB extends DB {
 		ztf_node_desc = new ZTreeFile("IndZtree_"+graphDBName);
 		btf_edge_src_label = new BTreeFile("IndEdgeSrcLabel_"+graphDBName, keyTypeString, 32, 0);
 		btf_edge_dest_label = new BTreeFile("IndEdgeDestLabel_"+graphDBName, keyTypeString, 32, 0);
+		
 	}
 
 	//Methods to create index files

@@ -68,7 +68,7 @@ public class BatchOperations {
 		System.out.println("Enter Graph DB name:");
 		graphDBName = sc.next();
 //		initGraphDB(graphDBName);
-		GraphDB gdb = new GraphDB(0, graphDBName);
+		gdb = new GraphDB(0, graphDBName);
 		System.out.println(SystemDefs.MINIBASE_RESTART_FLAG);
 		
 
@@ -590,8 +590,6 @@ public class BatchOperations {
 						ZTreeFile ztf_node_desc = new ZTreeFile("zBTFile");
 						BTreeFile btf_edge_src_label = new BTreeFile(
 								"IndEdgeSrcLabel_" + graphDBName);
-						BTreeFile btf_edge_dest_label = new BTreeFile(
-								"IndEdgeDestLabel_" + graphDBName);
 
 						if (qtype == 1) {
 
@@ -615,8 +613,8 @@ public class BatchOperations {
 
 						} else if (qtype == 4) {
 
-							pq.triangleQuery(pathexp, gdb.nhf.get_fileName(),
-									gdb.ehf.get_fileName(),
+							pq.triangleQuery(pathexp, nhf.get_fileName(),
+									ehf.get_fileName(),
 									btf_edge_src_label.get_fileName(),
 									btf_node_label.get_fileName(),
 									(short) numBuf, nodeLabelLength);
@@ -627,7 +625,8 @@ public class BatchOperations {
 						btf_node_label.close();
 						btf_edge_label.close();
 						btf_edge_weight.close();
-						// ztf_node_desc.close();
+						btf_edge_src_label.close();
+						ztf_node_desc.close();
 
 						printStatistics(gdb, nhf, ehf);
 					} catch (Exception e) {
