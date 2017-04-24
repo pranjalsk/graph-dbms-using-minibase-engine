@@ -39,8 +39,10 @@ public class PathExpressionParser {
 		 * Set iterator over the NIDs returned by the BatchMapper class
 		 */
 		if (headnode.matches("\\d+\\s?\\d+\\s?\\d+\\s?\\d+\\s?\\d+")) {
+			System.out.println("Reached1");
 			niditer = batchinsert.getNidFromDescriptor(headnode, nhf, ztf_desc); 
 		} else {
+			System.out.println("Reached2");
 			NID newnid = batchinsert.getNidFromNodeLabel(headnode, nhf, btf_node);
 			Heapfile newhf = new Heapfile("NIDheapfile");
 			RID newrid = new RID(new PageId(newnid.pageNo.pid), newnid.slotNo);
