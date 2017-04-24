@@ -181,13 +181,12 @@ public class PathExpression {
 
 			TupleOrder order = new TupleOrder(TupleOrder.Ascending);
 			try {
-				Iterator nodeIndexScan = new IndexScan(new IndexType(
-						IndexType.B_Index), nhfName, indexNodeLabelName, in2,
-						t2_str_sizes, 2, 2, inner_projlist, null, 1, false);
-				am_outer = new SortMerge(in1, 6, t1_str_sizes, in2, 2,
-						t2_str_sizes, 6, nodeLabelLength, 1, nodeLabelLength,
-						numBuf, inlj, nodeIndexScan, false, true, order,
-						outFilter, outer_projlist, outer_projlist.length);
+//				Iterator nodeIndexScan = new IndexScan(new IndexType(
+//						IndexType.B_Index), nhfName, indexNodeLabelName, in2,
+//						t2_str_sizes, 2, 2, inner_projlist, null, 1, false);
+				am_outer = new IndexNestedLoopsJoins(in1, 6, 6, t1_str_sizes, in2, 2,
+						1,t2_str_sizes, numBuf, inlj, nhfName, indexNodeLabelName, inner_projlist,
+						outFilter,null, outer_projlist, outer_projlist.length);
 			} catch (Exception e) {
 				System.err.println("*** Error preparing for nested_loop_join");
 				System.err.println("" + e);
