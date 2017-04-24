@@ -167,6 +167,7 @@ public class NestedLoopsJoins extends Iterator {
 				if (inner != null) // If this not the first time,
 				{
 					// close scan
+					((Scan)inner).closescan();
 					inner = null;
 				}
 
@@ -179,7 +180,7 @@ public class NestedLoopsJoins extends Iterator {
 				if ((outer_tuple = outer.get_next()) == null) {
 					done = true;
 					if (inner != null) {
-
+						((Scan)inner).closescan();
 						inner = null;
 					}
 

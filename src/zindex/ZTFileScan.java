@@ -52,11 +52,15 @@ public class ZTFileScan extends IndexFileScan implements GlobalConst {
 	 * @throws IteratorException
 	 * @throws UnpinPageException
 	 * @throws IOException
+	 * @throws ReplacerException 
+	 * @throws HashEntryNotFoundException 
+	 * @throws InvalidFrameNumberException 
+	 * @throws PageUnpinnedException 
 	 */
 	public ZTFileScan(KeyClass lowKey, KeyClass highKey)
 			throws GetFileEntryException, PinPageException,
 			ConstructPageException, KeyNotMatchException, IteratorException,
-			UnpinPageException, IOException {
+			UnpinPageException, IOException, PageUnpinnedException, InvalidFrameNumberException, HashEntryNotFoundException, ReplacerException {
 		zBTFile = new BTreeFile("zBTFile");
 		rangeScan = false;
 		if (lowKey instanceof DescriptorKey && highKey instanceof DescriptorKey) {
@@ -68,7 +72,7 @@ public class ZTFileScan extends IndexFileScan implements GlobalConst {
 		} else {
 			bScan = zBTFile.new_scan(lowKey, highKey);
 		}
-
+		zBTFile.close();
 	}
 
 	/**
@@ -79,10 +83,14 @@ public class ZTFileScan extends IndexFileScan implements GlobalConst {
 	 * @throws GetFileEntryException
 	 * @throws PinPageException
 	 * @throws ConstructPageException
+	 * @throws ReplacerException 
+	 * @throws HashEntryNotFoundException 
+	 * @throws InvalidFrameNumberException 
+	 * @throws PageUnpinnedException 
 	 */
 	public ZTFileScan(KeyClass target, int distance)
 			throws GetFileEntryException, PinPageException,
-			ConstructPageException {
+			ConstructPageException, PageUnpinnedException, InvalidFrameNumberException, HashEntryNotFoundException, ReplacerException {
 		zBTFile = new BTreeFile("zBTFile");
 		rangeScan = true;
 		this.target = target;
@@ -102,6 +110,7 @@ public class ZTFileScan extends IndexFileScan implements GlobalConst {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		zBTFile.close();
 	}
 
 	/**

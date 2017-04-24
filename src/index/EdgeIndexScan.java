@@ -269,6 +269,14 @@ public class EdgeIndexScan extends Iterator {
 	 */
 	public void close() throws IOException, IndexException {
 		if (!closeFlag) {
+			if (indFile instanceof BTreeFile) {
+				try {
+					((BTreeFile) indFile).close();
+				} catch (Exception e) {
+					throw new IndexException(e,
+							"BTree error in closing index file.");
+				}
+			}
 			if (indScan instanceof BTFileScan) {
 				try {
 					((BTFileScan) indScan).DestroyBTreeFileScan();

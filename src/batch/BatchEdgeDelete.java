@@ -14,7 +14,7 @@ import global.*;
 public class BatchEdgeDelete {
 
 	public void deleteBatchEdge(EdgeHeapFile ehf, NodeHeapfile nhf,
-			BTreeFile btf_node, BTreeFile btfEdgeLabl, BTreeFile btfEdgeWt,
+			BTreeFile btf_node, BTreeFile btfEdgeLabl, BTreeFile btfEdgeWt,BTreeFile btf_edge_src_label ,BTreeFile btf_edge_dest_label, 
 			String filePath) throws Exception {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(filePath));
@@ -44,8 +44,12 @@ public class BatchEdgeDelete {
 						deletedEdge.setHdr();
 						String edgelbl = deletedEdge.getLabel();
 						int edgeWt = deletedEdge.getWeight();
+						String edgeSrcLbl = deletedEdge.getSourceLabel();
+						String edgeDestLbl = deletedEdge.getDestLabel();
 						KeyClass edgelblKey = new StringKey(edgelbl);
 						KeyClass edgeWtKey = new IntegerKey(edgeWt);
+						KeyClass edgSrcKey = new StringKey(edgeSrcLbl);
+						KeyClass edgeDestKey = new StringKey(edgeDestLbl);
 
 						try {
 							boolean deleteStatus = ehf.deleteRecord(newEid);
@@ -56,6 +60,8 @@ public class BatchEdgeDelete {
 
 						btfEdgeLabl.Delete(edgelblKey, currentEid);
 						btfEdgeWt.Delete(edgeWtKey, currentEid);
+						btf_edge_src_label.Delete(edgSrcKey, currentEid);
+						btf_edge_dest_label.Delete(edgeDestKey, currentEid);
 					}
 
 				}

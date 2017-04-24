@@ -83,10 +83,9 @@ public class NodeQueryWithIndex {
 		IndexType indType = new IndexType(1);
 		try {
 			NScan nscan = nhf.openScan();
-			node = nscan.getNext(nid);
 			String targetnodeLabel;
 
-			while (node != null) {
+			while ((node = nscan.getNext(nid)) != null) {
 				node.setHdr();
 				targetnodeLabel = node.getLabel();
 				expr[0].op = new AttrOperator(AttrOperator.aopEQ);
@@ -112,7 +111,6 @@ public class NodeQueryWithIndex {
 							+ nodeDescriptor.get(3) + " , "
 							+ nodeDescriptor.get(4) + "]");
 				}
-				node = nscan.getNext(nid);
 				nIscan.close();
 			}
 			nscan.closescan();
@@ -199,7 +197,7 @@ public class NodeQueryWithIndex {
 			double distance) {
 
 		String nodeHeapFileName = nhf.get_fileName();
-		String nodeIndexFileName = "";
+		String nodeIndexFileName = ztf_Descriptor.get_fileName();
 		AttrType[] attrType = new AttrType[2];
 		short[] stringSize = new short[1];
 		stringSize[0] = nodeLabelLength;
@@ -243,6 +241,7 @@ public class NodeQueryWithIndex {
 						+ nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4)
 						+ "]");
 			}
+
 			nIscan.close();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -271,7 +270,7 @@ public class NodeQueryWithIndex {
 			double distance) {
 
 		String nodeHeapFileName = nhf.get_fileName();
-		String nodeIndexFileName = "";
+		String nodeIndexFileName = ztf_Descriptor.get_fileName();
 		AttrType[] attrType = new AttrType[2];
 		short[] stringSize = new short[1];
 		stringSize[0] = nodeLabelLength;
@@ -510,7 +509,7 @@ public class NodeQueryWithIndex {
 		expr[0].operand1.attrDesc = targetDescriptor;
 		expr[1] = null;
 
-		Iterator nIscan = new IndexScan(new IndexType(IndexType.Z_Index),
+		Iterator nIscan = new NodeIndexScan(new IndexType(IndexType.Z_Index),
 				nodeHeapFileName, ztf_Descriptor.get_fileName(), attrType,
 				stringSize, 2, 2, projlist, expr, 2, false);
 

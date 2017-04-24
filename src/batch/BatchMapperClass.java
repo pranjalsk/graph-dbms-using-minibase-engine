@@ -117,12 +117,14 @@ public class BatchMapperClass {
 						&& newEdge.getDestination().equals(destinationNID)) {
 					// currentEID.copyEID(newEid);
 					newScan.DestroyBTreeFileScan();
+					newEscan.closescan();
 					// return currentEID;
 					return newEid;
 				}
 				newEntry = newScan.get_next();
 			}
 			newScan.DestroyBTreeFileScan();
+			newEscan.closescan();
 			return new EID(new PageId(-1), -1);
 
 		} catch (Exception e) {
@@ -154,13 +156,21 @@ public class BatchMapperClass {
 			while ((newEntry = newScan.get_next()) != null) {
 				LeafData newData = (LeafData) newEntry.data;				
 				RID newRid = newData.getData();
-				Tuple t = new Tuple();
-				t.setHdr((short)1, new AttrType[] {new AttrType(AttrType.attrId)}, new short[] {});
-				t.setIDFld(1, newRid);
-				newhf.insertRecord(t.getTupleByteArray());
-				flag = true;
+				
+				NID newNid = new NID(newRid.pageNo, newRid.slotNo);
+				Node newNode = nhf.getRecord(newNid);
+				newNode.setHdr();
+				
+				Descriptor temp = newNode.getDesc();
+				if (temp.equal(inputDesc)==1) {
+					Tuple t = new Tuple();
+					t.setHdr((short)1, new AttrType[] {new AttrType(AttrType.attrId)}, new short[] {});
+					t.setIDFld(1, newRid);
+					newhf.insertRecord(t.getTupleByteArray());
+					flag = true;
+				}				
 			}
-
+			
 			newScan.DestroyBTreeFileScan();
 			if(!flag){
 				RID newRID = new RID(new PageId(-1), -1);
@@ -176,7 +186,6 @@ public class BatchMapperClass {
 
 			FldSpec[] projlist = new FldSpec[1];
 			projlist[0] = new FldSpec(new RelSpec(RelSpec.outer), 1);
-
 			Iterator iter = new FileScan("NIDheapfile", atrType,
 					str_sizes, (short) 1, 1, projlist, null);
 

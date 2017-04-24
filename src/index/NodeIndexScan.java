@@ -127,7 +127,7 @@ public class NodeIndexScan extends Iterator {
 			break;
 		case IndexType.Z_Index:
 			try {
-				indFile = new ZTreeFile("zBTFile");
+				indFile = new ZTreeFile(indName);
 			} catch (GetFileEntryException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -294,6 +294,22 @@ public class NodeIndexScan extends Iterator {
 	 */
 	public void close() throws IOException, IndexException {
 		if (!closeFlag) {
+			if (indFile instanceof BTreeFile) {
+				try {
+					((BTreeFile) indFile).close();
+				} catch (Exception e) {
+					throw new IndexException(e,
+							"BTree error in closing index file.");
+				}
+			}
+			if (indFile instanceof ZTreeFile) {
+				try {
+					((ZTreeFile) indFile).close();
+				} catch (Exception e) {
+					throw new IndexException(e,
+							"ZTree error in closing index file.");
+				}
+			}
 			if (indScan instanceof BTFileScan) {
 				try {
 					((BTFileScan) indScan).DestroyBTreeFileScan();

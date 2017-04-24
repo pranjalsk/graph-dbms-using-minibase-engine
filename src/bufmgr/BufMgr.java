@@ -506,7 +506,7 @@ public class BufMgr implements GlobalConst{
 	  throw new ReplacerException (null, "BUFMGR: REPLACER_ERROR.");  
 	  
 	}
-	
+
 	if ((frmeTable[frameNo].pageNo.pid != INVALID_PAGE)
 	    && (frmeTable[frameNo].dirty == true) ) {
 	  needwrite = 1;
@@ -534,7 +534,7 @@ public class BufMgr implements GlobalConst{
 	if (needwrite == 1) {	
 	  write_page(oldpageNo, apage);	 	
 	} // end of needwrite..
-	
+
 	// read in the page if not empty
 	if (emptyPage == false){
 	  try {
@@ -594,11 +594,10 @@ public class BufMgr implements GlobalConst{
 	   HashEntryNotFoundException, 
 	   InvalidFrameNumberException
     {
-      
       int frameNo;
       
       frameNo=hashTable.lookup(PageId_in_a_DB);
-      
+
       if (frameNo<0){
 	throw new HashEntryNotFoundException (null, "BUFMGR: HASH_NOT_FOUND.");
       }
