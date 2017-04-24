@@ -63,15 +63,6 @@ public class BatchOperations {
 	static HashSet<String> hs;
 
 	public static void main(String[] args) throws Exception {
-
-		Scanner sc = new Scanner(System.in);
-		System.out.println("Enter Graph DB name:");
-		graphDBName = sc.next();
-//		initGraphDB(graphDBName);
-		gdb = new GraphDB(0, graphDBName);
-		System.out.println(SystemDefs.MINIBASE_RESTART_FLAG);
-		
-
 		/*
 		 * Menu Driven Program (CUI for Batch operations) Enter the task name of
 		 * your choice Enter the input file path Enter the GraphDB name Call the
@@ -123,25 +114,11 @@ public class BatchOperations {
 
 					// ---------------------------------
 					filePath = inputArguments[1];
-					String inputGraphDBName = inputArguments[2];
-					while (!graphDBName.equals(inputGraphDBName)) {
-						System.out
-								.println("Wrong graph db name enter graph db name again");
-						System.out.println("Graph DB name: ");
-						Scanner sc1 = new Scanner(System.in);
-						inputGraphDBName = sc1.next();
-					}
+					graphDBName = inputArguments[2];					
 
-				} else if (taskNumber == 14) {
-					String inputGraphDBName = inputArguments[1];
-					while (!graphDBName.equals(inputGraphDBName)) {
-						System.out
-								.println("Wrong graph db name; enter graph db name again");
-						System.out.println("Graph DB name: ");
-						Scanner sc1 = new Scanner(System.in);
-						inputGraphDBName = sc1.next();
-					}
-
+				} 
+				else if (taskNumber == 14) {				
+					graphDBName = inputArguments[1];
 					numBuf = Integer.parseInt(inputArguments[2]);
 					qtype = Integer.parseInt(inputArguments[3]);
 					index = Integer.parseInt(inputArguments[4]);
@@ -161,7 +138,8 @@ public class BatchOperations {
 
 						targetDescriptor = new Descriptor();
 						targetDescriptor.set(d1, d2, d3, d4, d5);
-					} else if (qtype == 3 || qtype == 5) {
+					} 
+					else if (qtype == 3 || qtype == 5) {
 						d1 = Integer.parseInt(inputArguments[5]);
 						d2 = Integer.parseInt(inputArguments[6]);
 						d3 = Integer.parseInt(inputArguments[7]);
@@ -171,18 +149,14 @@ public class BatchOperations {
 						targetDescriptor = new Descriptor();
 						targetDescriptor.set(d1, d2, d3, d4, d5);
 						distance = dist;
-					} else if (qtype == 4) {
+					} 
+					else if (qtype == 4) {
 						targetLabel = inputArguments[5];
 					}
-				} else if (taskNumber == 15) {
-					String inputGraphDBName = inputArguments[1];
-					while (!graphDBName.equals(inputGraphDBName)) {
-						System.out
-								.println("Wrong graph db name; enter graph db name again");
-						System.out.println("Graph DB name: ");
-						Scanner sc1 = new Scanner(System.in);
-						inputGraphDBName = sc1.next();
-					}
+				} 
+				
+				else if (taskNumber == 15) {
+					graphDBName = inputArguments[1];
 					numBuf = Integer.parseInt(inputArguments[2]);
 					qtype = Integer.parseInt(inputArguments[3]);
 					index = Integer.parseInt(inputArguments[4]);
@@ -190,32 +164,20 @@ public class BatchOperations {
 						edgeWtBound1 = Integer.parseInt(inputArguments[5]);
 						edgeWtBound2 = Integer.parseInt(inputArguments[6]);
 					}
-				} else if (taskNumber == 32) {
+				} 
+				
+				else if (taskNumber == 32) {
 					
 					List<String> list = new ArrayList<String>();
 					Matcher m1 = Pattern.compile("([^\"]\\S*|\".+?\")\\s*").matcher(commandLineInvocation);
 					while (m1.find())
 					    list.add(m1.group(1)); 			
 
-//					System.out.println(list);
-					
-					String inputGraphDBName = list.get(1);
-					while (!graphDBName.equals(inputGraphDBName)) {
-						System.out
-								.println("Wrong graph db name; enter graph db name again");
-						System.out.println("Graph DB name: ");
-						Scanner sc1 = new Scanner(System.in);
-						inputGraphDBName = sc1.next();
-					}
+					graphDBName = list.get(1);
 					numBuf = Integer.parseInt(list.get(2));
 					pathexp = list.get(3).substring(1, list.get(3).length()-1); // to remove surrounding quotes.
-					
-//					System.out.println(pathexp);
-//					System.out.println(numBuf);
-//					System.out.println(inputGraphDBName);	
-					
-					Pattern p = Pattern
-							.compile("([PT]Q)(\\d)?(\\w)\\s?[:>]\\s?(.*)");
+
+					Pattern p = Pattern.compile("([PT]Q)(\\d)?(\\w)\\s?[:>]\\s?(.*)");
 					Matcher m = p.matcher(pathexp);
 
 					while (m.find()) {
@@ -229,6 +191,8 @@ public class BatchOperations {
 					}
 
 				}
+				gdb = new GraphDB(0, graphDBName);
+				System.out.println(SystemDefs.MINIBASE_RESTART_FLAG);
 				System.out.println("tasknumber" + taskNumber);
 
 				switch (taskNumber) {
@@ -649,24 +613,5 @@ public class BatchOperations {
 		System.out
 				.println("Number of pages written :" + PCounter.getWCounter());
 
-	}
-
-	public static void initGraphDB(String db_name) throws IOException {
-
-		String home = System.getProperty("user.home");
-		dbpath = home+ "/dbs/" + db_name + System.getProperty("user.name")
-				+ ".minibase-db";
-
-		boolean flag = true;
-		try{
-			RandomAccessFile fp =new RandomAccessFile(dbpath, "r");
-			fp.close();
-		}
-		catch(Exception e){
-			flag = false;
-		}
-
-		SystemDefs sysdef = new SystemDefs(dbpath, 10000, 500, "Clock", flag);	
-	
 	}
 }
