@@ -635,8 +635,6 @@ public class BatchOperations {
 			} // else
 
 			PCounter.initialize();
-			System.out.println("Reached>>>>>>>"+gdb.sysdef.JavabaseBM.getNumBuffers());
-			System.out.println("Reached>>>>>>>"+gdb.sysdef.JavabaseBM.getNumUnpinnedBuffers());
 			gdb.sysdef.JavabaseBM.flushAllPages();
 		} while (true);
 	}// main

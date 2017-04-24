@@ -65,7 +65,6 @@ public class NodeQuery {
 				node.setHdr();
 				nodeLabel = node.getLabel();
 				nodeDescriptor = node.getDesc();
-				System.out.print("NID:" + nid);
 				System.out.println(" Label: " + nodeLabel + " , Descriptor: ["
 						+ nodeDescriptor.get(0) + " , " + nodeDescriptor.get(1)
 						+ " , " + nodeDescriptor.get(2) + " , "
