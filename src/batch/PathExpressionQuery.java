@@ -770,14 +770,14 @@ public class PathExpressionQuery {
 
 		TupleOrder order = new TupleOrder(TupleOrder.Ascending);
 		EFileScan efscan1 = null;
-		EFileScan efscan2 = null;
+//		EFileScan efscan2 = null;
 		Iterator sm = null;
 
 		try {
 			efscan1 = new EFileScan(ehfName, attrType, s1_sizes, (short) 8, 8,
 					inputProjList, null);
-			efscan2 = new EFileScan(ehfName, attrType, s1_sizes, (short) 8, 8,
-					inputProjList, null);
+//			efscan2 = new EFileScan(ehfName, attrType, s1_sizes, (short) 8, 8,
+//					inputProjList, null);
 			sm = new NestedLoopsJoins(attrType, 8, s1_sizes, attrType, 8,
 					s1_sizes, numBuf, efscan1, ehfName, expr, null,
 					outputProjList, outputProjList.length);
@@ -888,14 +888,14 @@ public class PathExpressionQuery {
 
 		try {
 
-			efscan2 = new EFileScan(ehfName, attrType, s2_sizes, (short) 8, 8,
-					inputProjList, null);
+//			efscan2 = new EFileScan(ehfName, attrType, s2_sizes, (short) 8, 8,
+//					inputProjList, null);
 
-			/*
-			 * sm = new NestedLoopsJoins(jtype, 8, s1_sizes, attrType, 8,
-			 * s2_sizes, numBuf, am1, ehfName, expr, null, outputProjList,
-			 * outputProjList.length);
-			 */
+			
+//			 sm = new NestedLoopsJoins(jtype, 8, s1_sizes, attrType, 8,
+//			  s2_sizes, numBuf, am1, ehfName, expr, null, outputProjList,
+//			  outputProjList.length);
+			 
 			sm = new IndexNestedLoopsJoins(jtype, 8, 8, s1_sizes, attrType, 8,
 					7, s2_sizes, (short) numBuf, am1, ehfName,
 					indexEhfSourceNodeName, inputProjList, expr, null,

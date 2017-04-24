@@ -117,12 +117,14 @@ public class BatchMapperClass {
 						&& newEdge.getDestination().equals(destinationNID)) {
 					// currentEID.copyEID(newEid);
 					newScan.DestroyBTreeFileScan();
+					newEscan.closescan();
 					// return currentEID;
 					return newEid;
 				}
 				newEntry = newScan.get_next();
 			}
 			newScan.DestroyBTreeFileScan();
+			newEscan.closescan();
 			return new EID(new PageId(-1), -1);
 
 		} catch (Exception e) {

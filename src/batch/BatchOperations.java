@@ -348,7 +348,8 @@ public class BatchOperations {
 						btf_edge_label.close();
 						btf_edge_weight.close();
 						ztf_node_desc.close();
-
+						btf_edge_src_label.close();
+						btf_edge_dest_label.close();
 						printStatistics(gdb, nhf, ehf);
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -370,14 +371,20 @@ public class BatchOperations {
 								"IndEdgeLabel_" + graphDBName);
 						BTreeFile btf_edge_weight = new BTreeFile(
 								"IndEdgeWeight_" + graphDBName);
+						BTreeFile btf_edge_src_label = new BTreeFile(
+								"IndEdgeSrcLabel_" + graphDBName);
+						BTreeFile btf_edge_dest_label = new BTreeFile(
+								"IndEdgeDestLabel_" + graphDBName);
 
 						newEdgeDelete.deleteBatchEdge(ehf, nhf, btf_node_label,
-								btf_edge_label, btf_edge_weight, filePath);
+								btf_edge_label, btf_edge_weight,btf_edge_src_label, btf_edge_dest_label, filePath);
 
 						// close all files
 						btf_node_label.close();
 						btf_edge_label.close();
 						btf_edge_weight.close();
+						btf_edge_src_label.close();
+						btf_edge_dest_label.close();
 
 						printStatistics(gdb, nhf, ehf);
 					} catch (Exception e) {
@@ -398,10 +405,6 @@ public class BatchOperations {
 								+ graphDBName);
 						BTreeFile btf_node_label = new BTreeFile(
 								"IndNodeLabel_" + graphDBName);
-						BTreeFile btf_edge_label = new BTreeFile(
-								"IndEdgeLabel_" + graphDBName);
-						BTreeFile btf_edge_weight = new BTreeFile(
-								"IndEdgeWeight_" + graphDBName);
 						ZTreeFile ztf_node_desc = new ZTreeFile("zBTFile");
 
 						try {
@@ -460,16 +463,16 @@ public class BatchOperations {
 								}
 							}
 
-							// close all files
-							btf_node_label.close();
-							btf_edge_label.close();
-							btf_edge_weight.close();
-							ztf_node_desc.close();
+							
 
-							printStatistics(gdb, nhf, ehf);
+							
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
+						// close all files
+						btf_node_label.close();
+						ztf_node_desc.close();
+						printStatistics(gdb, nhf, ehf);
 					} catch (Exception e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -493,12 +496,6 @@ public class BatchOperations {
 								"IndEdgeLabel_" + graphDBName);
 						BTreeFile btf_edge_weight = new BTreeFile(
 								"IndEdgeWeight_" + graphDBName);
-						ZTreeFile ztf_node_desc = new ZTreeFile("zBTFile");
-						BTreeFile btf_edge_src_label = new BTreeFile(
-								"IndEdgeSrcLabel_" + graphDBName);
-						BTreeFile btf_edge_dest_label = new BTreeFile(
-								"IndEdgeDestLabel_" + graphDBName);
-
 						try {
 							// heapfile scan
 							if (index == 0) {
@@ -583,10 +580,6 @@ public class BatchOperations {
 								+ graphDBName);
 						BTreeFile btf_node_label = new BTreeFile(
 								"IndNodeLabel_" + graphDBName);
-						BTreeFile btf_edge_label = new BTreeFile(
-								"IndEdgeLabel_" + graphDBName);
-						BTreeFile btf_edge_weight = new BTreeFile(
-								"IndEdgeWeight_" + graphDBName);
 						ZTreeFile ztf_node_desc = new ZTreeFile("zBTFile");
 						BTreeFile btf_edge_src_label = new BTreeFile(
 								"IndEdgeSrcLabel_" + graphDBName);
@@ -623,8 +616,6 @@ public class BatchOperations {
 
 						// close all files
 						btf_node_label.close();
-						btf_edge_label.close();
-						btf_edge_weight.close();
 						btf_edge_src_label.close();
 						ztf_node_desc.close();
 
@@ -644,7 +635,9 @@ public class BatchOperations {
 			} // else
 
 			PCounter.initialize();
-
+			System.out.println("Reached>>>>>>>"+gdb.sysdef.JavabaseBM.getNumBuffers());
+			System.out.println("Reached>>>>>>>"+gdb.sysdef.JavabaseBM.getNumUnpinnedBuffers());
+			gdb.sysdef.JavabaseBM.flushAllPages();
 		} while (true);
 	}// main
 

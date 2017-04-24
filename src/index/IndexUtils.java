@@ -2,6 +2,10 @@ package index;
 
 import global.*;
 import btree.*;
+import bufmgr.HashEntryNotFoundException;
+import bufmgr.InvalidFrameNumberException;
+import bufmgr.PageUnpinnedException;
+import bufmgr.ReplacerException;
 import iterator.*;
 
 import java.io.*;
@@ -223,7 +227,7 @@ public class IndexUtils {
 	public static ZTFileScan ZTree_scan(CondExpr[] selects, IndexFile indFile) throws IOException, UnknownKeyTypeException,
 	InvalidSelectionException, KeyNotMatchException,
 	UnpinPageException, PinPageException, IteratorException,
-	ConstructPageException, GetFileEntryException{
+	ConstructPageException, GetFileEntryException, PageUnpinnedException, InvalidFrameNumberException, HashEntryNotFoundException, ReplacerException{
 		
 		IndexFileScan indScan;
 

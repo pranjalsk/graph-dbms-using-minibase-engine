@@ -108,6 +108,13 @@ public class GraphDB extends DB {
 		btf_edge_src_label = new BTreeFile("IndEdgeSrcLabel_"+graphDBName, keyTypeString, 32, 0);
 		btf_edge_dest_label = new BTreeFile("IndEdgeDestLabel_"+graphDBName, keyTypeString, 32, 0);
 		
+		btf_node_label.close();
+		btf_edge_label.close();
+		btf_edge_weight.close();
+		ztf_node_desc.close();
+		btf_edge_src_label.close();
+		btf_edge_dest_label.close();
+		
 	}
 
 	//Methods to create index files

@@ -204,11 +204,15 @@ public class ZTreeFile extends IndexFile implements GlobalConst {
 	 * @throws IteratorException
 	 * @throws UnpinPageException
 	 * @throws IOException
+	 * @throws ReplacerException 
+	 * @throws HashEntryNotFoundException 
+	 * @throws InvalidFrameNumberException 
+	 * @throws PageUnpinnedException 
 	 */
 	public ZTFileScan new_scan(KeyClass lo_key, KeyClass hi_key)
 			throws GetFileEntryException, PinPageException,
 			ConstructPageException, KeyNotMatchException, IteratorException,
-			UnpinPageException, IOException {
+			UnpinPageException, IOException, PageUnpinnedException, InvalidFrameNumberException, HashEntryNotFoundException, ReplacerException {
 		return new ZTFileScan(lo_key, hi_key);
 
 	}
@@ -227,11 +231,15 @@ public class ZTreeFile extends IndexFile implements GlobalConst {
 	 * @throws IteratorException
 	 * @throws UnpinPageException
 	 * @throws IOException
+	 * @throws ReplacerException 
+	 * @throws HashEntryNotFoundException 
+	 * @throws InvalidFrameNumberException 
+	 * @throws PageUnpinnedException 
 	 */
 	public ZTFileScan new_scan(KeyClass target, int distance)
 			throws GetFileEntryException, PinPageException,
 			ConstructPageException, KeyNotMatchException, IteratorException,
-			UnpinPageException, IOException {
+			UnpinPageException, IOException, PageUnpinnedException, InvalidFrameNumberException, HashEntryNotFoundException, ReplacerException {
 		return new ZTFileScan(target, distance);
 
 	}

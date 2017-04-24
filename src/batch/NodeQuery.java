@@ -65,8 +65,8 @@ public class NodeQuery {
 				node.setHdr();
 				nodeLabel = node.getLabel();
 				nodeDescriptor = node.getDesc();
-				System.out.print("NID:"+nid);
-				System.out.println( " Label: " + nodeLabel + " , Descriptor: ["
+				System.out.print("NID:" + nid);
+				System.out.println(" Label: " + nodeLabel + " , Descriptor: ["
 						+ nodeDescriptor.get(0) + " , " + nodeDescriptor.get(1)
 						+ " , " + nodeDescriptor.get(2) + " , "
 						+ nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4)
@@ -172,53 +172,27 @@ public class NodeQuery {
 		TupleOrder[] order = new TupleOrder[2];
 		order[0] = new TupleOrder(TupleOrder.Ascending);
 		order[1] = new TupleOrder(TupleOrder.Descending);
-		// Map<Double, Node> distanceToNodeMap = new TreeMap<Double, Node>();
-		// try {
-		// NFileScan nfscan = new NFileScan(nodeHeapFileName, attrType,
-		// stringSize, (short) 2, 2, projlist, expr);
-		// String nodeLabel;
-		// Descriptor nodeDescriptor;
-		// Node node = new Node();
-		// Tuple t;
-		// t = nfscan.get_next();
-		// while (t != null) {
-		// node.nodeInit(t.getTupleByteArray(), t.getOffset());
-		// node.setHdr();
-		// nodeLabel = node.getLabel();
-		// nodeDescriptor = node.getDesc();
-		// double distanceFromTar = nodeDescriptor.distance(targetDescriptor);
-		// distanceToNodeMap.put(distanceFromTar,new Node( node));
-		// t = nfscan.get_next();
-		// }
-		// for(double dist: distanceToNodeMap.keySet()){
-		// node = distanceToNodeMap.get(dist);
-		// nodeLabel = node.getLabel();
-		// nodeDescriptor = node.getDesc();
-		// System.out.println("Label: "+nodeLabel + " , Descriptor: [" +
-		// nodeDescriptor.get(0) + " , " + nodeDescriptor.get(1) + " , "
-		// + nodeDescriptor.get(2) + " , " + nodeDescriptor.get(3) + " , " +
-		// nodeDescriptor.get(4)+"]");
-		// }
-		// nfscan.close();
-		//
-		// }
-		// catch(Exception e){
-		// e.printStackTrace();
-		// }
-		Node node = new Node();
+		Map<Double, Node> distanceToNodeMap = new TreeMap<Double, Node>();
 		try {
 			NFileScan nfscan = new NFileScan(nodeHeapFileName, attrType,
 					stringSize, (short) 2, 2, projlist, expr);
-			Sort sort = new Sort(attrType, (short) 2, stringSize, nfscan, 2,
-					order[0], 20, numBuf, distance, targetDescriptor);
 			String nodeLabel;
 			Descriptor nodeDescriptor;
+			Node node = new Node();
 			Tuple t;
-			t = sort.get_next();
-
+			t = nfscan.get_next();
 			while (t != null) {
 				node.nodeInit(t.getTupleByteArray(), t.getOffset());
 				node.setHdr();
+				nodeLabel = node.getLabel();
+				nodeDescriptor = node.getDesc();
+				double distanceFromTar = nodeDescriptor
+						.distance(targetDescriptor);
+				distanceToNodeMap.put(distanceFromTar, new Node(node));
+				t = nfscan.get_next();
+			}
+			for (double dist : distanceToNodeMap.keySet()) {
+				node = distanceToNodeMap.get(dist);
 				nodeLabel = node.getLabel();
 				nodeDescriptor = node.getDesc();
 				System.out.println("Label: " + nodeLabel + " , Descriptor: ["
@@ -226,14 +200,30 @@ public class NodeQuery {
 						+ " , " + nodeDescriptor.get(2) + " , "
 						+ nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4)
 						+ "]");
-				t = sort.get_next();
 			}
 			nfscan.close();
-			sort.close();
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		/*
+		 * Node node = new Node(); try { NFileScan nfscan = new
+		 * NFileScan(nodeHeapFileName, attrType, stringSize, (short) 2, 2,
+		 * projlist, expr); Sort sort = new Sort(attrType, (short) 2,
+		 * stringSize, nfscan, 2, order[0], 20, numBuf, distance,
+		 * targetDescriptor); String nodeLabel; Descriptor nodeDescriptor; Tuple
+		 * t; t = sort.get_next();
+		 * 
+		 * while (t != null) { node.nodeInit(t.getTupleByteArray(),
+		 * t.getOffset()); node.setHdr(); nodeLabel = node.getLabel();
+		 * nodeDescriptor = node.getDesc(); System.out.println("Label: " +
+		 * nodeLabel + " , Descriptor: [" + nodeDescriptor.get(0) + " , " +
+		 * nodeDescriptor.get(1) + " , " + nodeDescriptor.get(2) + " , " +
+		 * nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4) + "]"); t =
+		 * sort.get_next(); } nfscan.close(); sort.close();
+		 * 
+		 * } catch (Exception e) { e.printStackTrace(); }
+		 */
 	}
 
 	/**
@@ -452,19 +442,22 @@ public class NodeQuery {
 	 *            Target Descriptor
 	 * @param distance
 	 *            Target Distance
-	 * @throws Exception 
-	 * @throws UnknownKeyTypeException 
-	 * @throws UnknowAttrType 
-	 * @throws LowMemException 
-	 * @throws SortException 
-	 * @throws PredEvalException 
-	 * @throws PageNotReadException 
-	 * @throws IndexException 
-	 * @throws JoinsException 
+	 * @throws Exception
+	 * @throws UnknownKeyTypeException
+	 * @throws UnknowAttrType
+	 * @throws LowMemException
+	 * @throws SortException
+	 * @throws PredEvalException
+	 * @throws PageNotReadException
+	 * @throws IndexException
+	 * @throws JoinsException
 	 */
 	public void query5(NodeHeapfile nhf, EdgeHeapFile ehf,
 			BTreeFile btf_node_label, short nodeLabelLength, short numBuf,
-			Descriptor targetDescriptor, double distance) throws JoinsException, IndexException, PageNotReadException, PredEvalException, SortException, LowMemException, UnknowAttrType, UnknownKeyTypeException, Exception {
+			Descriptor targetDescriptor, double distance)
+			throws JoinsException, IndexException, PageNotReadException,
+			PredEvalException, SortException, LowMemException, UnknowAttrType,
+			UnknownKeyTypeException, Exception {
 		String nodeHeapFileName = nhf.get_fileName();
 
 		AttrType[] attrType = new AttrType[2];
@@ -562,7 +555,6 @@ public class NodeQuery {
 						+ "] Outgoing edge: " + tu.getStrFld(3));
 			}
 		}
-		nfscan.close();
 		am.close();
 	}
 
