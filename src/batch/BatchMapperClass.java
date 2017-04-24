@@ -194,7 +194,7 @@ public class BatchMapperClass {
 					flag = true;
 				}				
 			}
-
+			
 			newScan.DestroyBTreeFileScan();
 			if(!flag){
 				RID newRID = new RID(new PageId(-1), -1);
@@ -210,7 +210,7 @@ public class BatchMapperClass {
 
 			FldSpec[] projlist = new FldSpec[1];
 			projlist[0] = new FldSpec(new RelSpec(RelSpec.outer), 1);
-
+			System.out.println("Reached3");
 			Iterator iter = new FileScan("NIDheapfile", atrType,
 					str_sizes, (short) 1, 1, projlist, null);
 

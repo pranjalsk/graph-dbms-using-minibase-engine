@@ -23,8 +23,11 @@ import nodeheap.NodeHeapfile;
 
 public class PathExpressionParser {
 
-	public int pathExpressionQuery1Parser(Iterator niditer, Object[] objExpList,
-			AttrType[] attrTypeList, String inputPathExpression,
+	Iterator niditer;
+	Object[] objExpList;
+	AttrType[] attrTypeList;
+	
+	public int pathExpressionQuery1Parser(String inputPathExpression,
 			BTreeFile btf_node, NodeHeapfile nhf, ZTreeFile ztf_desc)
 			throws Exception {
 		int [] type = new int[1];
@@ -39,10 +42,9 @@ public class PathExpressionParser {
 		 * Set iterator over the NIDs returned by the BatchMapper class
 		 */
 		if (headnode.matches("\\d+\\s?\\d+\\s?\\d+\\s?\\d+\\s?\\d+")) {
-			System.out.println("Reached1");
 			niditer = batchinsert.getNidFromDescriptor(headnode, nhf, ztf_desc); 
-		} else {
-			System.out.println("Reached2");
+		}
+		else {
 			NID newnid = batchinsert.getNidFromNodeLabel(headnode, nhf, btf_node);
 			Heapfile newhf = new Heapfile("NIDheapfile");
 			RID newrid = new RID(new PageId(newnid.pageNo.pid), newnid.slotNo);
@@ -61,16 +63,14 @@ public class PathExpressionParser {
 			niditer = new FileScan("NIDheapfile", atrType,
 					str_sizes, (short) 1, 1, projlist, null);
 		}
-		
-
-		
+				
 		int i;
 		int n = pathExpression.size();
 
 		objExpList = new Object[n];
 		attrTypeList = new AttrType[n];
 
-		objExpList[0] = null;
+		objExpList[0] = type[0];
 		attrTypeList[0] = new AttrType(AttrType.attrId);
 		
 		
@@ -95,8 +95,7 @@ public class PathExpressionParser {
 		return type[0];
 	}
 
-	public int pathExpressionQuery2Parser(Iterator niditer, Object[] objExpList,
-			AttrType[] attrTypeList, String inputPathExpression, NodeHeapfile nhf, ZTreeFile ztf_desc, BTreeFile btf_node) throws Exception {
+	public int pathExpressionQuery2Parser(String inputPathExpression, NodeHeapfile nhf, ZTreeFile ztf_desc, BTreeFile btf_node) throws Exception {
 		int [] type = new int[1];
 		
 		List<String[]> pathExpression = splitPathExpression(inputPathExpression, type);
@@ -110,7 +109,8 @@ public class PathExpressionParser {
 		 */
 		if (headnode.matches("\\d+\\s?\\d+\\s?\\d+\\s?\\d+\\s?\\d+")) {
 			niditer = batchinsert.getNidFromDescriptor(headnode, nhf, ztf_desc); 
-		} else {
+		}
+		else {
 			NID newnid = batchinsert.getNidFromNodeLabel(headnode, nhf, btf_node);
 			Heapfile newhf = new Heapfile("NIDheapfile");
 			RID newrid = new RID(new PageId(newnid.pageNo.pid), newnid.slotNo);
@@ -151,8 +151,7 @@ public class PathExpressionParser {
 		return type[0];
 	}
 
-	public int pathExpressionQuery3Parser(Iterator niditer, Object[] objExpList,
-			AttrType[] attrTypeList, String inputPathExpression, NodeHeapfile nhf, ZTreeFile ztf_desc, BTreeFile btf_node) throws Exception {
+	public int pathExpressionQuery3Parser(String inputPathExpression, NodeHeapfile nhf, ZTreeFile ztf_desc, BTreeFile btf_node) throws Exception {
 		int [] type = new int[1];
 		
 		List<String[]> pathExpression = splitPathExpression(inputPathExpression, type);
@@ -209,7 +208,7 @@ public class PathExpressionParser {
 		int[] type = new int[1];
 		List<String[]> pathExpression = splitPathExpression(trianglePathExpression, type);
 		int i;
-		//int n = pathExpression.size();
+
 		for(i=0; i<3; i++){
 			String input = pathExpression.get(i)[1].trim();
 			if (pathExpression.get(i)[0].equals("EL")) {

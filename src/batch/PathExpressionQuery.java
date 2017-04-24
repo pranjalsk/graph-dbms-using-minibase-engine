@@ -4,6 +4,8 @@ import edgeheap.EdgeHeapFile;
 import global.AttrOperator;
 import global.AttrType;
 import global.NID;
+import global.PageId;
+import global.RID;
 import global.TupleOrder;
 import heap.FieldNumberOutOfBoundException;
 import heap.HFBufMgrException;
@@ -61,28 +63,35 @@ public class PathExpressionQuery {
 		String indexNodeLabelName = btf_node_label.get_fileName();
 
 		PathExpressionParser parsr = new PathExpressionParser();
-		List<AttrType[]> attrTypeList = new ArrayList<AttrType[]>();
-		List<Object[]> objExpList = new ArrayList<Object[]>();
-
-		int type = parsr.pathExpressionQuery1Parser(objExpList, attrTypeList,
-				pathExpression, btf_node_label, nhfRef, ztf_node_desc);
-
+		
+		int type = parsr
+				.pathExpressionQuery1Parser(
+						pathExpression, btf_node_label, nhfRef, ztf_node_desc);
+		AttrType[] attrType = parsr.attrTypeList;
+		Object[] expression = parsr.objExpList;
+		Iterator sourceNIDs = parsr.niditer;
 		PathExpression pathExp = new PathExpression();
 
 		NodeHeapfile nhf = new NodeHeapfile(nhfName);
 		Heapfile pathExprQuery1Result = new Heapfile("pathExprQuery1Result");
-		
-		for (int i = 0; i < objExpList.size(); i++) {
 
-			Object[] expression = objExpList.get(i);
-			AttrType[] attr = attrTypeList.get(i);
-			Iterator tailNodeIds = pathExp.pathExpress1(expression, attr,
+		Tuple nidTup;
+		while ((nidTup = sourceNIDs.get_next()) != null) {
+
+			nidTup.setHdr((short) 1, new AttrType[] { new AttrType(
+					AttrType.attrId) }, new short[] {});
+			RID newrid = nidTup.getIDFld(1);
+			NID newNID = new NID(newrid.pageNo, newrid.slotNo);
+			expression[0] = newNID;
+			if (((NID) expression[0]).pageNo.pid == -1
+					&& ((NID) expression[0]).slotNo == -1) {
+				continue;
+			}
+			Iterator tailNodeIds = pathExp.pathExpress1(expression, attrType,
 					nhfName, ehfName, indexEhfSourceNodeName,
 					indexNodeLabelName, numBuf, nodeLabelLength);
 			Tuple tail;
-			if(expression[0] == null){
-				continue;
-			}
+
 			NID headNID = (NID) expression[0];
 			Node headNode = nhf.getRecord(headNID);
 			headNode.setHdr();
@@ -115,12 +124,14 @@ public class PathExpressionQuery {
 				pathExprQuery1Result.insertRecord(headTailPair
 						.getTupleByteArray());
 			}
-			
+
 			tailNodeIds.close();
 			Heapfile tailNodeFile = new Heapfile("TailNodeFileForPQ1");
 			tailNodeFile.deleteFile();
 		}
-
+		sourceNIDs.close();
+		Heapfile sourceNIDfile = new Heapfile("NIDheapfile");
+		sourceNIDfile.deleteFile();
 		switch (type) {
 		case 0:
 			typeA("pathExprQuery1Result");
@@ -146,25 +157,33 @@ public class PathExpressionQuery {
 		String indexNodeLabelName = btf_node_label.get_fileName();
 
 		PathExpressionParser parsr = new PathExpressionParser();
-		List<AttrType[]> attrTypeList = new ArrayList<AttrType[]>();
-		List<Object[]> objExpList = new ArrayList<Object[]>();
-		int type = parsr.pathExpressionQuery2Parser(objExpList, attrTypeList,
-				pathExpression, nhfRef, ztf_node_desc, btf_node_label);
+		int type = parsr
+				.pathExpressionQuery2Parser(
+						pathExpression, nhfRef, ztf_node_desc,btf_node_label);
+		AttrType[] attrType = parsr.attrTypeList;
+		Object[] expression = parsr.objExpList;
+		Iterator sourceNIDs = parsr.niditer;
 		PathExpression pathExp = new PathExpression();
-		NodeHeapfile nhf = new NodeHeapfile(nhfName);
 
+		NodeHeapfile nhf = new NodeHeapfile(nhfName);
 		Heapfile pathExprQuery2Result = new Heapfile("pathExprQuery2Result");
-		
-		for (int i = 0; i < objExpList.size(); i++) {
-			Object[] expression = objExpList.get(i);
-			AttrType[] attr = attrTypeList.get(i);
-			Iterator tailNodeIds = pathExp.pathExpress2(expression, attr,
+
+		Tuple nidTup;
+		while ((nidTup = sourceNIDs.get_next()) != null) {
+
+			nidTup.setHdr((short) 1, new AttrType[] { new AttrType(
+					AttrType.attrId) }, new short[] {});
+			RID newrid = nidTup.getIDFld(1);
+			NID newNID = new NID(newrid.pageNo, newrid.slotNo);
+			expression[0] = newNID;
+			if (((NID) expression[0]).pageNo.pid == -1
+					&& ((NID) expression[0]).slotNo == -1) {
+				continue;
+			}
+			Iterator tailNodeIds = pathExp.pathExpress2(expression, attrType,
 					nhfName, ehfName, indexEhfSourceNodeName,
 					indexNodeLabelName, numBuf, nodeLabelLength);
 			Tuple tail;
-			if(expression[0] == null){
-				continue;
-			}
 			NID headNID = (NID) expression[0];
 			Node headNode = nhf.getRecord(headNID);
 
@@ -207,6 +226,9 @@ public class PathExpressionQuery {
 			tailNodeFile.deleteFile();
 
 		}
+		sourceNIDs.close();
+		Heapfile sourceNIDfile = new Heapfile("NIDheapfile");
+		sourceNIDfile.deleteFile();
 		switch (type) {
 		case 0:
 			typeA("pathExprQuery2Result");
@@ -232,41 +254,46 @@ public class PathExpressionQuery {
 		String indexNodeLabelName = btf_node_label.get_fileName();
 
 		PathExpressionParser parsr = new PathExpressionParser();
-		List<AttrType[]> attrTypeList = new ArrayList<AttrType[]>();
-		List<Object[]> objExpList = new ArrayList<Object[]>();
-
-		int type = parsr.pathExpressionQuery3Parser(objExpList, attrTypeList,
-				pathExpression, nhfRef, ztf_node_desc, btf_node_label);
-
+		
+		int type = parsr
+				.pathExpressionQuery3Parser(
+						pathExpression, nhfRef, ztf_node_desc, btf_node_label);
+		AttrType[] attrType = parsr.attrTypeList;
+		Object[] expression = parsr.objExpList;
+		Iterator sourceNIDs = parsr.niditer;
 		PathExpression pathExp = new PathExpression();
 
 		NodeHeapfile nhf = new NodeHeapfile(nhfName);
 		Heapfile pathExprQuery3Result = new Heapfile("pathExprQuery3Result");
-		
 		boolean isMaxWtBound = false;
-		AttrType[] dummyAttr = attrTypeList.get(0);
-		if(dummyAttr[1].attrType == AttrType.attrString){
+
+		if (attrType[1].attrType == AttrType.attrString) {
 			isMaxWtBound = true;
 		}
-		for (int i = 0; i < objExpList.size(); i++) {
+		Tuple nidTup;
+		while ((nidTup = sourceNIDs.get_next()) != null) {
 
-			Object[] expression = objExpList.get(i);
-			Iterator tailNodeIds = null;
-			if(isMaxWtBound){
-				tailNodeIds = pathExp.pathExpress3_2(expression, 
-						nhfName, ehfName, indexEhfSourceNodeName,
-						indexNodeLabelName, numBuf, nodeLabelLength);
-			}else{
-				tailNodeIds = pathExp.pathExpress3_1(expression,
-						nhfName, ehfName, indexEhfSourceNodeName,
-						indexNodeLabelName, numBuf, nodeLabelLength);
-			}
-			
-			
-			Tuple tail;
-			if(expression[0] == null){
+			nidTup.setHdr((short) 1, new AttrType[] { new AttrType(
+					AttrType.attrId) }, new short[] {});
+			RID newrid = nidTup.getIDFld(1);
+			NID newNID = new NID(newrid.pageNo, newrid.slotNo);
+			expression[0] = newNID;
+			if (((NID) expression[0]).pageNo.pid == -1
+					&& ((NID) expression[0]).slotNo == -1) {
 				continue;
 			}
+			Iterator tailNodeIds = null;
+			if (isMaxWtBound) {
+				tailNodeIds = pathExp.pathExpress3_2(expression, nhfName,
+						ehfName, indexEhfSourceNodeName, indexNodeLabelName,
+						numBuf, nodeLabelLength);
+			} else {
+				tailNodeIds = pathExp.pathExpress3_1(expression, nhfName,
+						ehfName, indexEhfSourceNodeName, indexNodeLabelName,
+						numBuf, nodeLabelLength);
+			}
+
+			Tuple tail;
 			NID headNID = (NID) expression[0];
 			Node headNode = nhf.getRecord(headNID);
 			headNode.setHdr();
@@ -299,12 +326,14 @@ public class PathExpressionQuery {
 				pathExprQuery3Result.insertRecord(headTailPair
 						.getTupleByteArray());
 			}
-			
+
 			tailNodeIds.close();
 			Heapfile tailNodeFile = new Heapfile("TailNodeFileForPQ3");
 			tailNodeFile.deleteFile();
 		}
-
+		sourceNIDs.close();
+		Heapfile sourceNIDfile = new Heapfile("NIDheapfile");
+		sourceNIDfile.deleteFile();
 		switch (type) {
 		case 0:
 			typeA("pathExprQuery3Result");
@@ -317,7 +346,7 @@ public class PathExpressionQuery {
 			break;
 		}
 	}
-	
+
 	private void typeA(String fileName) throws JoinsException, IndexException,
 			InvalidTupleSizeException, InvalidTypeException,
 			PageNotReadException, PredEvalException, SortException,
@@ -462,7 +491,7 @@ public class PathExpressionQuery {
 		types[4] = new AttrType(AttrType.attrString);
 		types[5] = new AttrType(AttrType.attrString);
 		types[6] = new AttrType(AttrType.attrString);
-		
+
 		short s1_sizes[] = new short[6];
 		s1_sizes[0] = 32;
 		s1_sizes[1] = 32;
@@ -552,12 +581,13 @@ public class PathExpressionQuery {
 			res.setHdr((short) 4, type, str_sizes);
 			if (prevRes == null
 					|| !(prevRes.getStrFld(1)
-							.equalsIgnoreCase(res.getStrFld(1)) && prevRes
-							.getStrFld(2).equalsIgnoreCase(res.getStrFld(2)) && prevRes
-							.getStrFld(3).equalsIgnoreCase(res.getStrFld(3)))) {
+							.equalsIgnoreCase(res.getStrFld(1))
+							&& prevRes.getStrFld(2).equalsIgnoreCase(
+									res.getStrFld(2)) && prevRes.getStrFld(3)
+							.equalsIgnoreCase(res.getStrFld(3)))) {
 				prevRes = new Tuple(res);
-				System.out.println("[" + res.getStrFld(1) + ", " + res.getStrFld(2)
-						+ ", " + res.getStrFld(3) + "]");
+				System.out.println("[" + res.getStrFld(1) + ", "
+						+ res.getStrFld(2) + ", " + res.getStrFld(3) + "]");
 			}
 		}
 
