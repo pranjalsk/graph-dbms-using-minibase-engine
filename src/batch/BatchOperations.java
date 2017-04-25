@@ -520,9 +520,7 @@ public class BatchOperations {
 											edgeWtBound2);
 								} else if (qtype == 6) {
 									eq.query6(ehf);
-								} else if (qtype == 7) {
-									eq.query7(ehf, (short) 32);
-								}
+								} 
 
 							}
 							// index scan
