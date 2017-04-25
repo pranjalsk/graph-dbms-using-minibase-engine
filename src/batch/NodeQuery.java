@@ -73,6 +73,8 @@ public class NodeQuery {
 				node = nscan.getNext(nid);
 			}
 			nscan.closescan();
+			String queryPlan = "\nPi(node.label, node.descriptor) (NodeHeapFile)\n";
+			System.out.println(queryPlan);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -131,7 +133,9 @@ public class NodeQuery {
 			}
 			nfscan.close();
 			sort.close();
-
+			String queryPlan = "\nSort - node.label(Pi(node.label, node.descriptor) " +
+					"(NodeHeapFile))\n";
+			System.out.println(queryPlan);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -201,28 +205,12 @@ public class NodeQuery {
 						+ "]");
 			}
 			nfscan.close();
-
+			String queryPlan = "\nSort - node.descriptor(Pi(node.label, node.descriptor) " +
+					"(NodeHeapFile))\n";
+			System.out.println(queryPlan);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		/*
-		 * Node node = new Node(); try { NFileScan nfscan = new
-		 * NFileScan(nodeHeapFileName, attrType, stringSize, (short) 2, 2,
-		 * projlist, expr); Sort sort = new Sort(attrType, (short) 2,
-		 * stringSize, nfscan, 2, order[0], 20, numBuf, distance,
-		 * targetDescriptor); String nodeLabel; Descriptor nodeDescriptor; Tuple
-		 * t; t = sort.get_next();
-		 * 
-		 * while (t != null) { node.nodeInit(t.getTupleByteArray(),
-		 * t.getOffset()); node.setHdr(); nodeLabel = node.getLabel();
-		 * nodeDescriptor = node.getDesc(); System.out.println("Label: " +
-		 * nodeLabel + " , Descriptor: [" + nodeDescriptor.get(0) + " , " +
-		 * nodeDescriptor.get(1) + " , " + nodeDescriptor.get(2) + " , " +
-		 * nodeDescriptor.get(3) + " , " + nodeDescriptor.get(4) + "]"); t =
-		 * sort.get_next(); } nfscan.close(); sort.close();
-		 * 
-		 * } catch (Exception e) { e.printStackTrace(); }
-		 */
 	}
 
 	/**
@@ -284,6 +272,10 @@ public class NodeQuery {
 				t = nfscan.get_next();
 			}
 			nfscan.close();
+			String queryPlan = "\nPi(node.label, node.descriptor) " +
+					"(Sigma((targetDescriptor - node.descriptor) <= distance)" +
+					"(NodeHeapFile))\n";
+			System.out.println(queryPlan);
 		}
 
 		catch (Exception e) {
@@ -423,6 +415,11 @@ public class NodeQuery {
 		}
 		nfscan.close();
 		am.close();
+		String queryPlan = "\nPi(node.label, node.descriptor, edge.label) " +
+				"((edge.source == node.label) || (edge.dest == node.label))" +
+				"((Sigma(node.label == targetLabel)NodeHeapFile) |><|(nlj) EdgeHeapFile))\n";
+		System.out.println(queryPlan);
+
 	}
 
 	/**
@@ -555,6 +552,11 @@ public class NodeQuery {
 			}
 		}
 		am.close();
+		String queryPlan = "\nPi(node.label, node.descriptor, edge.label) " +
+				"(Sigma((edge.source == node.label) || (edge.dest == node.label))" +
+				"((Sigma((targetDescriptor - node.descriptor) <= distance))NodeHeapFile) " +
+				"|><|(nlj) EdgeHeapFile))\n";
+		System.out.println(queryPlan);
 	}
 
 }

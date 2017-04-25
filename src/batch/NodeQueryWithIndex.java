@@ -114,6 +114,8 @@ public class NodeQueryWithIndex {
 				nIscan.close();
 			}
 			nscan.closescan();
+			String queryPlan = "\n(Pi(node.label, node.descriptor) (Sigma(nodeheap.label==nodebt.label)(NodeHeapFile |><| NodeBTFile)))\n";
+			System.out.println(queryPlan);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -170,6 +172,8 @@ public class NodeQueryWithIndex {
 				node = nIscan.get_next();
 			}
 			nIscan.close();
+			String queryPlan = "\n(Pi(node.label, node.descriptor) (NodeBTFile))\n";
+			System.out.println(queryPlan);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -243,6 +247,8 @@ public class NodeQueryWithIndex {
 			}
 
 			nIscan.close();
+			String queryPlan = "\n(Pi(node.label, node.descriptor) (NodeZTFile))\n";
+			System.out.println(queryPlan);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -313,6 +319,8 @@ public class NodeQueryWithIndex {
 				node = nIscan.get_next();
 			}
 			nIscan.close();
+			String queryPlan = "\n(Pi(node.label, node.descriptor) (Sigma((targetDescriptor - node.descriptor) <= distance)(NodeZTFile)))\n";
+			System.out.println(queryPlan);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -450,6 +458,10 @@ public class NodeQueryWithIndex {
 		}
 		nIscan.close();
 		am.close();
+		String queryPlan = "\n(Pi(node.label, node.descriptor, edge.label) " +
+				"(edge.source == node.label) || (edge.dest == node.label))" +
+				"((Sigma(node.label == targetLabel)NodeBTFile) |><|(inlj) EdgeHeapFile)))\n";
+		System.out.println(queryPlan);
 	}
 
 	/**
@@ -587,5 +599,10 @@ public class NodeQueryWithIndex {
 		}
 		nIscan.close();
 		am.close();
+		String queryPlan = "\n(Pi(node.label, node.descriptor, edge.label) " +
+				"(Sigma((edge.source == node.label) || (edge.dest == node.label))" +
+				"((Sigma((targetDescriptor - node.descriptor) <= distance))NodeBTFile) " +
+				"|><|(inlj) EdgeHeapFile)))\n";
+		System.out.println(queryPlan);
 	}
 }

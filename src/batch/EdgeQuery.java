@@ -89,6 +89,8 @@ public class EdgeQuery {
 
 				edge = escan.getNext(eid);
 			}
+			String queryPlan = "(Pi(edge.label, edge.weight, edge.source, edge.dest) (EdgeHeapFile))\n";
+			System.out.println(queryPlan);
 			escan.closescan();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -172,7 +174,9 @@ public class EdgeQuery {
 			}
 			nfscan.close();
 			sort.close();
-
+			String queryPlan = "\n(Pi(edge.label, edge.weight, edge.source)(Sigma(node.label == edge.source)((Sort - node.label(Pi(node.label, node.descriptor) " +
+					"(NodeHeapFile)))  |><| EdgeHeapFile)))\n";
+			System.out.println(queryPlan);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -255,7 +259,9 @@ public class EdgeQuery {
 			}
 			nfscan.close();
 			sort.close();
-
+			String queryPlan = "\n(Pi(edge.label, edge.weight, edge.dest)(Sigma(node.label == edge.dest)((Sort - node.label(Pi(node.label, node.descriptor) " +
+					"(NodeHeapFile)))  |><| EdgeHeapFile)))\n";
+			System.out.println(queryPlan);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -340,6 +346,9 @@ public class EdgeQuery {
 			}
 			efscan.close();
 			sort.close();
+			String queryPlan = "\nSort - edge.label(Pi(edge.label, edge.weight, edge.source, edge.dest) " +
+					"(EdgeHeapFile))\n";
+			System.out.println(queryPlan);
 		} catch (Exception e) {
 			e.printStackTrace();
 
@@ -424,7 +433,9 @@ public class EdgeQuery {
 			}
 			sort.close();
 			efscan.close();
-
+			String queryPlan = "\nSort - edge.weight(Pi(edge.label, edge.weight, edge.source, edge.dest) " +
+					"(EdgeHeapFile))\n";
+			System.out.println(queryPlan);
 		} catch (Exception e) {
 			e.printStackTrace();
 
@@ -533,7 +544,9 @@ public class EdgeQuery {
 				e = efscan.get_next();
 			}
 			efscan.close();
-
+			String queryPlan = "\nPi(edge.label, edge.weight, edge.source, edge.dest) " +
+					"(Sigma(edge.weight > lowBound && edge.weight < upBound)(EdgeHeapFile))\n";
+			System.out.println(queryPlan);
 		} catch (Exception e) {
 			e.printStackTrace();
 
@@ -544,7 +557,7 @@ public class EdgeQuery {
 	 * printing the edge pairs who have the same destination node
 	 * but not with itself using IndexNestedLoopsJoins
 	 * @param ehf
-	 *            Edge Heap File
+	 * Edge Heap File
 	 * @throws Exception 
 	 * @throws UnknownKeyTypeException 
 	 * @throws UnknowAttrType 
@@ -659,6 +672,10 @@ public class EdgeQuery {
 		}
 		
 		nlj.close();
+		String queryPlan = "\n(Pi(outedge.label, inedge.label)(Sigma((outedge.dest == inedge.dest) && (outedge.label != inedge.label " +
+				"|| outedge.weight != inedge.weight || outedge.source != inedge.source))(EdgeHeapFile) " +
+				"|><|(nlj) EdgeHeapFile)))\n";
+		System.out.println(queryPlan);
 	}
 
 }

@@ -50,22 +50,25 @@ import nodeheap.Node;
 import nodeheap.NodeHeapfile;
 
 /**
- * Implements queries for following expression queries
- * P Q1a ← N N/(N N/) ∗ N N 	where	N N ← (N ode Label|N ode Descriptor)
- * P Q2a ← N N / EN (/ EN ) ∗	where	N N ← (N ode Label|N ode Descriptor)	&	EN ← (Edge Label|M ax Edge W eight)
- * P Q3a ← N N// Bound	where	N N ← (N ode Label|N ode Descriptor)	&	Bound ← (M ax N um Edges|M ax T otal Edge W eight)
- * T Qa ← EN ; EN ; EN	where	EN ← (Edge Label|M ax Edge W eight)
+ * Implements queries for following expression queries P Q1a ← N N/(N N/) ∗ N N
+ * where N N ← (N ode Label|N ode Descriptor) P Q2a ← N N / EN (/ EN ) ∗ where N
+ * N ← (N ode Label|N ode Descriptor) & EN ← (Edge Label|M ax Edge W eight) P
+ * Q3a ← N N// Bound where N N ← (N ode Label|N ode Descriptor) & Bound ← (M ax
+ * N um Edges|M ax T otal Edge W eight) T Qa ← EN ; EN ; EN where EN ← (Edge
+ * Label|M ax Edge W eight)
  */
 public class PathExpressionQuery {
 
+	public String queryPlan = "";
+
 	/**
-	 * Uses the parser that returns the type of query(a,b or c) 
-	 * and an iterator that satisfies the first node condition 
-	 * for the expression P Q1a ← N N/(N N/) ∗ N N.
-	 * Uses the pathexpression to feed each node id along with 
-	 * rest of the attributes to retrieve tails for that path
-	 * Adds the result to a pair to a heap file and feeds it to 
-	 * appropriate result printing type method.
+	 * Uses the parser that returns the type of query(a,b or c) and an iterator
+	 * that satisfies the first node condition for the expression P Q1a ← N N/(N
+	 * N/) ∗ N N. Uses the pathexpression to feed each node id along with rest
+	 * of the attributes to retrieve tails for that path Adds the result to a
+	 * pair to a heap file and feeds it to appropriate result printing type
+	 * method.
+	 * 
 	 * @param pathExpression
 	 * @param nhfRef
 	 * @param ehfRef
@@ -90,15 +93,13 @@ public class PathExpressionQuery {
 		String indexNodeLabelName = btf_node_label.get_fileName();
 
 		PathExpressionParser parsr = new PathExpressionParser();
-		
-		int type = parsr
-				.pathExpressionQuery1Parser(
-						pathExpression, btf_node_label, nhfRef, ztf_node_desc);
+
+		int type = parsr.pathExpressionQuery1Parser(pathExpression,
+				btf_node_label, nhfRef, ztf_node_desc);
 		AttrType[] attrType = parsr.attrTypeList;
 		Object[] expression = parsr.objExpList;
 		Iterator sourceNIDs = parsr.niditer;
 		PathExpression pathExp = new PathExpression();
-
 		NodeHeapfile nhf = new NodeHeapfile(nhfName);
 		Heapfile pathExprQuery1Result = new Heapfile("pathExprQuery1Result");
 
@@ -155,11 +156,20 @@ public class PathExpressionQuery {
 			tailNodeIds.close();
 			Heapfile tailNodeFile = new Heapfile("TailNodeFileForPQ1");
 			tailNodeFile.deleteFile();
-			
+
 		}
 		parsr.niditer.close();
 		Heapfile sourceNIDfile = new Heapfile("NIDheapfile");
 		sourceNIDfile.deleteFile();
+
+		queryPlan = "";
+		queryPlan = "(Sigma(NN condition)(NodeHeapFile))";
+		for (int i = 1; i < expression.length; i++) {
+			queryPlan = "(Sigma(srcCond)" + queryPlan
+					+ "|><|(inlj) (EdgeBTSrcFile))";
+			queryPlan = "(Sigma(destCond)" + queryPlan
+					+ "|><|(inlj) (NodeBTFile))";
+		}
 		switch (type) {
 		case 0:
 			typeA("pathExprQuery1Result");
@@ -174,13 +184,13 @@ public class PathExpressionQuery {
 	}
 
 	/**
-	 * Uses the parser that returns the type of query(a,b or c) 
-	 * and an iterator that satisfies the first node condition 
-	 * for the expression P Q2a ← N N / EN (/ EN ) ∗.
-	 * Uses the pathexpression to feed each node id along with 
-	 * rest of the attributes to retrieve tails for that path
-	 * Adds the result to a pair to a heap file and feeds it to 
-	 * appropriate result printing type method.
+	 * Uses the parser that returns the type of query(a,b or c) and an iterator
+	 * that satisfies the first node condition for the expression P Q2a ← N N /
+	 * EN (/ EN ) ∗. Uses the pathexpression to feed each node id along with
+	 * rest of the attributes to retrieve tails for that path Adds the result to
+	 * a pair to a heap file and feeds it to appropriate result printing type
+	 * method.
+	 * 
 	 * @param pathExpression
 	 * @param nhfRef
 	 * @param ehfRef
@@ -205,9 +215,8 @@ public class PathExpressionQuery {
 		String indexNodeLabelName = btf_node_label.get_fileName();
 
 		PathExpressionParser parsr = new PathExpressionParser();
-		int type = parsr
-				.pathExpressionQuery2Parser(
-						pathExpression, nhfRef, ztf_node_desc,btf_node_label);
+		int type = parsr.pathExpressionQuery2Parser(pathExpression, nhfRef,
+				ztf_node_desc, btf_node_label);
 		AttrType[] attrType = parsr.attrTypeList;
 		Object[] expression = parsr.objExpList;
 		Iterator sourceNIDs = parsr.niditer;
@@ -277,6 +286,13 @@ public class PathExpressionQuery {
 		sourceNIDs.close();
 		Heapfile sourceNIDfile = new Heapfile("NIDheapfile");
 		sourceNIDfile.deleteFile();
+
+		queryPlan = "";
+		queryPlan = "(Sigma(srcCond)((Sigma(NN condition)(NodeHeapFile)) |><|(inlj) EdgeBTSrcFile))";
+		for (int i = 1; i < expression.length; i++) {
+			queryPlan = "(Sigma(dest = src)" + queryPlan
+					+ "|><|(inlj) (EdgeBTSrcFile))";
+		}
 		switch (type) {
 		case 0:
 			typeA("pathExprQuery2Result");
@@ -291,13 +307,12 @@ public class PathExpressionQuery {
 	}
 
 	/**
-	 * Uses the parser that returns the type of query(a,b or c) 
-	 * and an iterator that satisfies the first node condition 
-	 * for the expression P Q3a ← N N// Bound.
-	 * Uses the pathexpression to feed each node id along with 
-	 * rest of the attributes to retrieve tails for that path
-	 * Adds the result to a pair to a heap file and feeds it to 
-	 * appropriate result printing type method.
+	 * Uses the parser that returns the type of query(a,b or c) and an iterator
+	 * that satisfies the first node condition for the expression P Q3a ← N N//
+	 * Bound. Uses the pathexpression to feed each node id along with rest of
+	 * the attributes to retrieve tails for that path Adds the result to a pair
+	 * to a heap file and feeds it to appropriate result printing type method.
+	 * 
 	 * @param pathExpression
 	 * @param nhfRef
 	 * @param ehfRef
@@ -322,10 +337,9 @@ public class PathExpressionQuery {
 		String indexNodeLabelName = btf_node_label.get_fileName();
 
 		PathExpressionParser parsr = new PathExpressionParser();
-		
-		int type = parsr
-				.pathExpressionQuery3Parser(
-						pathExpression, nhfRef, ztf_node_desc, btf_node_label);
+
+		int type = parsr.pathExpressionQuery3Parser(pathExpression, nhfRef,
+				ztf_node_desc, btf_node_label);
 		AttrType[] attrType = parsr.attrTypeList;
 		Object[] expression = parsr.objExpList;
 		Iterator sourceNIDs = parsr.niditer;
@@ -417,6 +431,7 @@ public class PathExpressionQuery {
 
 	/**
 	 * prints the head tail pairs from the given file
+	 * 
 	 * @param fileName
 	 * @throws JoinsException
 	 * @throws IndexException
@@ -456,7 +471,7 @@ public class PathExpressionQuery {
 
 		Iterator resultScanner = new FileScan(fileName, type, str_sizes,
 				(short) 3, (short) 2, proj_list, null);
-		
+
 		boolean noOutput = true;
 		Tuple res;
 		while ((res = resultScanner.get_next()) != null) {
@@ -465,17 +480,24 @@ public class PathExpressionQuery {
 			res.print(outtype);
 		}
 
-		if(noOutput){
-			System.out.println("No Head Tail pair satisfies the given path expression query.");
+		if (noOutput) {
+			System.out
+					.println("No Head Tail pair satisfies the given path expression query.");
 		}
 		resultScanner.close();
 		pathExprQueryResult.deleteFile();
+
+		System.out.println();
+		System.out.println(queryPlan);
+		System.out.println();
+
 	}
 
 	/**
 	 * prints the head tail pair from the given file in sorted order.
-	 * considering head tail pair combined string and applying sort 
-	 * on this combined string.
+	 * considering head tail pair combined string and applying sort on this
+	 * combined string.
+	 * 
 	 * @param fileName
 	 * @param numBuf
 	 * @throws JoinsException
@@ -522,19 +544,27 @@ public class PathExpressionQuery {
 					+ "]");
 		}
 
-		if(noOutput){
-			System.out.println("No Head Tail pair satisfies the given path expression query.");
+		if (noOutput) {
+			System.out
+					.println("No Head Tail pair satisfies the given path expression query.");
 		}
-		
+
 		sort.close();
 		pathExprQueryResult.deleteFile();
+		queryPlan = "Sort - headtail combine(" + queryPlan + ")";
+		System.out.println();
+
+		System.out.println(queryPlan);
+		System.out.println();
+
 	}
 
 	/**
 	 * prints the unique head tail pair from the given file in sorted order.
-	 * considering head tail pair combined string and applying sort 
-	 * on this combined string and checking if the previous printed pair 
-	 * is not equal to the current one.
+	 * considering head tail pair combined string and applying sort on this
+	 * combined string and checking if the previous printed pair is not equal to
+	 * the current one.
+	 * 
 	 * @param fileName
 	 * @param numBuf
 	 * @throws JoinsException
@@ -590,18 +620,27 @@ public class PathExpressionQuery {
 			}
 		}
 
-		if(noOutput){
-			System.out.println("No Head Tail pair satisfies the given path expression query.");
+		if (noOutput) {
+			System.out
+					.println("No Head Tail pair satisfies the given path expression query.");
 		}
-		
+
 		sort.close();
 		pathExprQueryResult.deleteFile();
+
+		queryPlan = "(Sigma(unique headtail combine)(Sort - headtail combine("
+				+ queryPlan + ")))";
+		System.out.println();
+
+		System.out.println(queryPlan);
+		System.out.println();
+
 	}
 
 	/**
-	 * retrievs the triangle trio nodes for the path expression
-	 * T Qa ← EN ; EN ; EN
-	 * if a triangular path exists between them
+	 * retrievs the triangle trio nodes for the path expression T Qa ← EN ; EN ;
+	 * EN if a triangular path exists between them
+	 * 
 	 * @param trianglePathExpression
 	 * @param nhfName
 	 * @param ehfName
@@ -708,9 +747,10 @@ public class PathExpressionQuery {
 
 	/**
 	 * prints the unique triangle node trio from the given file in sorted order.
-	 * considering trio combined string and applying sort 
-	 * on this combined string and checking if the previous printed trio 
-	 * is not equal to the current one.
+	 * considering trio combined string and applying sort on this combined
+	 * string and checking if the previous printed trio is not equal to the
+	 * current one.
+	 * 
 	 * @param fileName
 	 * @param numBuf
 	 * @throws JoinsException
@@ -772,17 +812,22 @@ public class PathExpressionQuery {
 			}
 		}
 
-		if(noOutput){
-			System.out.println("No Nodes satisfy the given triangle query expression.");
+		if (noOutput) {
+			System.out
+					.println("No Nodes satisfy the given triangle query expression.");
 		}
 		sort.close();
 		triExprQueryResult.deleteFile();
+		queryPlan = "";
+		queryPlan = "Sigma(Unique)(Sort-tiplet combined(Sigma(dest3 == src1 && src3 == dest2)(Sigma(2nd edge condition)(Sigma(1st edge condition)(EdgeHeapFile)) |><|(inlj) (EdgeHeapFile)) |><|(inlj) (EdgeHeapFile)))";
+		System.out.println(queryPlan);
 	}
 
 	/**
 	 * prints the triangular nodes trio from the given file in sorted order.
-	 * considering trio combined string and applying sort 
-	 * on this combined string.
+	 * considering trio combined string and applying sort on this combined
+	 * string.
+	 * 
 	 * @param fileName
 	 * @param numBuf
 	 * @throws JoinsException
@@ -830,16 +875,21 @@ public class PathExpressionQuery {
 					+ ", " + res.getStrFld(3) + "]");
 		}
 
-		if(noOutput){
-			System.out.println("No Nodes satisfy the given triangle query expression.");
+		if (noOutput) {
+			System.out
+					.println("No Nodes satisfy the given triangle query expression.");
 		}
-		
+
 		sort.close();
 		triExprQueryResult.deleteFile();
+		queryPlan = "";
+		queryPlan = "Sort-tiplet combined(Sigma(dest3 == src1 && src3 == dest2)(Sigma(2nd edge condition)(Sigma(1st edge condition)(EdgeHeapFile)) |><|(inlj) (EdgeHeapFile)) |><|(inlj) (EdgeHeapFile))";
+		System.out.println(queryPlan);
 	}
 
 	/**
 	 * prints the triangular node trios from the given file
+	 * 
 	 * @param fileName
 	 * @throws JoinsException
 	 * @throws IndexException
@@ -884,7 +934,7 @@ public class PathExpressionQuery {
 				(short) 4, (short) 3, proj_list, null);
 
 		boolean noOutput = true;
-		
+
 		Tuple res;
 		while ((res = resultScanner.get_next()) != null) {
 			noOutput = false;
@@ -892,18 +942,22 @@ public class PathExpressionQuery {
 			res.print(outtype);
 		}
 
-		if(noOutput){
-			System.out.println("No Nodes satisfy the given triangle query expression.");
+		if (noOutput) {
+			System.out
+					.println("No Nodes satisfy the given triangle query expression.");
 		}
-		
 		resultScanner.close();
 		triExprQueryResult.deleteFile();
+		queryPlan = "";
+		queryPlan = "(Sigma(dest3 == src1 && src3 == dest2)(Sigma(2nd edge condition)(Sigma(1st edge condition)(EdgeHeapFile)) |><|(inlj) (EdgeHeapFile)) |><|(inlj) (EdgeHeapFile))";
+		System.out.println(queryPlan);
 	}
 
 	/**
-	 * returns the joined edges that satisfy the condition for destination node from outer
-	 * is equal to the source node from inner. And satisfy the first 2 condition for edge 
-	 * label or weight from  T Qa ← EN ; EN ; EN expression
+	 * returns the joined edges that satisfy the condition for destination node
+	 * from outer is equal to the source node from inner. And satisfy the first
+	 * 2 condition for edge label or weight from T Qa ← EN ; EN ; EN expression
+	 * 
 	 * @param objExpressions
 	 * @param attrTypes
 	 * @param ehfName
@@ -961,7 +1015,26 @@ public class PathExpressionQuery {
 		s1_sizes[1] = 32;
 		s1_sizes[2] = 32;
 
-		CondExpr[] expr = new CondExpr[4];
+		CondExpr[] outexpr = new CondExpr[2];
+		outexpr[0] = new CondExpr();
+		outexpr[0].next = null;
+		outexpr[0].type2 = new AttrType(AttrType.attrSymbol);
+		if (attrTypes[0].attrType == AttrType.attrString) {
+			outexpr[0].op = new AttrOperator(AttrOperator.aopEQ);
+			outexpr[0].type1 = new AttrType(AttrType.attrString);
+			outexpr[0].operand2.symbol = new FldSpec(
+					new RelSpec(RelSpec.outer), 5);
+			outexpr[0].operand1.string = (String) objExpressions[0];
+		} else {
+			outexpr[0].op = new AttrOperator(AttrOperator.aopGE);
+			outexpr[0].type1 = new AttrType(AttrType.attrInteger);
+			outexpr[0].operand2.symbol = new FldSpec(
+					new RelSpec(RelSpec.outer), 6);
+			outexpr[0].operand1.integer = (Integer) objExpressions[0];
+		}
+		outexpr[1] = null;
+
+		CondExpr[] expr = new CondExpr[3];
 		expr[0] = new CondExpr();
 		expr[0].next = null;
 		expr[0].op = new AttrOperator(AttrOperator.aopEQ);
@@ -969,38 +1042,23 @@ public class PathExpressionQuery {
 		expr[0].operand1.symbol = new FldSpec(new RelSpec(RelSpec.outer), 8);
 		expr[0].type2 = new AttrType(AttrType.attrSymbol);
 		expr[0].operand2.symbol = new FldSpec(new RelSpec(RelSpec.innerRel), 7);
-
 		expr[1] = new CondExpr();
 		expr[1].next = null;
 		expr[1].type2 = new AttrType(AttrType.attrSymbol);
-		if (attrTypes[0].attrType == AttrType.attrString) {
+		if (attrTypes[1].attrType == AttrType.attrString) {
 			expr[1].op = new AttrOperator(AttrOperator.aopEQ);
 			expr[1].type1 = new AttrType(AttrType.attrString);
-			expr[1].operand2.symbol = new FldSpec(new RelSpec(RelSpec.outer), 5);
-			expr[1].operand1.string = (String) objExpressions[0];
+			expr[1].operand2.symbol = new FldSpec(
+					new RelSpec(RelSpec.innerRel), 5);
+			expr[1].operand1.string = (String) objExpressions[1];
 		} else {
 			expr[1].op = new AttrOperator(AttrOperator.aopGE);
 			expr[1].type1 = new AttrType(AttrType.attrInteger);
-			expr[1].operand2.symbol = new FldSpec(new RelSpec(RelSpec.outer), 6);
-			expr[1].operand1.integer = (Integer) objExpressions[0];
-		}
-		expr[2] = new CondExpr();
-		expr[2].next = null;
-		expr[2].type2 = new AttrType(AttrType.attrSymbol);
-		if (attrTypes[1].attrType == AttrType.attrString) {
-			expr[2].op = new AttrOperator(AttrOperator.aopEQ);
-			expr[2].type1 = new AttrType(AttrType.attrString);
-			expr[2].operand2.symbol = new FldSpec(
-					new RelSpec(RelSpec.innerRel), 5);
-			expr[2].operand1.string = (String) objExpressions[1];
-		} else {
-			expr[2].op = new AttrOperator(AttrOperator.aopGE);
-			expr[2].type1 = new AttrType(AttrType.attrInteger);
-			expr[2].operand2.symbol = new FldSpec(
+			expr[1].operand2.symbol = new FldSpec(
 					new RelSpec(RelSpec.innerRel), 6);
-			expr[2].operand1.integer = (Integer) objExpressions[1];
+			expr[1].operand1.integer = (Integer) objExpressions[1];
 		}
-		expr[3] = null;
+		expr[2] = null;
 
 		TupleOrder order = new TupleOrder(TupleOrder.Ascending);
 		EFileScan efscan1 = null;
@@ -1008,7 +1066,7 @@ public class PathExpressionQuery {
 
 		try {
 			efscan1 = new EFileScan(ehfName, attrType, s1_sizes, (short) 8, 8,
-					inputProjList, null);
+					inputProjList, outexpr);
 			sm = new NestedLoopsJoins(attrType, 8, s1_sizes, attrType, 8,
 					s1_sizes, numBuf, efscan1, ehfName, expr, null,
 					outputProjList, outputProjList.length);
@@ -1020,9 +1078,10 @@ public class PathExpressionQuery {
 	}
 
 	/**
-	 * returns the joined edges that satisfy the condition for destination node from outer
-	 * is equal to the source node from inner. And satisfy the 3rd condition for edge 
-	 * label or weight from  T Qa ← EN ; EN ; EN expression
+	 * returns the joined edges that satisfy the condition for destination node
+	 * from outer is equal to the source node from inner. And satisfy the 3rd
+	 * condition for edge label or weight from T Qa ← EN ; EN ; EN expression
+	 * 
 	 * @param objExpressions
 	 * @param attrTypes
 	 * @param ehfName
@@ -1130,7 +1189,7 @@ public class PathExpressionQuery {
 		Iterator sm = null;
 
 		try {
- 
+
 			sm = new IndexNestedLoopsJoins(jtype, 8, 8, s1_sizes, attrType, 8,
 					7, s2_sizes, (short) numBuf, am1, ehfName,
 					indexEhfSourceNodeName, inputProjList, expr, null,

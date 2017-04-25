@@ -144,12 +144,21 @@ public class EdgeQueryWithIndex {
 				eIscan.close();
 			}
 			escan.closescan();
-
+			String queryPlan = "\n(Pi(edge.label, edge.weight, edge.source, edge.dest) (Sigma(edgeheap.label==edgebt.label)(EdgeHeapFile |><| EdgeLabBTFile)))\n";
+			System.out.println(queryPlan);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
+	/**
+	 * 
+	 * @param ehf
+	 * @param btf_node_label
+	 * @param nhf
+	 * @param nodeLabelLength
+	 * @param numBuf
+	 */
 	public void query1(EdgeHeapFile ehf, BTreeFile btf_node_label,
 			NodeHeapfile nhf, short nodeLabelLength, short numBuf) {
 
@@ -208,12 +217,22 @@ public class EdgeQueryWithIndex {
 				node = nIscan.get_next();
 			}
 			nIscan.close();
+			String queryPlan = "\n(Pi(edge.label, edge.weight, edge.dest) (EdgeBTSrcFile))\n";
+			System.out.println(queryPlan);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 	}
 
+	/**
+	 * 
+	 * @param ehf
+	 * @param btf_node_label
+	 * @param nhf
+	 * @param nodeLabelLength
+	 * @param numBuf
+	 */
 	public void query2(EdgeHeapFile ehf, BTreeFile btf_node_label,
 			NodeHeapfile nhf, short nodeLabelLength, short numBuf) {
 		
@@ -272,6 +291,8 @@ public class EdgeQueryWithIndex {
 				node = nIscan.get_next();
 			}
 			nIscan.close();
+			String queryPlan = "\n(Pi(edge.label, edge.weight, edge.dest) (EdgeBTDestFile))\n";
+			System.out.println(queryPlan);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -352,6 +373,8 @@ public class EdgeQueryWithIndex {
 						+ destinationNodeSlotID);
 			}
 			eIscan.close();
+			String queryPlan = "\n(Pi(edge.label, edge.weight, edge.dest) (EdgeBTLabFile))\n";
+			System.out.println(queryPlan);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -433,6 +456,8 @@ public class EdgeQueryWithIndex {
 						+ destinationNodeSlotID);
 			}
 			eIscan.close();
+			String queryPlan = "\n(Pi(edge.label, edge.weight, edge.dest) (EdgeBTWtFile))\n";
+			System.out.println(queryPlan);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -542,7 +567,8 @@ public class EdgeQueryWithIndex {
 						+ destinationNodeSlotID);
 			}
 			eIscan.close();
-
+			String queryPlan = "\nPi(edge.label, edge.weight, edge.source, edge.dest) " +
+					"(Sigma(edge.weight > lowBound && edge.weight < upBound)(EdgeBTWtFile))\n";
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -671,7 +697,10 @@ public class EdgeQueryWithIndex {
 					+ " and " + tu.getStrFld(5)
 					+ " are incident pairs.");
 		}
-		
+		String queryPlan = "\n(Pi(outedge.label, inedge.label)(Sigma((outedge.dest == inedge.dest) && (outedge.label != inedge.label " +
+				"|| outedge.weight != inedge.weight || outedge.source != inedge.source))(EdgeHeapFile) " +
+				"|><|(inlj) EdgeBTLabFile)))\n";
+		System.out.println(queryPlan);
 		inlj.close();
 	}
 }
