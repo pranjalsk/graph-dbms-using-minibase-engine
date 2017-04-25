@@ -41,8 +41,30 @@ import iterator.NFileScan;
 import iterator.RelSpec;
 import iterator.SortMerge;
 
+/**
+ * receives as input a node ID, NID, and a path expression in different forms
+ * and returns an iterator over the IDs of the nodes in the tail of each path
+ * that satisfies the path expression.
+ */
 public class PathExpression {
 
+	/**
+	 * Takes in the expression PE1 ← N ID/(N N/) ∗ N N	where	N N ← (N ode Label|N ode Descriptor)
+	 * in the form of Object array and attribute type.
+	 * Using these form joins using IndexNestedLoopsJoins by iterating over the object array 
+	 * @param expression
+	 * @param attr
+	 * @param nhfName
+	 * @param ehfName
+	 * @param indexEhfSourceNodeName
+	 * @param indexNodeLabelName
+	 * @param numBuf
+	 * @param nodeLabelLength
+	 * @return
+	 * @throws InvalidSlotNumberException
+	 * @throws InvalidTupleSizeException
+	 * @throws Exception
+	 */
 	public Iterator pathExpress1(Object[] expression, AttrType[] attr,
 			String nhfName, String ehfName, String indexEhfSourceNodeName,
 			String indexNodeLabelName, short numBuf, short nodeLabelLength)
@@ -181,9 +203,10 @@ public class PathExpression {
 
 			TupleOrder order = new TupleOrder(TupleOrder.Ascending);
 			try {
-				am_outer = new IndexNestedLoopsJoins(in1, 6, 6, t1_str_sizes, in2, 2,
-						1,t2_str_sizes, numBuf, inlj, nhfName, indexNodeLabelName, inner_projlist,
-						outFilter,null, outer_projlist, outer_projlist.length);
+				am_outer = new IndexNestedLoopsJoins(in1, 6, 6, t1_str_sizes,
+						in2, 2, 1, t2_str_sizes, numBuf, inlj, nhfName,
+						indexNodeLabelName, inner_projlist, outFilter, null,
+						outer_projlist, outer_projlist.length);
 			} catch (Exception e) {
 				System.err.println("*** Error preparing for nested_loop_join");
 				System.err.println("" + e);
@@ -231,6 +254,24 @@ public class PathExpression {
 		return tail_iterator;
 	}
 
+	
+	/**
+	 * Takes in the expression P E2 ← N ID / EN (/ EN ) ∗	where	EN ← (Edge Label|M ax Edge W eight)
+	 * in the form of Object array and attribute type.
+	 * Using these form joins using IndexNestedLoopsJoins by iterating over the object array 
+	 * @param expression
+	 * @param attr
+	 * @param nhfName
+	 * @param ehfName
+	 * @param indexEhfSourceNodeName
+	 * @param indexNodeLabelName
+	 * @param numBuf
+	 * @param nodeLabelLength
+	 * @return
+	 * @throws InvalidSlotNumberException
+	 * @throws InvalidTupleSizeException
+	 * @throws Exception
+	 */
 	public Iterator pathExpress2(Object[] expression, AttrType[] attr,
 			String nhfName, String ehfName, String indexEhfSourceNodeName,
 			String indexNodeLabelName, short numBuf, short nodeLabelLength)
@@ -472,6 +513,23 @@ public class PathExpression {
 
 	}
 
+	
+	/**
+	 * Takes in the expression P E3 ← N ID // Bound	where	Bound ← (M ax N um Edges|M ax T otal Edge W eight)
+	 * in the form of Object array and attribute type.
+	 * Using these form joins using IndexNestedLoopsJoins by iterating over the object array 
+	 * @param expression
+	 * @param nhfName
+	 * @param ehfName
+	 * @param indexEhfSourceNodeName
+	 * @param indexNodeLabelName
+	 * @param numBuf
+	 * @param nodeLabelLength
+	 * @return
+	 * @throws InvalidSlotNumberException
+	 * @throws InvalidTupleSizeException
+	 * @throws Exception
+	 */
 	public Iterator pathExpress3_2(Object[] expression, String nhfName,
 			String ehfName, String indexEhfSourceNodeName,
 			String indexNodeLabelName, short numBuf, short nodeLabelLength)
@@ -697,7 +755,7 @@ public class PathExpression {
 					tempTail.setLabel(temptu.getStrFld(5));
 					tempTail.setWeight(temptu.getIntFld(4)
 							- temptu.getIntFld(6));
-					
+
 					tempTailEdgeFile.insertEdge(tempTail.getTupleByteArray());
 
 					while ((temptu = inlj.get_next()) != null) {
@@ -708,7 +766,7 @@ public class PathExpression {
 						rid = (RID) (bi
 								.getNidFromNodeLabel(temptu.getStrFld(8),
 										nodeHeapFile, btfNodeLabel));
-						
+
 						tail.setHdr((short) 1, new AttrType[] { new AttrType(
 								AttrType.attrId) }, new short[] {});
 						tail.setIDFld(1, rid);
@@ -720,7 +778,7 @@ public class PathExpression {
 						tempTail.setLabel(temptu.getStrFld(5));
 						tempTail.setWeight(temptu.getIntFld(4)
 								- temptu.getIntFld(6));
-						
+
 						tempTailEdgeFile.insertEdge(tempTail
 								.getTupleByteArray());
 					}
@@ -772,7 +830,7 @@ public class PathExpression {
 
 					RID rid = (RID) (bi.getNidFromNodeLabel(
 							temptu.getStrFld(8), nodeHeapFile, btfNodeLabel));
-					
+
 					tail.setHdr((short) 1, new AttrType[] { new AttrType(
 							AttrType.attrId) }, new short[] {});
 					tail.setIDFld(1, rid);
@@ -783,20 +841,19 @@ public class PathExpression {
 					tempTail.setDestLabel(temptu.getStrFld(8));
 					tempTail.setLabel(temptu.getStrFld(5));
 					tempTail.setWeight(maxTotalEdgeWeight - temptu.getIntFld(6));
-					
+
 					tempTailEdgeFile.insertEdge(tempTail.getTupleByteArray());
 
 					while ((temptu = inlj.get_next()) != null) {
 						temptu.setHdr((short) 8, tempTypes, tempStrSizes);
-						
+
 						tail = new Tuple();
 						tempTail = new Edge();
 
-						
 						rid = (RID) (bi
 								.getNidFromNodeLabel(temptu.getStrFld(8),
 										nodeHeapFile, btfNodeLabel));
-						
+
 						tail.setHdr((short) 1, new AttrType[] { new AttrType(
 								AttrType.attrId) }, new short[] {});
 						tail.setIDFld(1, rid);
@@ -808,7 +865,7 @@ public class PathExpression {
 						tempTail.setLabel(temptu.getStrFld(5));
 						tempTail.setWeight(maxTotalEdgeWeight
 								- temptu.getIntFld(6));
-						
+
 						tempTailEdgeFile.insertEdge(tempTail
 								.getTupleByteArray());
 					}
@@ -824,7 +881,6 @@ public class PathExpression {
 			proj_list[1] = new FldSpec(outer_relation, 2); // Descriptor
 			am_outer = new EFileScan(tempTailEdgeFileName, tempTypes,
 					tempStrSizes, (short) 8, 8, temp_proj_list, null);
-			
 
 		} while (true);
 		btfNodeLabel.close();
@@ -840,11 +896,27 @@ public class PathExpression {
 		}
 		Iterator tail_iterator = new FileScan("TailNodeFileForPQ3", atrType,
 				str_sizes, (short) 1, 1, tailNodeprojlist, null);
-		
 
 		return tail_iterator;
 	}
 
+	
+	/**
+	 * Takes in the expression P E3 ← N ID // Bound	where	Bound ← (M ax N um Edges|M ax T otal Edge W eight)
+	 * in the form of Object array and attribute type.
+	 * Using these form joins using IndexNestedLoopsJoins by iterating over the object array 
+	 * @param expression
+	 * @param nhfName
+	 * @param ehfName
+	 * @param indexEhfSourceNodeName
+	 * @param indexNodeLabelName
+	 * @param numBuf
+	 * @param nodeLabelLength
+	 * @return
+	 * @throws InvalidSlotNumberException
+	 * @throws InvalidTupleSizeException
+	 * @throws Exception
+	 */
 	public Iterator pathExpress3_1(Object[] expression, String nhfName,
 			String ehfName, String indexEhfSourceNodeName,
 			String indexNodeLabelName, short numBuf, short nodeLabelLength)
@@ -1090,7 +1162,8 @@ public class PathExpression {
 		for (int i = 0; i < maxNumberOfEdges; i++) {
 
 			String tempTailEdgeFileName = "TempTailEdgeFile" + i;
-			EdgeHeapFile tempTailEdgeFile = new EdgeHeapFile(tempTailEdgeFileName);
+			EdgeHeapFile tempTailEdgeFile = new EdgeHeapFile(
+					tempTailEdgeFileName);
 			tempTailEdgeFile.deleteFile();
 
 		}

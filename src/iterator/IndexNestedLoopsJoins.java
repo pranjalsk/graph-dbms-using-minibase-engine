@@ -11,11 +11,11 @@ import java.io.*;
 
 /**
  * 
- * This file contains an implementation of the nested loops join algorithm as
- * described in the Shapiro paper. The algorithm is extremely simple:
+ * This file contains an implementation of the index nested loops join algorithm.
+ *  The algorithm is extremely simple:
  * 
- * foreach tuple r in R do foreach tuple s in S do if (ri == sj) then add (r, s)
- * to the result.
+ * foreach tuple r in R do foreach tuple s that satisfies the condition (ri == sj)
+ * in the index file of S then add (r, s) to the result.
  */
 
 public class IndexNestedLoopsJoins extends Iterator {
@@ -38,6 +38,8 @@ public class IndexNestedLoopsJoins extends Iterator {
 	private IndexScan inner;
 	private String innerRelName;
 	private String innerIndexName;
+	
+	
 	/**
 	 * constructor Initialize the two relations which are joined, including
 	 * relation type,
@@ -46,20 +48,28 @@ public class IndexNestedLoopsJoins extends Iterator {
 	 *            Array containing field types of R.
 	 * @param len_in1
 	 *            # of columns in R.
+	 * @param  outer_fld_No   
+	 * 			  joining condition field of outer iterator
 	 * @param t1_str_sizes
 	 *            shows the length of the string fields.
 	 * @param in2
 	 *            Array containing field types of S
 	 * @param len_in2
 	 *            # of columns in S
+	 * @param  inner_fld_No   
+	 * 			  joining condition field of inner relation
 	 * @param t2_str_sizes
 	 *            shows the length of the string fields.
 	 * @param amt_of_mem
 	 *            IN PAGES
 	 * @param am1
 	 *            access method for left i/p to join
-	 * @param relationName
-	 *            access hfapfile for right i/p to join
+	 * @param innerRelName
+	 *            access heapfile for right i/p to join
+	 * @param innerIndexName
+	 *            access indexfile for right i/p to join
+	 * @param inner_proj_list
+	 *            shows what input fields go where in the inner tuple
 	 * @param outFilter
 	 *            select expressions
 	 * @param rightFilter
@@ -67,7 +77,7 @@ public class IndexNestedLoopsJoins extends Iterator {
 	 * @param proj_list
 	 *            shows what input fields go where in the output tuple
 	 * @param n_out_flds
-	 *            number of outer relation fileds
+	 *            number of outer relation fields
 	 * @exception IOException
 	 *                some I/O fault
 	 * @exception NestedLoopException

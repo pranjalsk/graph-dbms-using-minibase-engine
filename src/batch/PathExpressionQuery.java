@@ -49,8 +49,35 @@ import bufmgr.PageNotReadException;
 import nodeheap.Node;
 import nodeheap.NodeHeapfile;
 
+/**
+ * Implements queries for following expression queries
+ * P Q1a ← N N/(N N/) ∗ N N 	where	N N ← (N ode Label|N ode Descriptor)
+ * P Q2a ← N N / EN (/ EN ) ∗	where	N N ← (N ode Label|N ode Descriptor)	&	EN ← (Edge Label|M ax Edge W eight)
+ * P Q3a ← N N// Bound	where	N N ← (N ode Label|N ode Descriptor)	&	Bound ← (M ax N um Edges|M ax T otal Edge W eight)
+ * T Qa ← EN ; EN ; EN	where	EN ← (Edge Label|M ax Edge W eight)
+ */
 public class PathExpressionQuery {
 
+	/**
+	 * Uses the parser that returns the type of query(a,b or c) 
+	 * and an iterator that satisfies the first node condition 
+	 * for the expression P Q1a ← N N/(N N/) ∗ N N.
+	 * Uses the pathexpression to feed each node id along with 
+	 * rest of the attributes to retrieve tails for that path
+	 * Adds the result to a pair to a heap file and feeds it to 
+	 * appropriate result printing type method.
+	 * @param pathExpression
+	 * @param nhfRef
+	 * @param ehfRef
+	 * @param btf_edge_src_label
+	 * @param btf_node_label
+	 * @param ztf_node_desc
+	 * @param numBuf
+	 * @param nodeLabelLength
+	 * @throws InvalidSlotNumberException
+	 * @throws InvalidTupleSizeException
+	 * @throws Exception
+	 */
 	public void pathExpressQuery1(String pathExpression, NodeHeapfile nhfRef,
 			EdgeHeapFile ehfRef, BTreeFile btf_edge_src_label,
 			BTreeFile btf_node_label, ZTreeFile ztf_node_desc, short numBuf,
@@ -146,6 +173,26 @@ public class PathExpressionQuery {
 		}
 	}
 
+	/**
+	 * Uses the parser that returns the type of query(a,b or c) 
+	 * and an iterator that satisfies the first node condition 
+	 * for the expression P Q2a ← N N / EN (/ EN ) ∗.
+	 * Uses the pathexpression to feed each node id along with 
+	 * rest of the attributes to retrieve tails for that path
+	 * Adds the result to a pair to a heap file and feeds it to 
+	 * appropriate result printing type method.
+	 * @param pathExpression
+	 * @param nhfRef
+	 * @param ehfRef
+	 * @param btf_edge_src_label
+	 * @param btf_node_label
+	 * @param ztf_node_desc
+	 * @param numBuf
+	 * @param nodeLabelLength
+	 * @throws InvalidSlotNumberException
+	 * @throws InvalidTupleSizeException
+	 * @throws Exception
+	 */
 	public void pathExpressQuery2(String pathExpression, NodeHeapfile nhfRef,
 			EdgeHeapFile ehfRef, BTreeFile btf_edge_src_label,
 			BTreeFile btf_node_label, ZTreeFile ztf_node_desc, short numBuf,
@@ -243,6 +290,26 @@ public class PathExpressionQuery {
 		}
 	}
 
+	/**
+	 * Uses the parser that returns the type of query(a,b or c) 
+	 * and an iterator that satisfies the first node condition 
+	 * for the expression P Q3a ← N N// Bound.
+	 * Uses the pathexpression to feed each node id along with 
+	 * rest of the attributes to retrieve tails for that path
+	 * Adds the result to a pair to a heap file and feeds it to 
+	 * appropriate result printing type method.
+	 * @param pathExpression
+	 * @param nhfRef
+	 * @param ehfRef
+	 * @param btf_edge_src_label
+	 * @param btf_node_label
+	 * @param ztf_node_desc
+	 * @param numBuf
+	 * @param nodeLabelLength
+	 * @throws InvalidSlotNumberException
+	 * @throws InvalidTupleSizeException
+	 * @throws Exception
+	 */
 	public void pathExpressQuery3(String pathExpression, NodeHeapfile nhfRef,
 			EdgeHeapFile ehfRef, BTreeFile btf_edge_src_label,
 			BTreeFile btf_node_label, ZTreeFile ztf_node_desc, short numBuf,
@@ -348,6 +415,21 @@ public class PathExpressionQuery {
 		}
 	}
 
+	/**
+	 * prints the head tail pairs from the given file
+	 * @param fileName
+	 * @throws JoinsException
+	 * @throws IndexException
+	 * @throws InvalidTupleSizeException
+	 * @throws InvalidTypeException
+	 * @throws PageNotReadException
+	 * @throws PredEvalException
+	 * @throws SortException
+	 * @throws LowMemException
+	 * @throws UnknowAttrType
+	 * @throws UnknownKeyTypeException
+	 * @throws Exception
+	 */
 	private void typeA(String fileName) throws JoinsException, IndexException,
 			InvalidTupleSizeException, InvalidTypeException,
 			PageNotReadException, PredEvalException, SortException,
@@ -390,6 +472,24 @@ public class PathExpressionQuery {
 		pathExprQueryResult.deleteFile();
 	}
 
+	/**
+	 * prints the head tail pair from the given file in sorted order.
+	 * considering head tail pair combined string and applying sort 
+	 * on this combined string.
+	 * @param fileName
+	 * @param numBuf
+	 * @throws JoinsException
+	 * @throws IndexException
+	 * @throws InvalidTupleSizeException
+	 * @throws InvalidTypeException
+	 * @throws PageNotReadException
+	 * @throws PredEvalException
+	 * @throws SortException
+	 * @throws LowMemException
+	 * @throws UnknowAttrType
+	 * @throws UnknownKeyTypeException
+	 * @throws Exception
+	 */
 	private void typeB(String fileName, int numBuf) throws JoinsException,
 			IndexException, InvalidTupleSizeException, InvalidTypeException,
 			PageNotReadException, PredEvalException, SortException,
@@ -430,6 +530,25 @@ public class PathExpressionQuery {
 		pathExprQueryResult.deleteFile();
 	}
 
+	/**
+	 * prints the unique head tail pair from the given file in sorted order.
+	 * considering head tail pair combined string and applying sort 
+	 * on this combined string and checking if the previous printed pair 
+	 * is not equal to the current one.
+	 * @param fileName
+	 * @param numBuf
+	 * @throws JoinsException
+	 * @throws IndexException
+	 * @throws InvalidTupleSizeException
+	 * @throws InvalidTypeException
+	 * @throws PageNotReadException
+	 * @throws PredEvalException
+	 * @throws SortException
+	 * @throws LowMemException
+	 * @throws UnknowAttrType
+	 * @throws UnknownKeyTypeException
+	 * @throws Exception
+	 */
 	private void typeC(String fileName, int numBuf) throws JoinsException,
 			IndexException, InvalidTupleSizeException, InvalidTypeException,
 			PageNotReadException, PredEvalException, SortException,
@@ -479,6 +598,30 @@ public class PathExpressionQuery {
 		pathExprQueryResult.deleteFile();
 	}
 
+	/**
+	 * retrievs the triangle trio nodes for the path expression
+	 * T Qa ← EN ; EN ; EN
+	 * if a triangular path exists between them
+	 * @param trianglePathExpression
+	 * @param nhfName
+	 * @param ehfName
+	 * @param indexEhfSourceNodeName
+	 * @param indexNodeLabelName
+	 * @param numBuf
+	 * @param nodeLabelLength
+	 * @throws JoinsException
+	 * @throws IndexException
+	 * @throws InvalidTupleSizeException
+	 * @throws InvalidTypeException
+	 * @throws PageNotReadException
+	 * @throws TupleUtilsException
+	 * @throws PredEvalException
+	 * @throws SortException
+	 * @throws LowMemException
+	 * @throws UnknowAttrType
+	 * @throws UnknownKeyTypeException
+	 * @throws Exception
+	 */
 	public void triangleQuery(String trianglePathExpression, String nhfName,
 			String ehfName, String indexEhfSourceNodeName,
 			String indexNodeLabelName, short numBuf, short nodeLabelLength)
@@ -563,6 +706,25 @@ public class PathExpressionQuery {
 		}
 	}
 
+	/**
+	 * prints the unique triangle node trio from the given file in sorted order.
+	 * considering trio combined string and applying sort 
+	 * on this combined string and checking if the previous printed trio 
+	 * is not equal to the current one.
+	 * @param fileName
+	 * @param numBuf
+	 * @throws JoinsException
+	 * @throws IndexException
+	 * @throws InvalidTupleSizeException
+	 * @throws InvalidTypeException
+	 * @throws PageNotReadException
+	 * @throws PredEvalException
+	 * @throws SortException
+	 * @throws LowMemException
+	 * @throws UnknowAttrType
+	 * @throws UnknownKeyTypeException
+	 * @throws Exception
+	 */
 	private void triangletypeC(String fileName, short numBuf)
 			throws JoinsException, IndexException, InvalidTupleSizeException,
 			InvalidTypeException, PageNotReadException, PredEvalException,
@@ -617,6 +779,22 @@ public class PathExpressionQuery {
 		triExprQueryResult.deleteFile();
 	}
 
+	/**
+	 * prints the triangular nodes trio from the given file in sorted order.
+	 * considering trio combined string and applying sort 
+	 * on this combined string.
+	 * @param fileName
+	 * @param numBuf
+	 * @throws JoinsException
+	 * @throws IndexException
+	 * @throws PageNotReadException
+	 * @throws PredEvalException
+	 * @throws LowMemException
+	 * @throws UnknowAttrType
+	 * @throws UnknownKeyTypeException
+	 * @throws FieldNumberOutOfBoundException
+	 * @throws Exception
+	 */
 	private void triangletypeB(String fileName, short numBuf)
 			throws JoinsException, IndexException, PageNotReadException,
 			PredEvalException, LowMemException, UnknowAttrType,
@@ -660,6 +838,19 @@ public class PathExpressionQuery {
 		triExprQueryResult.deleteFile();
 	}
 
+	/**
+	 * prints the triangular node trios from the given file
+	 * @param fileName
+	 * @throws JoinsException
+	 * @throws IndexException
+	 * @throws PageNotReadException
+	 * @throws PredEvalException
+	 * @throws SortException
+	 * @throws LowMemException
+	 * @throws UnknowAttrType
+	 * @throws UnknownKeyTypeException
+	 * @throws Exception
+	 */
 	private void triangletypeA(String fileName) throws JoinsException,
 			IndexException, PageNotReadException, PredEvalException,
 			SortException, LowMemException, UnknowAttrType,
@@ -709,6 +900,16 @@ public class PathExpressionQuery {
 		triExprQueryResult.deleteFile();
 	}
 
+	/**
+	 * returns the joined edges that satisfy the condition for destination node from outer
+	 * is equal to the source node from inner. And satisfy the first 2 condition for edge 
+	 * label or weight from  T Qa ← EN ; EN ; EN expression
+	 * @param objExpressions
+	 * @param attrTypes
+	 * @param ehfName
+	 * @param numBuf
+	 * @return
+	 */
 	private Iterator getTriNodeEdgePair(Object[] objExpressions,
 			AttrType[] attrTypes, String ehfName, int numBuf) {
 
@@ -818,6 +1019,18 @@ public class PathExpressionQuery {
 		return sm;
 	}
 
+	/**
+	 * returns the joined edges that satisfy the condition for destination node from outer
+	 * is equal to the source node from inner. And satisfy the 3rd condition for edge 
+	 * label or weight from  T Qa ← EN ; EN ; EN expression
+	 * @param objExpressions
+	 * @param attrTypes
+	 * @param ehfName
+	 * @param indexEhfSourceNodeName
+	 * @param am1
+	 * @param numBuf
+	 * @return
+	 */
 	private Iterator getThirdConnectingEdge(Object[] objExpressions,
 			AttrType[] attrTypes, String ehfName,
 			String indexEhfSourceNodeName, Iterator am1, int numBuf) {
