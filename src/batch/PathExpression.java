@@ -181,9 +181,6 @@ public class PathExpression {
 
 			TupleOrder order = new TupleOrder(TupleOrder.Ascending);
 			try {
-//				Iterator nodeIndexScan = new IndexScan(new IndexType(
-//						IndexType.B_Index), nhfName, indexNodeLabelName, in2,
-//						t2_str_sizes, 2, 2, inner_projlist, null, 1, false);
 				am_outer = new IndexNestedLoopsJoins(in1, 6, 6, t1_str_sizes, in2, 2,
 						1,t2_str_sizes, numBuf, inlj, nhfName, indexNodeLabelName, inner_projlist,
 						outFilter,null, outer_projlist, outer_projlist.length);
@@ -684,21 +681,11 @@ public class PathExpression {
 
 				if ((temptu = inlj.get_next()) != null) {
 					temptu.setHdr((short) 8, tempTypes, tempStrSizes);
-					// System.out.println("Node Label: " + temptu.getStrFld(8));
 					Tuple tail = new Tuple();
 					Edge tempTail = new Edge();
-					// System.err.println("Prior to Edge Updation for Node : "+temptu.getStrFld(8));
-					// System.out.println("Source Node Label: " +
-					// temptu.getStrFld(7)+" , Destination Node Label: "+temptu.getStrFld(8)+" , Edge Weight: "+temptu.getIntFld(6)
-					// +" , Left Edge Weight: "+temptu.getIntFld(4));
 					RID rid = (RID) (bi.getNidFromNodeLabel(
 							temptu.getStrFld(8), nodeHeapFile, btfNodeLabel));
 
-					/*
-					 * if (rid == null) System.out.println("RID is null"); else
-					 * System.out.println("RID Page No. : " + rid.pageNo +
-					 * " , RID Slot No. : " + rid.slotNo);
-					 */
 					tail.setHdr((short) 1, new AttrType[] { new AttrType(
 							AttrType.attrId) }, new short[] {});
 					tail.setIDFld(1, rid);
@@ -710,43 +697,18 @@ public class PathExpression {
 					tempTail.setLabel(temptu.getStrFld(5));
 					tempTail.setWeight(temptu.getIntFld(4)
 							- temptu.getIntFld(6));
-					/*
-					 * System.err.println("After Edge Updation for Node : "+temptu
-					 * .getStrFld(8));
-					 * System.out.println("Edge Source Node Label: "
-					 * +tempTail.getStrFld(7)+
-					 * " , Edge Destination Node Label: "+tempTail.getStrFld(8)+
-					 * " , Revised Edge Weight: "+tempTail.getIntFld(6)+
-					 * " , Left Edge Weight: "+tempTail.getIntFld(4));
-					 */
+					
 					tempTailEdgeFile.insertEdge(tempTail.getTupleByteArray());
 
 					while ((temptu = inlj.get_next()) != null) {
 						temptu.setHdr((short) 8, tempTypes, tempStrSizes);
-						// System.out.println("Node Label: " +
-						// temptu.getStrFld(8));
 						tail = new Tuple();
 						tempTail = new Edge();
 
-						/*
-						 * System.err.println("Prior to Edge Updation for Node : "
-						 * +temptu.getStrFld(8));
-						 * System.out.println("Source Node Label: " +
-						 * temptu.getStrFld(7)+
-						 * " , Destination Node Label: "+temptu.getStrFld(8)+
-						 * " , Edge Weight: "+temptu.getIntFld(6) +
-						 * " , Left Edge Weight: "+temptu.getIntFld(4));
-						 */
 						rid = (RID) (bi
 								.getNidFromNodeLabel(temptu.getStrFld(8),
 										nodeHeapFile, btfNodeLabel));
-						// System.out.println(rid.pageNo.pid+":"+rid.slotNo);
-
-						/*
-						 * if (rid == null) System.out.println("RID is null");
-						 * else System.out.println("RID Page No. : " +
-						 * rid.pageNo + " , RID Slot No. : " + rid.slotNo);
-						 */
+						
 						tail.setHdr((short) 1, new AttrType[] { new AttrType(
 								AttrType.attrId) }, new short[] {});
 						tail.setIDFld(1, rid);
@@ -758,16 +720,7 @@ public class PathExpression {
 						tempTail.setLabel(temptu.getStrFld(5));
 						tempTail.setWeight(temptu.getIntFld(4)
 								- temptu.getIntFld(6));
-						/*
-						 * System.err.println("After Edge Updation for Node : "+
-						 * temptu.getStrFld(8));
-						 * System.out.println("Edge Source Node Label: "
-						 * +tempTail.getStrFld(7)+
-						 * " , Edge Destination Node Label: "
-						 * +tempTail.getStrFld(8)+
-						 * " , Revised Edge Weight: "+tempTail.getIntFld(6)+
-						 * " , Left Edge Weight: "+tempTail.getIntFld(4));
-						 */
+						
 						tempTailEdgeFile.insertEdge(tempTail
 								.getTupleByteArray());
 					}
@@ -776,7 +729,6 @@ public class PathExpression {
 					break;
 
 			} else if (i == 0) {
-				// System.out.println("i: " + i);
 
 				short[] t1_str_sizes = new short[1];
 				t1_str_sizes[0] = nodeLabelLength;
@@ -815,27 +767,12 @@ public class PathExpression {
 
 				if ((temptu = inlj.get_next()) != null) {
 					temptu.setHdr((short) 8, tempTypes, tempStrSizes);
-					// System.out.println("Node Label: " + temptu.getStrFld(8));
 					Tuple tail = new Tuple();
 					Edge tempTail = new Edge();
 
-					/*
-					 * System.err.println("Prior to Edge Updation for Node : "+
-					 * temptu.getStrFld(8));
-					 * System.out.println("Source Node Label: " +
-					 * temptu.getStrFld(7)+
-					 * " , Destination Node Label: "+temptu.getStrFld(8)+
-					 * " , Edge Weight: "+temptu.getIntFld(6));
-					 */
 					RID rid = (RID) (bi.getNidFromNodeLabel(
 							temptu.getStrFld(8), nodeHeapFile, btfNodeLabel));
-					// System.out.println(rid.pageNo.pid+":"+rid.slotNo);
-
-					/*
-					 * if (rid == null) System.out.println("RID is null"); else
-					 * System.out.println("RID Page No. : " + rid.pageNo +
-					 * " , RID Slot No. : " + rid.slotNo);
-					 */
+					
 					tail.setHdr((short) 1, new AttrType[] { new AttrType(
 							AttrType.attrId) }, new short[] {});
 					tail.setIDFld(1, rid);
@@ -846,44 +783,20 @@ public class PathExpression {
 					tempTail.setDestLabel(temptu.getStrFld(8));
 					tempTail.setLabel(temptu.getStrFld(5));
 					tempTail.setWeight(maxTotalEdgeWeight - temptu.getIntFld(6));
-					// tempTail.setIntFld(4, maxTotalEdgeWeight -
-					// temptu.getIntFld(6));
-					/*
-					 * System.err.println("After Edge Updation for Node : "+temptu
-					 * .getStrFld(8));
-					 * System.out.println("Edge Source Node Label: "
-					 * +tempTail.getStrFld(7)+
-					 * " , Edge Destination Node Label: "+tempTail.getStrFld(8)+
-					 * " , Revised Edge Weight: "+tempTail.getIntFld(6)+
-					 * " , Left Edge Weight: "+tempTail.getIntFld(4));
-					 */
+					
 					tempTailEdgeFile.insertEdge(tempTail.getTupleByteArray());
 
 					while ((temptu = inlj.get_next()) != null) {
 						temptu.setHdr((short) 8, tempTypes, tempStrSizes);
-						// System.out.println("Node Label: " +
-						// temptu.getStrFld(8));
+						
 						tail = new Tuple();
 						tempTail = new Edge();
 
-						/*
-						 * System.err.println("Prior to Edge Updation for Node : "
-						 * +temptu.getStrFld(8));
-						 * System.out.println("Source Node Label: " +
-						 * temptu.getStrFld(7)+
-						 * " , Destination Node Label: "+temptu.getStrFld(8)+
-						 * " , Edge Weight: "+temptu.getIntFld(6));
-						 */
+						
 						rid = (RID) (bi
 								.getNidFromNodeLabel(temptu.getStrFld(8),
 										nodeHeapFile, btfNodeLabel));
-						// System.out.println(rid.pageNo.pid+":"+rid.slotNo);
-
-						/*
-						 * if (rid == null) System.out.println("RID is null");
-						 * else System.out.println("RID Page No. : " +
-						 * rid.pageNo + " , RID Slot No. : " + rid.slotNo);
-						 */
+						
 						tail.setHdr((short) 1, new AttrType[] { new AttrType(
 								AttrType.attrId) }, new short[] {});
 						tail.setIDFld(1, rid);
@@ -895,18 +808,7 @@ public class PathExpression {
 						tempTail.setLabel(temptu.getStrFld(5));
 						tempTail.setWeight(maxTotalEdgeWeight
 								- temptu.getIntFld(6));
-						// tempTail.setIntFld(4, maxTotalEdgeWeight -
-						// temptu.getIntFld(6));
-						/*
-						 * System.err.println("After Edge Updation for Node : "+
-						 * temptu.getStrFld(8));
-						 * System.out.println("Edge Source Node Label: "
-						 * +tempTail.getStrFld(7)+
-						 * " , Edge Destination Node Label: "
-						 * +tempTail.getStrFld(8)+
-						 * " , Revised Edge Weight: "+tempTail.getIntFld(6)+
-						 * " , Left Edge Weight: "+tempTail.getIntFld(4));
-						 */
+						
 						tempTailEdgeFile.insertEdge(tempTail
 								.getTupleByteArray());
 					}
@@ -922,14 +824,7 @@ public class PathExpression {
 			proj_list[1] = new FldSpec(outer_relation, 2); // Descriptor
 			am_outer = new EFileScan(tempTailEdgeFileName, tempTypes,
 					tempStrSizes, (short) 8, 8, temp_proj_list, null);
-			/*
-			 * Tuple temp; while((temp = am_outer.get_next()) != null){
-			 * temp.setHdr((short)8, tempTypes, tempStrSizes);
-			 * System.out.println("Edge Source Node Label: "+temp.getStrFld(7)+
-			 * " , Edge Destination Node Label: "+temp.getStrFld(8)
-			 * +" , Revised Edge Weight: "+temp.getIntFld(4)
-			 * +" , Edge Weight: "+temp.getIntFld(6)); }
-			 */
+			
 
 		} while (true);
 		btfNodeLabel.close();
@@ -945,13 +840,7 @@ public class PathExpression {
 		}
 		Iterator tail_iterator = new FileScan("TailNodeFileForPQ3", atrType,
 				str_sizes, (short) 1, 1, tailNodeprojlist, null);
-		/*Tuple t;
-		while ((t = tail_iterator.get_next()) != null) {
-			t.setHdr((short) 1, atrType, str_sizes);
-			RID rid = t.getIDFld(1);
-			System.out.println(rid.pageNo.pid + ":" + rid.slotNo);
-			t.print(atrType);
-		}*/
+		
 
 		return tail_iterator;
 	}
@@ -1034,7 +923,6 @@ public class PathExpression {
 		short[] t1_str_sizes, t2_str_sizes;
 		AttrType[] in1;
 		for (int i = 0; i < maxNumberOfEdges; i++) {
-			// System.out.println("i: " + i);
 
 			// Iterator Settings for EdgeHeapFile
 			t2_str_sizes = new short[3];
@@ -1164,11 +1052,6 @@ public class PathExpression {
 				RID rid = (RID) (bi.getNidFromNodeLabel(temptu.getStrFld(1),
 						nodeHeapFile, btfNodeLabel));
 
-				/*
-				 * if (rid == null) System.out.println("RID is null"); else
-				 * System.out.println("RID Page No. : " + rid.pageNo +
-				 * " , RID Slot No. : " + rid.slotNo);
-				 */
 				tail.setHdr((short) 1, new AttrType[] { new AttrType(
 						AttrType.attrId) }, new short[] {});
 				tail.setIDFld(1, rid);
@@ -1181,7 +1064,6 @@ public class PathExpression {
 				tempTailNodeFile.insertNode(temptu.getTupleByteArray());
 			}
 
-			// btfNodeLabel.close();
 			inlj.close();
 			am_outer.close();
 
@@ -1191,7 +1073,6 @@ public class PathExpression {
 					tempStrSizes, (short) 2, 2, proj_list, null);
 
 		}
-		// ****************************//*
 
 		while ((tu = am_outer.get_next()) != null) {
 			tu.setHdr((short) 2, tempTypes, tempStrSizes);
@@ -1203,7 +1084,6 @@ public class PathExpression {
 			tail.setIDFld(1, rid);
 			tailNodeFile.insertRecord(tail.getTupleByteArray());
 		}
-		// ****************************//*
 		btfNodeLabel.close();
 		inlj.close();
 		am_outer.close();
@@ -1216,12 +1096,6 @@ public class PathExpression {
 		}
 		Iterator tail_iterator = new FileScan("TailNodeFileForPQ3", atrType,
 				str_sizes, (short) 1, 1, tailNodeprojlist, null);
-		/*Tuple t;
-		while ((t = tail_iterator.get_next()) != null) {
-			t.setHdr((short) 1, atrType, str_sizes);
-			RID rid = t.getIDFld(1);
-			t.print(atrType);
-		}*/
 
 		return tail_iterator;
 	}

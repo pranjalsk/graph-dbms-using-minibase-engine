@@ -101,10 +101,6 @@ public class EdgeQueryWithIndex {
 					edgeLabel = edge.getLabel();
 					edgeSrc = edge.getSourceLabel();
 					edgeDest = edge.getDestLabel();
-					// sourceNodePageID = edge.getSource().pageNo.pid;
-					// sourceNodeSlotID = edge.getSource().slotNo;
-					// destinationNodePageID = edge.getDestination().pageNo.pid;
-					// destinationNodeSlotID = edge.getDestination().slotNo;
 					sourceNID = edge.getSource();
 					destinationNID = edge.getDestination();
 

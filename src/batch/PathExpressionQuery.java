@@ -374,13 +374,18 @@ public class PathExpressionQuery {
 
 		Iterator resultScanner = new FileScan(fileName, type, str_sizes,
 				(short) 3, (short) 2, proj_list, null);
-
+		
+		boolean noOutput = true;
 		Tuple res;
 		while ((res = resultScanner.get_next()) != null) {
+			noOutput = false;
 			res.setHdr((short) 2, outtype, out_str_sizes);
 			res.print(outtype);
 		}
 
+		if(noOutput){
+			System.out.println("No Head Tail pair satisfies the given path expression query.");
+		}
 		resultScanner.close();
 		pathExprQueryResult.deleteFile();
 	}
@@ -408,14 +413,19 @@ public class PathExpressionQuery {
 
 		Iterator sort = new Sort(type, (short) 3, str_sizes, resultScanner, 3,
 				new TupleOrder(0), 32, numBuf);
-
+		boolean noOutput = true;
 		Tuple res;
 		while ((res = sort.get_next()) != null) {
+			noOutput = false;
 			res.setHdr((short) 3, type, str_sizes);
 			System.out.println("[" + res.getStrFld(1) + "," + res.getStrFld(2)
 					+ "]");
 		}
 
+		if(noOutput){
+			System.out.println("No Head Tail pair satisfies the given path expression query.");
+		}
+		
 		sort.close();
 		pathExprQueryResult.deleteFile();
 	}
@@ -445,9 +455,11 @@ public class PathExpressionQuery {
 		Iterator sort = new Sort(type, (short) 3, str_sizes, resultScanner, 3,
 				new TupleOrder(0), 32, numBuf);
 
+		boolean noOutput = true;
 		Tuple prevRes = null;
 		Tuple res;
 		while ((res = sort.get_next()) != null) {
+			noOutput = false;
 			res.setHdr((short) 3, type, str_sizes);
 			if (prevRes == null
 					|| !(prevRes.getStrFld(1)
@@ -459,6 +471,10 @@ public class PathExpressionQuery {
 			}
 		}
 
+		if(noOutput){
+			System.out.println("No Head Tail pair satisfies the given path expression query.");
+		}
+		
 		sort.close();
 		pathExprQueryResult.deleteFile();
 	}
@@ -576,9 +592,11 @@ public class PathExpressionQuery {
 		Iterator sort = new Sort(type, (short) 4, str_sizes, resultScanner, 4,
 				new TupleOrder(0), 32, numBuf);
 
+		boolean noOutput = true;
 		Tuple prevRes = null;
 		Tuple res;
 		while ((res = sort.get_next()) != null) {
+			noOutput = false;
 			res.setHdr((short) 4, type, str_sizes);
 			if (prevRes == null
 					|| !(prevRes.getStrFld(1)
@@ -592,6 +610,9 @@ public class PathExpressionQuery {
 			}
 		}
 
+		if(noOutput){
+			System.out.println("No Nodes satisfy the given triangle query expression.");
+		}
 		sort.close();
 		triExprQueryResult.deleteFile();
 	}
@@ -622,14 +643,19 @@ public class PathExpressionQuery {
 
 		Iterator sort = new Sort(type, (short) 4, str_sizes, resultScanner, 4,
 				new TupleOrder(0), 32, numBuf);
-
+		boolean noOutput = true;
 		Tuple res;
 		while ((res = sort.get_next()) != null) {
+			noOutput = false;
 			res.setHdr((short) 4, type, str_sizes);
 			System.out.println("[" + res.getStrFld(1) + ", " + res.getStrFld(2)
 					+ ", " + res.getStrFld(3) + "]");
 		}
 
+		if(noOutput){
+			System.out.println("No Nodes satisfy the given triangle query expression.");
+		}
+		
 		sort.close();
 		triExprQueryResult.deleteFile();
 	}
@@ -666,12 +692,19 @@ public class PathExpressionQuery {
 		Iterator resultScanner = new FileScan(fileName, type, str_sizes,
 				(short) 4, (short) 3, proj_list, null);
 
+		boolean noOutput = true;
+		
 		Tuple res;
 		while ((res = resultScanner.get_next()) != null) {
+			noOutput = false;
 			res.setHdr((short) 3, outtype, out_str_sizes);
 			res.print(outtype);
 		}
 
+		if(noOutput){
+			System.out.println("No Nodes satisfy the given triangle query expression.");
+		}
+		
 		resultScanner.close();
 		triExprQueryResult.deleteFile();
 	}
@@ -770,14 +803,11 @@ public class PathExpressionQuery {
 
 		TupleOrder order = new TupleOrder(TupleOrder.Ascending);
 		EFileScan efscan1 = null;
-//		EFileScan efscan2 = null;
 		Iterator sm = null;
 
 		try {
 			efscan1 = new EFileScan(ehfName, attrType, s1_sizes, (short) 8, 8,
 					inputProjList, null);
-//			efscan2 = new EFileScan(ehfName, attrType, s1_sizes, (short) 8, 8,
-//					inputProjList, null);
 			sm = new NestedLoopsJoins(attrType, 8, s1_sizes, attrType, 8,
 					s1_sizes, numBuf, efscan1, ehfName, expr, null,
 					outputProjList, outputProjList.length);
@@ -887,15 +917,7 @@ public class PathExpressionQuery {
 		Iterator sm = null;
 
 		try {
-
-//			efscan2 = new EFileScan(ehfName, attrType, s2_sizes, (short) 8, 8,
-//					inputProjList, null);
-
-			
-//			 sm = new NestedLoopsJoins(jtype, 8, s1_sizes, attrType, 8,
-//			  s2_sizes, numBuf, am1, ehfName, expr, null, outputProjList,
-//			  outputProjList.length);
-			 
+ 
 			sm = new IndexNestedLoopsJoins(jtype, 8, 8, s1_sizes, attrType, 8,
 					7, s2_sizes, (short) numBuf, am1, ehfName,
 					indexEhfSourceNodeName, inputProjList, expr, null,
