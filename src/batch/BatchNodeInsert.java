@@ -5,10 +5,12 @@ import nodeheap.Node;
 import nodeheap.NodeHeapfile;
 
 public class BatchNodeInsert {
-
+	/**
+	 * @param nhf
+	 * @param sCurrentLine
+	 * @throws Exception
+	 */
 	public void insertBatchNode(NodeHeapfile nhf, String sCurrentLine) throws Exception{
-		
-		// TODO Auto-generated method stub
 		try{
 		String[] tokens = sCurrentLine.split(" ");
 		String label=tokens[0];
@@ -20,8 +22,7 @@ public class BatchNodeInsert {
 		Descriptor desc= new Descriptor();
 		desc.set(value1, value2, value3, value4, value5);
 		Node node=makeNode(label, desc);
-//		node.print();
-		nhf.insertNode(node.getNodeByteArray()); //failing here
+		nhf.insertNode(node.getNodeByteArray());
  		}
 		catch(Exception ex)
 		{
@@ -29,14 +30,17 @@ public class BatchNodeInsert {
 		}
 	}
 
+	/**
+	 * @param label
+	 * @param desc
+	 * @return
+	 * @throws Exception
+	 */
 	private Node makeNode(String label, Descriptor desc) throws Exception {
-		// TODO Auto-generated method stub
 		Node node =new Node();
 		node.setHdr();
 		node.setLabel(label);
 		node.setDesc(desc);
 		return node;
 	}
-
-
 }
