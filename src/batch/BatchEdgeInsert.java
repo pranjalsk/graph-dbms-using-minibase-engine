@@ -25,20 +25,19 @@ public class BatchEdgeInsert {
 				BatchMapperClass batchinsert = new BatchMapperClass();
 				NID sourceNID = batchinsert.getNidFromNodeLabel(sourceLabel, nhf, btf_node);
 				NID destinationNID = batchinsert.getNidFromNodeLabel(destinationLabel, nhf,btf_node);
-				
-				Edge newEdge = new Edge();
-				newEdge.setHdr();
-				newEdge.setSource(sourceNID);
-				newEdge.setDestination(destinationNID);
-				newEdge.setLabel(edgeLabel);
-				newEdge.setWeight(edgeWeight);
-				newEdge.setSourceLabel(sourceLabel);
-				newEdge.setDestLabel(destinationLabel);
-				
-				//newEdge.print();
-				
-				EID newEid = new EID();
-				newEid = ehf.insertEdge(newEdge.getEdgeByteArray());
+				if(sourceNID.pageNo.pid != -1 && sourceNID.slotNo != -1
+						&& destinationNID.pageNo.pid != -1 && destinationNID.slotNo != -1) {
+					Edge newEdge = new Edge();
+					newEdge.setHdr();
+					newEdge.setSource(sourceNID);
+					newEdge.setDestination(destinationNID);
+					newEdge.setLabel(edgeLabel);
+					newEdge.setWeight(edgeWeight);
+					newEdge.setSourceLabel(sourceLabel);
+					newEdge.setDestLabel(destinationLabel);
+					EID newEid = new EID();
+					newEid = ehf.insertEdge(newEdge.getEdgeByteArray());
+				}
 			}
 		}
 		
