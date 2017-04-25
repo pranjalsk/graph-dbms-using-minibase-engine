@@ -18,8 +18,6 @@ import heap.*;
 public class BatchNodeDelete {
 
 	/**
-	 * reurns
-	 * 
 	 * @param nhf
 	 * @param ehf
 	 * @param btfNodeLbl
@@ -58,45 +56,6 @@ public class BatchNodeDelete {
 				NID nidToDel = new NID();
 				nidToDel.copyNid(currentNid);
 				nidlist.add(currentNid);
-
-				// Delete all edges associated with the node
-				/*EID newEid = new EID();
-				EScan newEscan = ehf.openScan();
-				Edge newEdge = new Edge();
-				// boolean done = false;
-				NID sourceNID = null;
-				NID destinationNID = null;
-				deleteStatus = false;
-				boolean done = false;
-
-				while (!done) {
-					newEdge = newEscan.getNext(newEid);
-					EID currentEid = new EID();
-					currentEid.copyEID(newEid);
-					if (newEdge == null) {
-						done = true;
-						break;
-					}
-					newEdge.setHdr();
-					
-					Edge deletedEdge =  ehf.getRecord(currentEid);
-					deletedEdge.setHdr();
-					String edgelbl = deletedEdge.getLabel();
-					int edgeWt = deletedEdge.getWeight();
-					KeyClass edgelblKey = new StringKey(edgelbl);
-					KeyClass edgeWtKey = new IntegerKey(edgeWt);
-					
-					sourceNID = newEdge.getSource();
-					destinationNID = newEdge.getDestination();
-					if (currentNid.equals(sourceNID)
-							|| currentNid.equals(destinationNID)) {
-						deleteStatus = ehf.deleteRecord(newEid);
-						btfEdgeLabl.Delete(edgelblKey, currentEid);
-						btfEdgeWt.Delete(edgeWtKey, currentEid);			
-					}// end-if
-				}// end-while
-				newEscan.closescan();*/
-
 				ztfNodeDesc.Delete(descKey, nidToDel);
 				btfNodeLbl.Delete(lblKey, nidToDel);
 			}//end-while
@@ -141,11 +100,15 @@ public class BatchNodeDelete {
 		}
 
 	}
+	/**
+	 * @param nidlist
+	 * @param myNID
+	 * @return
+	 */
 	public boolean checkIfContains(ArrayList<NID> nidlist, NID myNID){	
 		for(NID n: nidlist)
 			if(n.equals(myNID))
 				return true;		
 		return false;
 	}
-
 }

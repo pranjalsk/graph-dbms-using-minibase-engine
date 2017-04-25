@@ -62,11 +62,17 @@ public class BatchOperations {
 	public static String logpath;
 	static HashSet<String> hs;
 
+	/**
+	 * @param args
+	 * @throws Exception
+	 */
 	public static void main(String[] args) throws Exception {
 		/*
-		 * Menu Driven Program (CUI for Batch operations) Enter the task name of
-		 * your choice Enter the input file path Enter the GraphDB name Call the
-		 * appropriate class methods according to the task number
+		 * Menu Driven Program (CUI for Batch operations)
+		 * Enter the task name of your choice
+		 * Enter the input file path
+		 * Enter the GraphDB name
+		 * Call the appropriate class methods according to the task number
 		 */
 		do {
 			BufferedReader br = new BufferedReader(new InputStreamReader(
@@ -438,7 +444,6 @@ public class BatchOperations {
 						ztf_node_desc.close();
 						printStatistics(gdb, nhf, ehf);
 					} catch (Exception e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
 					break;
@@ -528,7 +533,6 @@ public class BatchOperations {
 						}
 
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					break;
@@ -603,6 +607,13 @@ public class BatchOperations {
 		} while (true);
 	}// main
 
+	/**
+	 * @param newGDB
+	 * @param nhf
+	 * @param ehf
+	 * @throws Exception
+	 */
+	//Prints Nodecount and Edgecount
 	public static void printStatistics(GraphDB newGDB, NodeHeapfile nhf,
 			EdgeHeapFile ehf) throws Exception {
 		int n = newGDB.getNodeCnt(nhf);

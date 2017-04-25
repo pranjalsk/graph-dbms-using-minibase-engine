@@ -21,31 +21,19 @@ import zindex.DescriptorKey;
 import btree.*;
 
 public class BatchMapperClass {
-	/*
-	 * Function to find the NID for a given Node label We get the node heap file
-	 * from the GraphDB instance; this is passed as argument
+
+	/**
+	 * @param nodeLabel
+	 * @param nhf
+	 * @param btf_node
+	 * @return
+	 * @throws Exception
 	 */
+	
+	//Returns NID corresponding to input Node label
 	public NID getNidFromNodeLabel(String nodeLabel, NodeHeapfile nhf,
 			BTreeFile btf_node) throws Exception {
-		try {
-			// NID newNid = new NID();
-			// NScan newNscan = nhf.openScan();
-			// Node newNode = new Node();
-			// boolean done = false;
-			//
-			// while(!done){
-			// newNode = newNscan.getNext(newNid);
-			// if (newNode == null) {
-			// break;
-			// }
-			// newNode.setHdr();
-			// String label = newNode.getLabel();
-			// if(nodeLabel.equalsIgnoreCase(label)){
-			// done = true;
-			// }
-			// }
-			// newNscan.closescan();
-			// return newNid;
+		try {			
 			NID newnid;
 			RID newRid = new RID();
 			KeyClass key = new StringKey(nodeLabel);
@@ -67,46 +55,25 @@ public class BatchMapperClass {
 		}
 	}// getNidFromNodeLabel
 
+	/**
+	 * @param sourceNID
+	 * @param destinationNID
+	 * @param edgeLabel
+	 * @param ehf
+	 * @param btf_edgelabel
+	 * @return
+	 * @throws Exception
+	 */
+	// Returns EID corresponding to input Edge label, Source NID, Destination NID
 	public EID getEidFromEdgeLabel(NID sourceNID, NID destinationNID,
 			String edgeLabel, EdgeHeapFile ehf, BTreeFile btf_edgelabel)
 			throws Exception {
 		try {
-			// EID newEid = new EID();
-			// EScan newEscan = ehf.openScan();
-			// Edge newEdge = new Edge();
-			// boolean done = false;
-			//
-			// while(!done){
-			// newEdge = newEscan.getNext(newEid);
-			// if(newEdge == null){
-			// done = true;
-			// break;
-			// }
-			// newEdge.setHdr();
-			// if(newEdge.getLabel().equalsIgnoreCase(edgeLabel) &&
-			// newEdge.getSource().equals(sourceNID) &&
-			// newEdge.getDestination().equals(destinationNID)){
-			// done = true;
-			// }
-			// }
-			// newEscan.closescan();
-			// return newEid;
-
-			// RID newRid = new RID();
-			// EID newEid = null;
-			// EID currentEID = new EID();
 			EScan newEscan = ehf.openScan();
-
 			KeyClass key = new StringKey(edgeLabel);
 			BTFileScan newScan = btf_edgelabel.new_scan(null, null);
-			// KeyDataEntry newEntry = new KeyDataEntry();
-			// boolean done = false;
 			KeyDataEntry newEntry = newScan.get_next();
 			while (newEntry != null) {
-				// KeyDataEntry newEntry = newScan.get_next();
-				// if (newEntry == null) {
-				// break;
-				// }
 				LeafData newData = (LeafData) newEntry.data;
 				RID newRid = newData.getData();
 				EID newEid = new EID(newRid.pageNo, newRid.slotNo);
@@ -115,10 +82,8 @@ public class BatchMapperClass {
 				if (newEdge.getLabel().equalsIgnoreCase(edgeLabel)
 						&& newEdge.getSource().equals(sourceNID)
 						&& newEdge.getDestination().equals(destinationNID)) {
-					// currentEID.copyEID(newEid);
 					newScan.DestroyBTreeFileScan();
 					newEscan.closescan();
-					// return currentEID;
 					return newEid;
 				}
 				newEntry = newScan.get_next();
@@ -134,33 +99,14 @@ public class BatchMapperClass {
 	}// getEidFromEdgeLabel
 
 	
-// *******Don't know author of this method and where it is being used*********************	
-//	public NID getNidFromNodeDescriptor(Descriptor sourceDesc,
-//			NodeHeapfile nhf, BTreeFile btf_node) {
-//		try {
-//
-//			NID newnid;
-//			RID newRid = new RID();
-//			KeyClass key = new DescriptorKey(sourceDesc);
-//			ZTFileScan newScan = new ZTFileScan(key, key);
-//			// btf_node.new_scan(key, key);
-//			KeyDataEntry newEntry = newScan.get_next();
-//			if (newEntry != null) {
-//				LeafData newData = (LeafData) newEntry.data;
-//				newRid = newData.getData();
-//				newnid = new NID(newRid.pageNo, newRid.slotNo);
-//			} else {
-//				newnid = new NID(new PageId(-1), -1);
-//			}
-//
-//			newScan.DestroyBTreeFileScan();
-//			return newnid;
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			return null;
-//		}
-//	}
-
+	/**
+	 * @param input
+	 * @param nhf
+	 * @param ztf_desc
+	 * @return
+	 * @throws Exception
+	 */
+	// Returns an iterator over all NIDs associated with input Node Descriptor
 	public Iterator getNidFromDescriptor(String input, NodeHeapfile nhf,
 			ZTreeFile ztf_desc) throws Exception {
 		
@@ -224,4 +170,3 @@ public class BatchMapperClass {
 	}// getNidFromDescriptor
 
 }// BatchInsert
-
