@@ -460,6 +460,8 @@ public class BatchOperations {
 								"IndEdgeLabel_" + graphDBName);
 						BTreeFile btf_edge_weight = new BTreeFile(
 								"IndEdgeWeight_" + graphDBName);
+						BTreeFile btf_edge_dest_label = new BTreeFile(
+								"IndEdgeDestLabel_" + graphDBName);
 						try {
 							// heapfile scan
 							if (index == 0) {
@@ -483,7 +485,7 @@ public class BatchOperations {
 											(short) numBuf, edgeWtBound1,
 											edgeWtBound2);
 								} else if (qtype == 6) {
-									eq.query6(ehf);
+									eq.query6(ehf,(short) numBuf);
 								} 
 
 							}
@@ -509,7 +511,7 @@ public class BatchOperations {
 											edgeLabelLength, (short) numBuf,
 											edgeWtBound1, edgeWtBound2);
 								} else if (qtype == 6) {
-									eqi.query6(ehf, btf_edge_label, nhf,
+									eqi.query6(ehf, btf_edge_dest_label, nhf,
 											edgeLabelLength, (short) numBuf);
 								}
 							}
@@ -518,7 +520,7 @@ public class BatchOperations {
 							btf_node_label.close();
 							btf_edge_label.close();
 							btf_edge_weight.close();
-							// ztf_node_desc.close();
+							btf_edge_dest_label.close();
 
 							printStatistics(gdb, nhf, ehf);
 						} catch (Exception e) {

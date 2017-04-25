@@ -17,12 +17,31 @@ import global.EID;
 import global.IndexType;
 import global.NID;
 import heap.FieldNumberOutOfBoundException;
+import heap.InvalidTupleSizeException;
+import heap.InvalidTypeException;
+import heap.Tuple;
 import index.EdgeIndexScan;
+import index.IndexException;
 import index.NodeIndexScan;
 import iterator.CondExpr;
+import iterator.EFileScan;
+import iterator.FileScanException;
 import iterator.FldSpec;
+import iterator.IndexNestedLoopsJoins;
+import iterator.InvalidRelation;
+import iterator.Iterator;
+import iterator.JoinsException;
+import iterator.LowMemException;
+import iterator.NestedLoopException;
+import iterator.NestedLoopsJoins;
+import iterator.PredEvalException;
 import iterator.RelSpec;
+import iterator.SortException;
+import iterator.TupleUtilsException;
+import iterator.UnknowAttrType;
+import iterator.UnknownKeyTypeException;
 import btree.BTreeFile;
+import bufmgr.PageNotReadException;
 
 public class EdgeQueryWithIndex {
 
@@ -530,80 +549,129 @@ public class EdgeQueryWithIndex {
 
 	}
 
-	public void query6(EdgeHeapFile ehf, BTreeFile btf_edge_label,
-			NodeHeapfile nhf, short edgeLabelLength, short numBuf) {
+	/**
+	 * printing the edge pairs who have the same destination node
+	 * but not with itself using IndexNestedLoopsJoins
+	 * @param ehf
+	 * @param btf_edge_dest_label
+	 * @param nhf
+	 * @param edgeLabelLength
+	 * @param numBuf
+	 * @throws JoinsException
+	 * @throws IndexException
+	 * @throws PageNotReadException
+	 * @throws PredEvalException
+	 * @throws SortException
+	 * @throws LowMemException
+	 * @throws UnknowAttrType
+	 * @throws UnknownKeyTypeException
+	 * @throws Exception
+	 */
+	public void query6(EdgeHeapFile ehf, BTreeFile btf_edge_dest_label,
+			NodeHeapfile nhf, short edgeLabelLength, short numBuf)
+			throws JoinsException, IndexException, PageNotReadException, PredEvalException, SortException, LowMemException, UnknowAttrType, UnknownKeyTypeException, Exception {
+		short[] t2_str_sizes = new short[3];
+		t2_str_sizes[0] = 32;
+		t2_str_sizes[1] = 32;
+		t2_str_sizes[2] = 32;
+		AttrType[] in2 = new AttrType[8];
+		in2[0] = new AttrType(AttrType.attrInteger);
+		in2[1] = new AttrType(AttrType.attrInteger);
+		in2[2] = new AttrType(AttrType.attrInteger);
+		in2[3] = new AttrType(AttrType.attrInteger);
+		in2[4] = new AttrType(AttrType.attrString);
+		in2[5] = new AttrType(AttrType.attrInteger);
+		in2[6] = new AttrType(AttrType.attrString);
+		in2[7] = new AttrType(AttrType.attrString);
+		
+		FldSpec[] proj_list = new FldSpec[8];
+		RelSpec inner_relation = new RelSpec(RelSpec.innerRel);
+		RelSpec outer_relation = new RelSpec(RelSpec.outer);
+		proj_list[0] = new FldSpec(outer_relation, 1);
+		proj_list[1] = new FldSpec(outer_relation, 2);
+		proj_list[2] = new FldSpec(outer_relation, 3);
+		proj_list[3] = new FldSpec(outer_relation, 4);
+		proj_list[4] = new FldSpec(outer_relation, 5);
+		proj_list[5] = new FldSpec(outer_relation, 6);
+		proj_list[6] = new FldSpec(outer_relation, 7);
+		proj_list[7] = new FldSpec(outer_relation, 8);
+		
+		CondExpr[] out_filter_outer_Iterator = new CondExpr[3];
+		out_filter_outer_Iterator[0] = new CondExpr();
+		out_filter_outer_Iterator[0].op = new AttrOperator(AttrOperator.aopEQ);
+		out_filter_outer_Iterator[0].type2 = new AttrType(AttrType.attrSymbol);
+		out_filter_outer_Iterator[0].type1 = new AttrType(AttrType.attrSymbol);
+		out_filter_outer_Iterator[0].operand2.symbol = new FldSpec(new RelSpec(
+				RelSpec.outer), 8);
+		out_filter_outer_Iterator[0].operand1.symbol = new FldSpec(new RelSpec(
+				RelSpec.innerRel), 8);
+		out_filter_outer_Iterator[1] = new CondExpr();
+		out_filter_outer_Iterator[1].op = new AttrOperator(AttrOperator.aopNE);
+		out_filter_outer_Iterator[1].type2 = new AttrType(AttrType.attrSymbol);
+		out_filter_outer_Iterator[1].type1 = new AttrType(AttrType.attrSymbol);
+		out_filter_outer_Iterator[1].operand2.symbol = new FldSpec(new RelSpec(
+				RelSpec.outer), 5);
+		out_filter_outer_Iterator[1].operand1.symbol = new FldSpec(new RelSpec(
+				RelSpec.innerRel), 5);
+		out_filter_outer_Iterator[2] = null;
+		CondExpr or2 =	new CondExpr();
+		or2.op = new AttrOperator(AttrOperator.aopNE);
+		or2.type2 = new AttrType(AttrType.attrSymbol);
+		or2.type1 = new AttrType(AttrType.attrSymbol);
+		or2.operand2.symbol = new FldSpec(new RelSpec(
+				RelSpec.outer), 6);
+		or2.operand1.symbol = new FldSpec(new RelSpec(
+				RelSpec.innerRel), 6);
+		CondExpr or3 = new CondExpr();
+		or3.op = new AttrOperator(AttrOperator.aopNE);
+		or3.type2 = new AttrType(AttrType.attrSymbol);
+		or3.type1 = new AttrType(AttrType.attrSymbol);
+		or3.operand2.symbol = new FldSpec(new RelSpec(
+				RelSpec.outer), 7);
+		or3.operand1.symbol = new FldSpec(new RelSpec(
+				RelSpec.innerRel), 7);
+		or3.next =or2;
+		out_filter_outer_Iterator[1].next = or2;
+		
+		FldSpec[] outer_proj_list = new FldSpec[8];
+		outer_proj_list[0] = new FldSpec(inner_relation, 5);
+		outer_proj_list[1] = new FldSpec(inner_relation, 6);
+		outer_proj_list[2] = new FldSpec(inner_relation, 7);
+		outer_proj_list[3] = new FldSpec(inner_relation, 8);
+		outer_proj_list[4] = new FldSpec(outer_relation, 5);
+		outer_proj_list[5] = new FldSpec(outer_relation, 6);
+		outer_proj_list[6] = new FldSpec(outer_relation, 7);
+		outer_proj_list[7] = new FldSpec(outer_relation, 8);
+		
+		Iterator eScan = new EFileScan(ehf.get_fileName(), in2, t2_str_sizes, (short)8, 8, proj_list, null);
 		
 		
-		String edgeHeapFileName = ehf.get_fileName();
-		String edgeIndexFileName = btf_edge_label.get_fileName();
-
-		AttrType[] attrType = new AttrType[8];
-		short[] stringSize = new short[3];
-		stringSize[0] = edgeLabelLength;
-		stringSize[1] = edgeLabelLength;
-		stringSize[2] = edgeLabelLength;
-		attrType[0] = new AttrType(AttrType.attrInteger);
-		attrType[1] = new AttrType(AttrType.attrInteger);
-		attrType[2] = new AttrType(AttrType.attrInteger);
-		attrType[3] = new AttrType(AttrType.attrInteger);
-		attrType[4] = new AttrType(AttrType.attrString);
-		attrType[5] = new AttrType(AttrType.attrInteger);
-		attrType[6] = new AttrType(AttrType.attrString);
-		attrType[7] = new AttrType(AttrType.attrString);
+		Iterator inlj = new IndexNestedLoopsJoins(in2, 8, 8, t2_str_sizes, in2, 8, 8, t2_str_sizes, numBuf, eScan, ehf.get_fileName(), btf_edge_dest_label.get_fileName(), proj_list, out_filter_outer_Iterator, null, outer_proj_list, 8);
 		
-		
-		FldSpec[] projlist = new FldSpec[8];
-		RelSpec rel = new RelSpec(RelSpec.outer);
-		projlist[0] = new FldSpec(rel, 1);
-		projlist[1] = new FldSpec(rel, 2);
-		projlist[2] = new FldSpec(rel, 3);
-		projlist[3] = new FldSpec(rel, 4);
-		projlist[4] = new FldSpec(rel, 5);
-		projlist[5] = new FldSpec(rel, 6);
-		projlist[6] = new FldSpec(rel, 7);
-		projlist[7] = new FldSpec(rel, 8);
-
-		CondExpr[] expr = null;
-		IndexType indType = new IndexType(1);
-		
-		int count = 0;
-		Edge edgeOuter;
-		try {
-			EdgeIndexScan eOuterscan = new EdgeIndexScan(indType, edgeHeapFileName,
-					edgeIndexFileName, attrType, stringSize, 8, 8, projlist,
-					expr, 5, false);
-			edgeOuter = eOuterscan.get_next();
-
-			while (edgeOuter != null) {
-				edgeOuter.setHdr();
-				NID outerEdgeDist = edgeOuter.getDestination();
-				
-				Edge edgeInner;
-				EdgeIndexScan eInnerscan = new EdgeIndexScan(indType, edgeHeapFileName,
-						edgeIndexFileName, attrType, stringSize, 8, 8, projlist,
-						expr, 5, false);
-				edgeInner = eInnerscan.get_next();
-				
-				while(edgeInner != null){
-					edgeInner.setHdr();
-					NID innerEdgeDist = edgeInner.getDestination();
-					if(edgeInner.getLabel() != edgeOuter.getLabel() && edgeInner.getWeight() != edgeOuter.getWeight() 
-							&& edgeInner.getSource() != edgeOuter.getSource() && edgeInner.getDestination() != edgeOuter.getDestination()){
-						if(outerEdgeDist.equals(innerEdgeDist)){
-							System.out.println("Edges " + edgeOuter.getLabel() + " and " + edgeInner.getLabel()
-									+ " are incident pairs.");
-							count++;
-						}
-					}
-					edgeInner = eInnerscan.get_next();
-				}
-				eInnerscan.close();
-				edgeOuter = eOuterscan.get_next();
-			}
-			eOuterscan.close();
-		} catch (Exception e) {
-			e.printStackTrace();
+		short[] output_str_sizes = new short[6];
+		output_str_sizes[0] = 32;
+		output_str_sizes[1] = 32;
+		output_str_sizes[2] = 32;
+		output_str_sizes[3] = 32;
+		output_str_sizes[4] = 32;
+		output_str_sizes[5] = 32;
+		AttrType[] output_attr = new AttrType[8];
+		output_attr[0] = new AttrType(AttrType.attrString);
+		output_attr[1] = new AttrType(AttrType.attrInteger);
+		output_attr[2] = new AttrType(AttrType.attrString);
+		output_attr[3] = new AttrType(AttrType.attrString);
+		output_attr[4] = new AttrType(AttrType.attrString);
+		output_attr[5] = new AttrType(AttrType.attrInteger);
+		output_attr[6] = new AttrType(AttrType.attrString);
+		output_attr[7] = new AttrType(AttrType.attrString);
+		Tuple tu;
+		while((tu = inlj.get_next()) != null){
+			tu.setHdr((short)8, output_attr, output_str_sizes);
+			System.out.println("Edges " + tu.getStrFld(1)
+					+ " and " + tu.getStrFld(5)
+					+ " are incident pairs.");
 		}
-		System.out.println("No. of incident edge pairs "+count);
+		
+		inlj.close();
 	}
 }
