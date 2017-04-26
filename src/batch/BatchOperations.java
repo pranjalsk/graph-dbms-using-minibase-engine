@@ -198,7 +198,7 @@ public class BatchOperations {
 
 				}
 				gdb = new GraphDB(0, graphDBName);
-				System.out.println(SystemDefs.MINIBASE_RESTART_FLAG);
+				//System.out.println(SystemDefs.MINIBASE_RESTART_FLAG);
 				System.out.println("tasknumber" + taskNumber);
 
 				switch (taskNumber) {

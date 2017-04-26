@@ -79,7 +79,7 @@ public class GraphDB extends DB {
 		super();
 		
 		String home = System.getProperty("user.home");
-		dbpath = home+ "/dbs/" + graphDBName + System.getProperty("user.name")
+		dbpath = home+ "/" + graphDBName + System.getProperty("user.name")
 				+ ".minibase-db";
 
 		boolean flag = true;
