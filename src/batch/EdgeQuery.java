@@ -677,5 +677,102 @@ public class EdgeQuery {
 				"|><|(nlj) EdgeHeapFile)))\n";
 		System.out.println(queryPlan);
 	}
+	
+	//Sort Merge Join
+	public void query7(EdgeHeapFile ehf, short labelLength) {
+		CondExpr[] expr = new CondExpr[2];
+		expr[0] = new CondExpr();
+		expr[1] = new CondExpr();
 
+		expr[0].next = null;
+		expr[0].op = new AttrOperator(AttrOperator.aopEQ);
+		expr[0].type1 = new AttrType(AttrType.attrSymbol);
+		expr[0].operand1.symbol = new FldSpec(new RelSpec(RelSpec.outer), 8);
+		expr[0].type2 = new AttrType(AttrType.attrSymbol);
+		expr[0].operand2.symbol = new FldSpec(new RelSpec(RelSpec.innerRel), 7);
+		expr[1] = null;
+		
+		
+		AttrType[] attrType = new AttrType[8];
+		attrType[0] = new AttrType(AttrType.attrInteger); // SrcNID.pageid
+		attrType[1] = new AttrType(AttrType.attrInteger); // SrcNID.slotno
+		attrType[2] = new AttrType(AttrType.attrInteger); // DestNID.pageid
+		attrType[3] = new AttrType(AttrType.attrInteger); // DestNID.slotno
+		attrType[4] = new AttrType(AttrType.attrString); // EdgeLabel
+		attrType[5] = new AttrType(AttrType.attrInteger); // EdgeWeight
+		attrType[6] = new AttrType(AttrType.attrString); // SrcLabel
+		attrType[7] = new AttrType(AttrType.attrString); // DestLabel
+
+		AttrType[] jtype = new AttrType[8];
+		jtype[0] = new AttrType(AttrType.attrString); // EdgeLabel1
+		jtype[1] = new AttrType(AttrType.attrInteger); // EdgeWeight1
+		jtype[2] = new AttrType(AttrType.attrString); // SrcLabel1
+		jtype[3] = new AttrType(AttrType.attrString); // DestLabel1
+
+		jtype[4] = new AttrType(AttrType.attrString); // EdgeLabel2
+		jtype[5] = new AttrType(AttrType.attrInteger); // EdgeWeight2
+		jtype[6] = new AttrType(AttrType.attrString); // SrcLabel2
+		jtype[7] = new AttrType(AttrType.attrString); // DestLabel2
+
+		FldSpec[] inputProjList = new FldSpec[8];
+		RelSpec rel1 = new RelSpec(RelSpec.outer);
+		RelSpec rel2 = new RelSpec(RelSpec.innerRel);
+		inputProjList[0] = new FldSpec(rel1, 1);
+		inputProjList[1] = new FldSpec(rel1, 2);
+		inputProjList[2] = new FldSpec(rel1, 3);
+		inputProjList[3] = new FldSpec(rel1, 4);
+		inputProjList[4] = new FldSpec(rel1, 5);
+		inputProjList[5] = new FldSpec(rel1, 6);
+		inputProjList[6] = new FldSpec(rel1, 7);
+		inputProjList[7] = new FldSpec(rel1, 8);
+
+		FldSpec[] outputProjList = new FldSpec[8];
+		outputProjList[0] = new FldSpec(rel1, 5);
+		outputProjList[1] = new FldSpec(rel1, 6);
+		outputProjList[2] = new FldSpec(rel1, 7);
+		outputProjList[3] = new FldSpec(rel1, 8);
+		outputProjList[4] = new FldSpec(rel2, 5);
+		outputProjList[5] = new FldSpec(rel2, 6);
+		outputProjList[6] = new FldSpec(rel2, 7);
+		outputProjList[7] = new FldSpec(rel2, 8);
+
+		String edgeHeapFileName = ehf.get_fileName();
+		short s1_sizes[] = new short[3];
+		s1_sizes[0] = labelLength;
+		s1_sizes[1] = labelLength;
+		s1_sizes[2] = labelLength;
+		
+		short s2_sizes[] = new short[6];
+		s2_sizes[0] = labelLength;
+		s2_sizes[1] = labelLength;
+		s2_sizes[2] = labelLength;
+		s2_sizes[3] = labelLength;
+		s2_sizes[4] = labelLength;
+		s2_sizes[5] = labelLength;
+
+		TupleOrder order = new TupleOrder(TupleOrder.Ascending);
+		EFileScan efscan1 = null;
+		EFileScan efscan2 = null;
+		SortMerge sm = null;
+		Tuple t;
+
+		try {
+			efscan1 = new EFileScan(edgeHeapFileName, attrType, s1_sizes,
+					(short) 8, 8, inputProjList, null);
+			efscan2 = new EFileScan(edgeHeapFileName, attrType, s1_sizes,
+					(short) 8, 8, inputProjList, null);
+			sm = new SortMerge(
+					attrType, 8, s1_sizes, attrType, 8, s1_sizes, 8,
+					labelLength, 7, labelLength, 100, efscan1, efscan2, false,
+					false, order, expr, outputProjList, outputProjList.length);
+					
+			while ((t = sm.get_next()) != null) {
+				t.print(jtype);
+			}
+			efscan1.close();
+			efscan2.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }
