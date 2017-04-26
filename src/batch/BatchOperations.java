@@ -62,11 +62,17 @@ public class BatchOperations {
 	public static String logpath;
 	static HashSet<String> hs;
 
+	/**
+	 * @param args
+	 * @throws Exception
+	 */
 	public static void main(String[] args) throws Exception {
 		/*
-		 * Menu Driven Program (CUI for Batch operations) Enter the task name of
-		 * your choice Enter the input file path Enter the GraphDB name Call the
-		 * appropriate class methods according to the task number
+		 * Menu Driven Program (CUI for Batch operations)
+		 * Enter the task name of your choice
+		 * Enter the input file path
+		 * Enter the GraphDB name
+		 * Call the appropriate class methods according to the task number
 		 */
 		do {
 			BufferedReader br = new BufferedReader(new InputStreamReader(
@@ -438,7 +444,6 @@ public class BatchOperations {
 						ztf_node_desc.close();
 						printStatistics(gdb, nhf, ehf);
 					} catch (Exception e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
 					break;
@@ -460,6 +465,8 @@ public class BatchOperations {
 								"IndEdgeLabel_" + graphDBName);
 						BTreeFile btf_edge_weight = new BTreeFile(
 								"IndEdgeWeight_" + graphDBName);
+						BTreeFile btf_edge_dest_label = new BTreeFile(
+								"IndEdgeDestLabel_" + graphDBName);
 						try {
 							// heapfile scan
 							if (index == 0) {
@@ -483,10 +490,10 @@ public class BatchOperations {
 											(short) numBuf, edgeWtBound1,
 											edgeWtBound2);
 								} else if (qtype == 6) {
-									eq.query6(ehf);
-								} else if (qtype == 7) {
-									eq.query7(ehf, (short) 32);
-								}
+									eq.query6(ehf,(short) numBuf);
+								} else if(qtype == 7){
+									eq.query7(gdb.ehf, (short) 32);	//Sort Merge Join
+	  							}
 
 							}
 							// index scan
@@ -511,7 +518,7 @@ public class BatchOperations {
 											edgeLabelLength, (short) numBuf,
 											edgeWtBound1, edgeWtBound2);
 								} else if (qtype == 6) {
-									eqi.query6(ehf, btf_edge_label, nhf,
+									eqi.query6(ehf, btf_edge_dest_label, nhf,
 											edgeLabelLength, (short) numBuf);
 								}
 							}
@@ -520,7 +527,7 @@ public class BatchOperations {
 							btf_node_label.close();
 							btf_edge_label.close();
 							btf_edge_weight.close();
-							// ztf_node_desc.close();
+							btf_edge_dest_label.close();
 
 							printStatistics(gdb, nhf, ehf);
 						} catch (Exception e) {
@@ -528,7 +535,6 @@ public class BatchOperations {
 						}
 
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					break;
@@ -603,6 +609,13 @@ public class BatchOperations {
 		} while (true);
 	}// main
 
+	/**
+	 * @param newGDB
+	 * @param nhf
+	 * @param ehf
+	 * @throws Exception
+	 */
+	//Prints Nodecount and Edgecount
 	public static void printStatistics(GraphDB newGDB, NodeHeapfile nhf,
 			EdgeHeapFile ehf) throws Exception {
 		int n = newGDB.getNodeCnt(nhf);

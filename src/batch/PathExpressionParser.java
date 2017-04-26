@@ -27,6 +27,15 @@ public class PathExpressionParser {
 	Object[] objExpList;
 	AttrType[] attrTypeList;
 	
+	/**
+	 * @param inputPathExpression
+	 * @param btf_node
+	 * @param nhf
+	 * @param ztf_desc
+	 * @return
+	 * @throws Exception
+	 */
+	// Returns an iterator over all possible NIDs of the head node, an array of objects & its types for Query1
 	public int pathExpressionQuery1Parser(String inputPathExpression,
 			BTreeFile btf_node, NodeHeapfile nhf, ZTreeFile ztf_desc)
 			throws Exception {
@@ -95,6 +104,15 @@ public class PathExpressionParser {
 		return type[0];
 	}
 
+	/**
+	 * @param inputPathExpression
+	 * @param nhf
+	 * @param ztf_desc
+	 * @param btf_node
+	 * @return
+	 * @throws Exception
+	 */
+	// Returns an iterator over all possible NIDs of the head node, an array of objects & its types for Query2
 	public int pathExpressionQuery2Parser(String inputPathExpression, NodeHeapfile nhf, ZTreeFile ztf_desc, BTreeFile btf_node) throws Exception {
 		int [] type = new int[1];
 		
@@ -151,6 +169,15 @@ public class PathExpressionParser {
 		return type[0];
 	}
 
+	/**
+	 * @param inputPathExpression
+	 * @param nhf
+	 * @param ztf_desc
+	 * @param btf_node
+	 * @return
+	 * @throws Exception
+	 */
+	// Returns an iterator over all possible NIDs of the head node, an array of objects & its types for Query3
 	public int pathExpressionQuery3Parser(String inputPathExpression, NodeHeapfile nhf, ZTreeFile ztf_desc, BTreeFile btf_node) throws Exception {
 		int [] type = new int[1];
 		
@@ -203,6 +230,13 @@ public class PathExpressionParser {
 		return type[0];
 	}
 	
+	/**
+	 * @param objExpressions
+	 * @param attrTypes
+	 * @param trianglePathExpression
+	 * @return
+	 */
+	// Returns an array of objects & its types for Triangle Query
 	public int triangleQueryParser(Object[] objExpressions,
 			AttrType[] attrTypes, String trianglePathExpression) {
 		int[] type = new int[1];
@@ -223,6 +257,12 @@ public class PathExpressionParser {
 		return type[0];
 	}
 
+	/**
+	 * @param pathexp
+	 * @param type
+	 * @return
+	 */
+	//Splits the input query string into appropriate format to be used by parser functions
 	public List<String[]> splitPathExpression(String pathexp, int[] type) {
 
 		List<String> partialListForQueries = new ArrayList<String>();
@@ -246,6 +286,10 @@ public class PathExpressionParser {
 		return map;
 	}
 
+	/**
+	 * @param partialListForQueries
+	 * @return
+	 */
 	public List<String[]> keyValueSeparator(List<String> partialListForQueries) {
 
 		List<String[]> map = new ArrayList<String[]>();

@@ -12,7 +12,17 @@ import nodeheap.*;
 import global.*;
 
 public class BatchEdgeDelete {
-
+	/**
+	 * @param ehf
+	 * @param nhf
+	 * @param btf_node
+	 * @param btfEdgeLabl
+	 * @param btfEdgeWt
+	 * @param btf_edge_src_label
+	 * @param btf_edge_dest_label
+	 * @param filePath
+	 * @throws Exception
+	 */
 	public void deleteBatchEdge(EdgeHeapFile ehf, NodeHeapfile nhf,
 			BTreeFile btf_node, BTreeFile btfEdgeLabl, BTreeFile btfEdgeWt,BTreeFile btf_edge_src_label ,BTreeFile btf_edge_dest_label, 
 			String filePath) throws Exception {
@@ -54,7 +64,6 @@ public class BatchEdgeDelete {
 						try {
 							boolean deleteStatus = ehf.deleteRecord(newEid);
 						} catch (Exception e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 

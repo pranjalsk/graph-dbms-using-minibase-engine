@@ -10,7 +10,13 @@ import heap.*;
 import diskmgr.*;
 
 public class BatchEdgeInsert {
-	
+	/**
+	 * @param ehf
+	 * @param nhf
+	 * @param btf_node
+	 * @param filePath
+	 * @throws Exception
+	 */
 	public void insertBatchEdge(EdgeHeapFile ehf, NodeHeapfile nhf, BTreeFile btf_node, String filePath) throws Exception{
 		try{
 			BufferedReader br = new BufferedReader(new FileReader(filePath));
@@ -45,7 +51,4 @@ public class BatchEdgeInsert {
 			e.printStackTrace();
 		}
 	}
-	/*At the end of the batch insertion process, the program should also output the relevant database statistics (node and
-			edge counts) and the number of disk pages that were read and written (separately) during the operation.
-			To be figured out*/
 }

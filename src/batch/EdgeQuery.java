@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import btree.BTreeFile;
+import bufmgr.PageNotReadException;
 
 import edgeheap.EScan;
 import edgeheap.Edge;
@@ -17,14 +18,29 @@ import global.EID;
 import global.NID;
 import global.TupleOrder;
 import heap.FieldNumberOutOfBoundException;
+import heap.InvalidTupleSizeException;
+import heap.InvalidTypeException;
 import heap.Tuple;
+import index.IndexException;
 import iterator.CondExpr;
 import iterator.EFileScan;
+import iterator.FileScanException;
 import iterator.FldSpec;
+import iterator.InvalidRelation;
+import iterator.Iterator;
+import iterator.JoinsException;
+import iterator.LowMemException;
 import iterator.NFileScan;
+import iterator.NestedLoopException;
+import iterator.NestedLoopsJoins;
+import iterator.PredEvalException;
 import iterator.RelSpec;
 import iterator.Sort;
+import iterator.SortException;
 import iterator.SortMerge;
+import iterator.TupleUtilsException;
+import iterator.UnknowAttrType;
+import iterator.UnknownKeyTypeException;
 import nodeheap.NScan;
 import nodeheap.Node;
 import nodeheap.NodeHeapfile;
@@ -73,6 +89,8 @@ public class EdgeQuery {
 
 				edge = escan.getNext(eid);
 			}
+			String queryPlan = "(Pi(edge.label, edge.weight, edge.source, edge.dest) (EdgeHeapFile))\n";
+			System.out.println(queryPlan);
 			escan.closescan();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -156,7 +174,9 @@ public class EdgeQuery {
 			}
 			nfscan.close();
 			sort.close();
-
+			String queryPlan = "\n(Pi(edge.label, edge.weight, edge.source)(Sigma(node.label == edge.source)((Sort - node.label(Pi(node.label, node.descriptor) " +
+					"(NodeHeapFile)))  |><| EdgeHeapFile)))\n";
+			System.out.println(queryPlan);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -239,7 +259,9 @@ public class EdgeQuery {
 			}
 			nfscan.close();
 			sort.close();
-
+			String queryPlan = "\n(Pi(edge.label, edge.weight, edge.dest)(Sigma(node.label == edge.dest)((Sort - node.label(Pi(node.label, node.descriptor) " +
+					"(NodeHeapFile)))  |><| EdgeHeapFile)))\n";
+			System.out.println(queryPlan);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -324,6 +346,9 @@ public class EdgeQuery {
 			}
 			efscan.close();
 			sort.close();
+			String queryPlan = "\nSort - edge.label(Pi(edge.label, edge.weight, edge.source, edge.dest) " +
+					"(EdgeHeapFile))\n";
+			System.out.println(queryPlan);
 		} catch (Exception e) {
 			e.printStackTrace();
 
@@ -408,7 +433,9 @@ public class EdgeQuery {
 			}
 			sort.close();
 			efscan.close();
-
+			String queryPlan = "\nSort - edge.weight(Pi(edge.label, edge.weight, edge.source, edge.dest) " +
+					"(EdgeHeapFile))\n";
+			System.out.println(queryPlan);
 		} catch (Exception e) {
 			e.printStackTrace();
 
@@ -517,7 +544,9 @@ public class EdgeQuery {
 				e = efscan.get_next();
 			}
 			efscan.close();
-
+			String queryPlan = "\nPi(edge.label, edge.weight, edge.source, edge.dest) " +
+					"(Sigma(edge.weight > lowBound && edge.weight < upBound)(EdgeHeapFile))\n";
+			System.out.println(queryPlan);
 		} catch (Exception e) {
 			e.printStackTrace();
 
@@ -525,57 +554,131 @@ public class EdgeQuery {
 	}
 
 	/**
-	 * 
+	 * printing the edge pairs who have the same destination node
+	 * but not with itself using IndexNestedLoopsJoins
 	 * @param ehf
-	 *            Edge Heap File
-	 * @param nhf
-	 *            Node Heap File
+	 * Edge Heap File
+	 * @throws Exception 
+	 * @throws UnknownKeyTypeException 
+	 * @throws UnknowAttrType 
+	 * @throws LowMemException 
+	 * @throws PredEvalException 
+	 * @throws PageNotReadException 
+	 * @throws InvalidTypeException 
+	 * @throws InvalidTupleSizeException 
 	 */
-	public void query6(EdgeHeapFile ehf) {
-
-		int count = 0;
-		Edge edgeOuter;
-		EID eidOuter = new EID();
-		try {
-			EScan eOuterscan = ehf.openScan();
-			edgeOuter = eOuterscan.getNext(eidOuter);
-
-			while (edgeOuter != null) {
-				edgeOuter.setHdr();
-				NID outerEdgeDist = edgeOuter.getDestination();
-
-				Edge edgeInner;
-				EID eidInner = new EID();
-				EScan eInnerscan = ehf.openScan();
-				edgeInner = eInnerscan.getNext(eidInner);
-
-				while (edgeInner != null) {
-					edgeInner.setHdr();
-					NID innerEdgeDist = edgeInner.getDestination();
-					if (edgeInner.getLabel() != edgeOuter.getLabel()
-							&& edgeInner.getWeight() != edgeOuter.getWeight()
-							&& edgeInner.getSource() != edgeOuter.getSource()
-							&& edgeInner.getDestination() != edgeOuter
-									.getDestination()) {
-						if (outerEdgeDist.equals(innerEdgeDist)) {
-							System.out.println("Edges " + edgeOuter.getLabel()
-									+ " and " + edgeInner.getLabel()
-									+ " are incident pairs.");
-							count++;
-						}
-					}
-					edgeInner = eInnerscan.getNext(eidInner);
-				}
-				eInnerscan.closescan();
-				edgeOuter = eOuterscan.getNext(eidOuter);
-			}
-			eOuterscan.closescan();
-		} catch (Exception e) {
-			e.printStackTrace();
+	public void query6(EdgeHeapFile ehf, short numBuf) throws InvalidTupleSizeException, InvalidTypeException, PageNotReadException, PredEvalException, LowMemException, UnknowAttrType, UnknownKeyTypeException, Exception {
+		
+		short[] t2_str_sizes = new short[3];
+		t2_str_sizes[0] = 32;
+		t2_str_sizes[1] = 32;
+		t2_str_sizes[2] = 32;
+		AttrType[] in2 = new AttrType[8];
+		in2[0] = new AttrType(AttrType.attrInteger);
+		in2[1] = new AttrType(AttrType.attrInteger);
+		in2[2] = new AttrType(AttrType.attrInteger);
+		in2[3] = new AttrType(AttrType.attrInteger);
+		in2[4] = new AttrType(AttrType.attrString);
+		in2[5] = new AttrType(AttrType.attrInteger);
+		in2[6] = new AttrType(AttrType.attrString);
+		in2[7] = new AttrType(AttrType.attrString);
+		
+		FldSpec[] proj_list = new FldSpec[8];
+		RelSpec inner_relation = new RelSpec(RelSpec.innerRel);
+		RelSpec outer_relation = new RelSpec(RelSpec.outer);
+		proj_list[0] = new FldSpec(outer_relation, 1);
+		proj_list[1] = new FldSpec(outer_relation, 2);
+		proj_list[2] = new FldSpec(outer_relation, 3);
+		proj_list[3] = new FldSpec(outer_relation, 4);
+		proj_list[4] = new FldSpec(outer_relation, 5);
+		proj_list[5] = new FldSpec(outer_relation, 6);
+		proj_list[6] = new FldSpec(outer_relation, 7);
+		proj_list[7] = new FldSpec(outer_relation, 8);
+		
+		CondExpr[] out_filter_outer_Iterator = new CondExpr[3];
+		out_filter_outer_Iterator[0] = new CondExpr();
+		out_filter_outer_Iterator[0].op = new AttrOperator(AttrOperator.aopEQ);
+		out_filter_outer_Iterator[0].type2 = new AttrType(AttrType.attrSymbol);
+		out_filter_outer_Iterator[0].type1 = new AttrType(AttrType.attrSymbol);
+		out_filter_outer_Iterator[0].operand2.symbol = new FldSpec(new RelSpec(
+				RelSpec.outer), 8);
+		out_filter_outer_Iterator[0].operand1.symbol = new FldSpec(new RelSpec(
+				RelSpec.innerRel), 8);
+		out_filter_outer_Iterator[1] = new CondExpr();
+		out_filter_outer_Iterator[1].op = new AttrOperator(AttrOperator.aopNE);
+		out_filter_outer_Iterator[1].type2 = new AttrType(AttrType.attrSymbol);
+		out_filter_outer_Iterator[1].type1 = new AttrType(AttrType.attrSymbol);
+		out_filter_outer_Iterator[1].operand2.symbol = new FldSpec(new RelSpec(
+				RelSpec.outer), 5);
+		out_filter_outer_Iterator[1].operand1.symbol = new FldSpec(new RelSpec(
+				RelSpec.innerRel), 5);
+		out_filter_outer_Iterator[2] = null;
+		CondExpr or2 =	new CondExpr();
+		or2.op = new AttrOperator(AttrOperator.aopNE);
+		or2.type2 = new AttrType(AttrType.attrSymbol);
+		or2.type1 = new AttrType(AttrType.attrSymbol);
+		or2.operand2.symbol = new FldSpec(new RelSpec(
+				RelSpec.outer), 6);
+		or2.operand1.symbol = new FldSpec(new RelSpec(
+				RelSpec.innerRel), 6);
+		CondExpr or3 = new CondExpr();
+		or3.op = new AttrOperator(AttrOperator.aopNE);
+		or3.type2 = new AttrType(AttrType.attrSymbol);
+		or3.type1 = new AttrType(AttrType.attrSymbol);
+		or3.operand2.symbol = new FldSpec(new RelSpec(
+				RelSpec.outer), 7);
+		or3.operand1.symbol = new FldSpec(new RelSpec(
+				RelSpec.innerRel), 7);
+		or3.next =or2;
+		out_filter_outer_Iterator[1].next = or2;
+		
+		FldSpec[] outer_proj_list = new FldSpec[8];
+		outer_proj_list[0] = new FldSpec(inner_relation, 5);
+		outer_proj_list[1] = new FldSpec(inner_relation, 6);
+		outer_proj_list[2] = new FldSpec(inner_relation, 7);
+		outer_proj_list[3] = new FldSpec(inner_relation, 8);
+		outer_proj_list[4] = new FldSpec(outer_relation, 5);
+		outer_proj_list[5] = new FldSpec(outer_relation, 6);
+		outer_proj_list[6] = new FldSpec(outer_relation, 7);
+		outer_proj_list[7] = new FldSpec(outer_relation, 8);
+		Iterator eScan = new EFileScan(ehf.get_fileName(), in2, t2_str_sizes, (short)8, 8, proj_list, null);
+		
+		
+		Iterator nlj = new NestedLoopsJoins(in2, 8, t2_str_sizes, in2, 8, t2_str_sizes, numBuf, eScan, ehf.get_fileName(), out_filter_outer_Iterator, null, outer_proj_list, 8);
+		
+		
+		short[] output_str_sizes = new short[6];
+		output_str_sizes[0] = 32;
+		output_str_sizes[1] = 32;
+		output_str_sizes[2] = 32;
+		output_str_sizes[3] = 32;
+		output_str_sizes[4] = 32;
+		output_str_sizes[5] = 32;
+		AttrType[] output_attr = new AttrType[8];
+		output_attr[0] = new AttrType(AttrType.attrString);
+		output_attr[1] = new AttrType(AttrType.attrInteger);
+		output_attr[2] = new AttrType(AttrType.attrString);
+		output_attr[3] = new AttrType(AttrType.attrString);
+		output_attr[4] = new AttrType(AttrType.attrString);
+		output_attr[5] = new AttrType(AttrType.attrInteger);
+		output_attr[6] = new AttrType(AttrType.attrString);
+		output_attr[7] = new AttrType(AttrType.attrString);
+		Tuple tu;
+		while((tu = nlj.get_next()) != null){
+			tu.setHdr((short)8, output_attr, output_str_sizes);
+			System.out.println("Edges " + tu.getStrFld(1)
+					+ " and " + tu.getStrFld(5)
+					+ " are incident pairs.");
 		}
-		System.out.println("No. of incident edge pairs " + count);
+		
+		nlj.close();
+		String queryPlan = "\n(Pi(outedge.label, inedge.label)(Sigma((outedge.dest == inedge.dest) && (outedge.label != inedge.label " +
+				"|| outedge.weight != inedge.weight || outedge.source != inedge.source))(EdgeHeapFile) " +
+				"|><|(nlj) EdgeHeapFile)))\n";
+		System.out.println(queryPlan);
 	}
-
+	
+	//Sort Merge Join
 	public void query7(EdgeHeapFile ehf, short labelLength) {
 		CondExpr[] expr = new CondExpr[2];
 		expr[0] = new CondExpr();
@@ -601,23 +704,15 @@ public class EdgeQuery {
 		attrType[7] = new AttrType(AttrType.attrString); // DestLabel
 
 		AttrType[] jtype = new AttrType[8];
-//		jtype[0] = new AttrType(AttrType.attrInteger); // SrcNID1.pageid
-//		jtype[1] = new AttrType(AttrType.attrInteger); // SrcNID1.slotno
-//		jtype[2] = new AttrType(AttrType.attrInteger); // DestNID1.pageid
-//		jtype[3] = new AttrType(AttrType.attrInteger); // DestNID1.slotno
 		jtype[0] = new AttrType(AttrType.attrString); // EdgeLabel1
 		jtype[1] = new AttrType(AttrType.attrInteger); // EdgeWeight1
 		jtype[2] = new AttrType(AttrType.attrString); // SrcLabel1
 		jtype[3] = new AttrType(AttrType.attrString); // DestLabel1
-		
-//		jtype[8] = new AttrType(AttrType.attrInteger); // SrcNID.pageid
-//		jtype[9] = new AttrType(AttrType.attrInteger); // SrcNID.slotno
-//		jtype[10] = new AttrType(AttrType.attrInteger); // DestNID.pageid
-//		jtype[11] = new AttrType(AttrType.attrInteger); // DestNID.slotno
-		jtype[4] = new AttrType(AttrType.attrString); // EdgeLabel
-		jtype[5] = new AttrType(AttrType.attrInteger); // EdgeWeight
-		jtype[6] = new AttrType(AttrType.attrString); // SrcLabel
-		jtype[7] = new AttrType(AttrType.attrString); // DestLabel
+
+		jtype[4] = new AttrType(AttrType.attrString); // EdgeLabel2
+		jtype[5] = new AttrType(AttrType.attrInteger); // EdgeWeight2
+		jtype[6] = new AttrType(AttrType.attrString); // SrcLabel2
+		jtype[7] = new AttrType(AttrType.attrString); // DestLabel2
 
 		FldSpec[] inputProjList = new FldSpec[8];
 		RelSpec rel1 = new RelSpec(RelSpec.outer);
@@ -640,14 +735,6 @@ public class EdgeQuery {
 		outputProjList[5] = new FldSpec(rel2, 6);
 		outputProjList[6] = new FldSpec(rel2, 7);
 		outputProjList[7] = new FldSpec(rel2, 8);
-/*		outputProjList[8] = new FldSpec(rel2, 1);
-		outputProjList[9] = new FldSpec(rel2, 2);
-		outputProjList[10] = new FldSpec(rel2, 3);
-		outputProjList[11] = new FldSpec(rel2, 4);
-		outputProjList[12] = new FldSpec(rel2, 5);
-		outputProjList[13] = new FldSpec(rel2, 6);
-		outputProjList[14] = new FldSpec(rel2, 7);
-		outputProjList[15] = new FldSpec(rel2, 8);*/
 
 		String edgeHeapFileName = ehf.get_fileName();
 		short s1_sizes[] = new short[3];
@@ -688,5 +775,4 @@ public class EdgeQuery {
 			e.printStackTrace();
 		}
 	}
-
 }
