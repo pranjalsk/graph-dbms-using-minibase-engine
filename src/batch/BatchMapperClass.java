@@ -98,19 +98,16 @@ public class BatchMapperClass {
 		}
 	}// getEidFromEdgeLabel
 
-	
-<<<<<<< HEAD
 
-=======
-	/**
+	/**Returns an iterator over all NIDs associated with input Node Descriptor
 	 * @param input
 	 * @param nhf
 	 * @param ztf_desc
 	 * @return
 	 * @throws Exception
 	 */
-	// Returns an iterator over all NIDs associated with input Node Descriptor
->>>>>>> cfc27026a13264a4fe0a2ffc5718264f2606315d
+	// 
+
 	public Iterator getNidFromDescriptor(String input, NodeHeapfile nhf,
 			ZTreeFile ztf_desc) throws Exception {
 		
