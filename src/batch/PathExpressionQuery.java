@@ -33,6 +33,7 @@ import iterator.PredEvalException;
 import iterator.RelSpec;
 import iterator.Sort;
 import iterator.SortException;
+import iterator.SortMerge;
 import iterator.TupleUtilsException;
 import iterator.UnknowAttrType;
 import iterator.UnknownKeyTypeException;
@@ -819,7 +820,7 @@ public class PathExpressionQuery {
 		sort.close();
 		triExprQueryResult.deleteFile();
 		queryPlan = "";
-		queryPlan = "Sigma(Unique)(Sort-tiplet combined(Sigma(dest3 == src1 && src3 == dest2)(Sigma(2nd edge condition)(Sigma(1st edge condition)(EdgeHeapFile)) |><|(inlj) (EdgeHeapFile)) |><|(inlj) (EdgeHeapFile)))";
+		queryPlan = "Sigma(Unique)(Sort-tiplet combined(Sigma(dest3 == src1 && src3 == dest2)(Sigma(2nd edge condition)(Sigma(1st edge condition)(EdgeHeapFile)) |><|(inlj) (EdgeHeapFile)) |><|(sort-merge) (EdgeHeapFile)))";
 		System.out.println(queryPlan);
 	}
 
@@ -1034,46 +1035,53 @@ public class PathExpressionQuery {
 		}
 		outexpr[1] = null;
 
-		CondExpr[] expr = new CondExpr[3];
+		CondExpr[] expr = new CondExpr[2];
+//		expr[0] = new CondExpr();
+//		expr[0].next = null;
+//		expr[0].op = new AttrOperator(AttrOperator.aopEQ);
+//		expr[0].type1 = new AttrType(AttrType.attrSymbol);
+//		expr[0].operand1.symbol = new FldSpec(new RelSpec(RelSpec.outer), 8);
+//		expr[0].type2 = new AttrType(AttrType.attrSymbol);
+//		expr[0].operand2.symbol = new FldSpec(new RelSpec(RelSpec.innerRel), 7);
 		expr[0] = new CondExpr();
 		expr[0].next = null;
-		expr[0].op = new AttrOperator(AttrOperator.aopEQ);
-		expr[0].type1 = new AttrType(AttrType.attrSymbol);
-		expr[0].operand1.symbol = new FldSpec(new RelSpec(RelSpec.outer), 8);
 		expr[0].type2 = new AttrType(AttrType.attrSymbol);
-		expr[0].operand2.symbol = new FldSpec(new RelSpec(RelSpec.innerRel), 7);
-		expr[1] = new CondExpr();
-		expr[1].next = null;
-		expr[1].type2 = new AttrType(AttrType.attrSymbol);
 		if (attrTypes[1].attrType == AttrType.attrString) {
-			expr[1].op = new AttrOperator(AttrOperator.aopEQ);
-			expr[1].type1 = new AttrType(AttrType.attrString);
-			expr[1].operand2.symbol = new FldSpec(
+			expr[0].op = new AttrOperator(AttrOperator.aopEQ);
+			expr[0].type1 = new AttrType(AttrType.attrString);
+			expr[0].operand2.symbol = new FldSpec(
 					new RelSpec(RelSpec.innerRel), 5);
-			expr[1].operand1.string = (String) objExpressions[1];
+			expr[0].operand1.string = (String) objExpressions[1];
 		} else {
-			expr[1].op = new AttrOperator(AttrOperator.aopGE);
-			expr[1].type1 = new AttrType(AttrType.attrInteger);
-			expr[1].operand2.symbol = new FldSpec(
+			expr[0].op = new AttrOperator(AttrOperator.aopGE);
+			expr[0].type1 = new AttrType(AttrType.attrInteger);
+			expr[0].operand2.symbol = new FldSpec(
 					new RelSpec(RelSpec.innerRel), 6);
-			expr[1].operand1.integer = (Integer) objExpressions[1];
+			expr[0].operand1.integer = (Integer) objExpressions[1];
 		}
-		expr[2] = null;
+		expr[1] = null;
 
 		TupleOrder order = new TupleOrder(TupleOrder.Ascending);
-		EFileScan efscan1 = null;
 		Iterator sm = null;
 
 		try {
-			efscan1 = new EFileScan(ehfName, attrType, s1_sizes, (short) 8, 8,
-					inputProjList, outexpr);
-			sm = new NestedLoopsJoins(attrType, 8, s1_sizes, attrType, 8,
-					s1_sizes, numBuf, efscan1, ehfName, expr, null,
-					outputProjList, outputProjList.length);
+			EFileScan efscan1 = new EFileScan(ehfName, attrType, s1_sizes,
+					(short) 8, 8, inputProjList, null);
+			EFileScan efscan2 = new EFileScan(ehfName, attrType, s1_sizes,
+					(short) 8, 8, inputProjList, null);
+			sm = new SortMerge(attrType, 8, s1_sizes, attrType, 8, s1_sizes, 8,
+					32, 7, 32, numBuf, efscan1, efscan2, false, false, order,
+					expr, outputProjList, outputProjList.length);
+
+//			EFileScan efscan1 = new EFileScan(ehfName, attrType, s1_sizes, (short) 8,
+//			 8,
+//			 inputProjList, outexpr);
+//			 sm = new NestedLoopsJoins(attrType, 8, s1_sizes, attrType, 8,
+//			 s1_sizes, numBuf, efscan1, ehfName, expr, null,
+//			 outputProjList, outputProjList.length);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 		return sm;
 	}
 
@@ -1185,7 +1193,6 @@ public class PathExpressionQuery {
 		expr[3] = null;
 
 		TupleOrder order = new TupleOrder(TupleOrder.Ascending);
-		EFileScan efscan2 = null;
 		Iterator sm = null;
 
 		try {

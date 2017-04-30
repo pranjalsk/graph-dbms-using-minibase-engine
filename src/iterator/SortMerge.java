@@ -41,6 +41,8 @@ public class SortMerge extends Iterator implements GlobalConst {
 	private double distance;
 	private Descriptor target;
 
+	short s1_si[];
+	
 	/**
 	 * constructor,initialization
 	 * 
@@ -108,6 +110,7 @@ public class SortMerge extends Iterator implements GlobalConst {
 			TupleUtilsException, IOException
 
 	{
+		s1_si = s1_sizes;
 		_in1 = new AttrType[in1.length];
 		_in2 = new AttrType[in2.length];
 		System.arraycopy(in1, 0, _in1, 0, in1.length);
@@ -615,19 +618,20 @@ public class SortMerge extends Iterator implements GlobalConst {
 				
 			}
 			if ((_tuple2 = io_buf2.Get(TempTuple2)) == null) {
-
 				if ((_tuple1 = io_buf1.Get(TempTuple1)) == null) {
 					io_buf1.close();
 					io_buf2.close();
+					temp_file_fd1.deleteFile();
+					temp_file_fd2.deleteFile();
+					temp_file_fd1 = new Heapfile(null);
+					temp_file_fd2 = new Heapfile(null);
 					process_next_block = true;
 					continue; // Process next equivalence class
 				} else {
 					io_buf2.reread();
 					_tuple2 = io_buf2.Get(TempTuple2);
-
 				}
 			}
-			
 			if (PredEval.Eval(OutputFilter, TempTuple1, TempTuple2, _in1, _in2) == true) {
 				Projection.Join(TempTuple1, _in1, TempTuple2, _in2, Jtuple,
 						perm_mat, nOutFlds);

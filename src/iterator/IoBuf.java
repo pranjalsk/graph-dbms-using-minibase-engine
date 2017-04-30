@@ -42,6 +42,9 @@ public class IoBuf implements GlobalConst {
 		curr_page = 0;
 		flushed = false;
 		mode = WRITE_BUFFER;
+		if(i_buf != null){
+			i_buf.close();
+		}
 		i_buf = new SpoofIbuf();
 		done = false;
 	}
@@ -110,7 +113,6 @@ public class IoBuf implements GlobalConst {
 		if (flushed) {
 			// get tuples from
 			if ((temptuple = i_buf.Get(buf)) == null) {
-				i_buf.close();
 				done = true;
 				return null;
 			}
@@ -122,7 +124,6 @@ public class IoBuf implements GlobalConst {
 				return null;
 			}
 			buf.tupleSet(_bufs[curr_page], t_rd_from_pg * t_size, t_size);
-
 			// Setup for next read
 			t_rd_from_pg++;
 			if (t_rd_from_pg == t_per_pg) {
@@ -162,6 +163,7 @@ public class IoBuf implements GlobalConst {
 						throw e;
 					}
 				}
+				
 			}
 			dirty = false;
 		}
@@ -178,7 +180,7 @@ public class IoBuf implements GlobalConst {
 	 *                other exceptions
 	 */
 	public void reread() throws IOException, Exception {
-
+		done = false;
 		mode = READ_BUFFER;
 		if (flushed) // Has the output buffe been flushed?
 		{
@@ -188,6 +190,7 @@ public class IoBuf implements GlobalConst {
 			i_buf.init(_temp_fd, _bufs, _n_pages, t_size, (int) t_written);
 		} else {
 			// All the tuples are in the buffer, just read them out.
+			
 			t_rd_from_pg = 0;
 			curr_page = 0;
 		}

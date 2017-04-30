@@ -759,16 +759,16 @@ public class EdgeQuery {
 		try {
 			efscan1 = new EFileScan(edgeHeapFileName, attrType, s1_sizes,
 					(short) 8, 8, inputProjList, null);
-			Sort sort1 = new Sort(attrType, (short) 8, s1_sizes, efscan1,
-					8, order, 32, numBuf / 2);
+//			Sort sort1 = new Sort(attrType, (short) 8, s1_sizes, efscan1,
+//					8, order, 32, numBuf / 2);
 			efscan2 = new EFileScan(edgeHeapFileName, attrType, s1_sizes,
 					(short) 8, 8, inputProjList, null);
-			Sort sort2 = new Sort(attrType, (short) 8, s1_sizes, efscan2,
-					7, order, 32, numBuf / 2);
+//			Sort sort2 = new Sort(attrType, (short) 8, s1_sizes, efscan2,
+//					7, order, 32, numBuf / 2);
 			sm = new SortMerge(
 					attrType, 8, s1_sizes, attrType, 8, s1_sizes, 8,
-					labelLength, 7, labelLength, numBuf, sort1, sort2, true,
-					true, order, null, outputProjList, outputProjList.length);
+					labelLength, 7, labelLength, numBuf, efscan1, efscan2, false,
+					false, order, null, outputProjList, outputProjList.length);
 					
 			while ((t = sm.get_next()) != null) {
 				t.print(jtype);
