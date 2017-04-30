@@ -226,6 +226,7 @@ public class Heapfile implements Filetype,  GlobalConst {
       
       if(name == null) 
 	{
+    	  System.out.println("Reached>>>>>>>"+tempfilecount);
 	  // If the name is NULL, allocate a temporary name
 	  // and no logging is required.
 	  _fileName = "tempHeapFile";

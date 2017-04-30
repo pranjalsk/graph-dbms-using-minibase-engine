@@ -492,7 +492,7 @@ public class BatchOperations {
 								} else if (qtype == 6) {
 									eq.query6(ehf,(short) numBuf);
 								} else if(qtype == 7){
-									eq.query7(gdb.ehf, (short) 32);	//Sort Merge Join
+									eq.query7(gdb.ehf, (short) 32,(short) numBuf);	//Sort Merge Join
 	  							}
 
 							}
