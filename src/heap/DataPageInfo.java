@@ -74,9 +74,9 @@ class DataPageInfo implements GlobalConst{
    */
   public DataPageInfo(Tuple _atuple)
        throws InvalidTupleSizeException, IOException
-  {   
+  {  
      // need check _atuple size == this.size ?otherwise, throw new exception
-    if (_atuple.getLength()!=12){
+    if (_atuple.getLength()!=12){ System.out.println("Racehd>>>>>>>>>"+_atuple.getLength());
       throw new InvalidTupleSizeException(null, "HEAPFILE: TUPLE SIZE ERROR");
     }
 
@@ -114,7 +114,6 @@ class DataPageInfo implements GlobalConst{
     return atuple;
 
   }
-  
     
   /** write this object's useful fields(availspace, recct, pageId) 
    *  to the data[](may be in buffer pool)

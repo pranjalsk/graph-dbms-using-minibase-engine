@@ -27,8 +27,6 @@ public class BTreeFile extends IndexFile
   
   private static FileOutputStream fos;
   private static DataOutputStream trace;
-  
-  
   /** It causes a structured trace to be written to a
    * file.  This output is
    * used to drive a visualization tool that shows the inner workings of the
@@ -43,7 +41,7 @@ public class BTreeFile extends IndexFile
       fos=new FileOutputStream(filename);
       trace=new DataOutputStream(fos);
     }
-  
+
   /** Stop tracing. And close trace file. 
    *@exception IOException error from the lower layer
    */
@@ -61,6 +59,10 @@ public class BTreeFile extends IndexFile
   private  PageId  headerPageId;
   private String  dbname;  
   
+	public String get_fileName() {
+		return new String(dbname);
+	}
+	
   /**
    * Access method to data member.
    * @return  Return a BTreeHeaderPage object that is the header page
@@ -350,9 +352,9 @@ public class BTreeFile extends IndexFile
    *@exception NodeNotMatchException  node not match index page nor leaf page
    *@exception ConvertException error when convert between revord and byte 
    *             array
-   *@exception DeleteRecException error when delete in index page
+   *@exception DeleteRecException eIndexNodeLabelrror when delete in index page
    *@exception IndexSearchException error when search 
-   *@exception IteratorException iterator error
+   *@exception IteratorException iteIndexNodeLabelrator error
    *@exception LeafDeleteException error when delete in leaf page
    *@exception InsertException  error when insert in index page
    */    
@@ -376,8 +378,10 @@ public class BTreeFile extends IndexFile
     {
       KeyDataEntry  newRootEntry;
       
-      if (BT.getKeyLength(key) > headerPage.get_maxKeySize())
-	throw new KeyTooLongException(null,"");
+      if (BT.getKeyLength(key) > headerPage.get_maxKeySize()){
+    	  System.out.println("reached"+BT.getKeyLength(key));
+    	  throw new KeyTooLongException(null,"");
+      }
       
       if ( key instanceof StringKey ) {
 	if ( headerPage.get_keyType() != AttrType.attrString ) {
@@ -1038,7 +1042,7 @@ public class BTreeFile extends IndexFile
       KeyDataEntry curEntry;
       
       pageno = headerPage.get_rootId();
-      
+      //System.out.println("pageno: "+pageno.pid);
       if (pageno.pid == INVALID_PAGE){        // no pages in the BTREE
         pageLeaf = null;                // should be handled by 
         // startrid =INVALID_PAGEID ;             // the caller
@@ -1053,7 +1057,6 @@ public class BTreeFile extends IndexFile
 	trace.writeBytes("VISIT node " + pageno + lineSep);
 	trace.flush();
       }
-      
       
       // ASSERTION
       // - pageno and sortPage is the root of the btree
@@ -1071,7 +1074,7 @@ public class BTreeFile extends IndexFile
 	}
 	
 	unpinPage(pageno);
-	
+	//System.out.println("prevpageno: "+prevpageno.pid);
 	pageno = prevpageno;
 	page=pinPage(pageno);
 	sortPage=new BTSortedPage(page, headerPage.get_keyType()); 
@@ -1097,7 +1100,7 @@ public class BTreeFile extends IndexFile
 	  // oops, no more records, so set this scan to indicate this.
 	  return null;
 	}
-	
+	//System.out.println("nextpageno: "+nextpageno.pid);
 	pageno = nextpageno; 
 	pageLeaf=  new BTLeafPage( pinPage(pageno), headerPage.get_keyType());    
 	curEntry=pageLeaf.getFirst(startrid);

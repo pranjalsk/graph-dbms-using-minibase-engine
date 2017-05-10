@@ -1,37 +1,27 @@
-## Welcome to GitHub Pages
+# GRAPH DATABASE MANAGEMENT SYSTEM IMPLEMENTATION
 
-You can use the [editor on GitHub](https://github.com/pranjalsk/MinibaseGraph/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+Submitted for credit towards CSE 510: Database mangement system implmentation [Spring 2017] at Arizona State University.
+------------------------------------------------------------------------------------------------------------------------
+Collaborators:
+1. Shirish Chavan
+2. Chiraag Subramanian
+3. Pranjal Karankar
+4. Uthara Keerthi
+5. Soundarya Manohara
+6. Manjusha Ravindranath
+------------------------------------------------------------------------------------------------------------------------
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+# Introduction
 
-### Markdown
+Minibase is a database management system which is designed not just to have a functional DBMS, but to have a DBMS where the individual components can be studied and implemented.
+A relational database is a collection of data items organized as a set of formally-described tables from which data can be accessed or reassembled in many different ways without having to reorganize the database tables. 
+A graph database is a database that uses graph structures for semantic queries with nodes, edges and properties to represent and store data. The key concept of the system is the graph (or edge or relationship), which directly relates data items in the store. The relationships allow data in the store to be linked together directly, and in many cases retrieved with one operation.
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+# Goal
 
-```markdown
-Syntax highlighted code block
+Design and implement blocks of graph database management system on the top of relational database engine of minibase.
 
-# Header 1
-## Header 2
-### Header 3
+# System Requirement
 
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/pranjalsk/MinibaseGraph/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+Linux based machine
+Make appropriate changes in make files based on Java version on your machine

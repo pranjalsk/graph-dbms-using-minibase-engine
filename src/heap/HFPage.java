@@ -5,10 +5,10 @@ package heap;
 import java.io.*;
 import java.lang.*;
 
+import heap.ConstSlot;
+
 import global.*;
 import diskmgr.*;
-
-
 
  /**
   * Define constant values for INVALID_SLOT and EMPTY_SLOT
@@ -509,7 +509,6 @@ public class HFPage extends Page
       
       int i=curRid.slotNo;
       short length; 
-      
       // find the next non-empty slot
       for (i++; i < slotCnt;  i++)
 	{

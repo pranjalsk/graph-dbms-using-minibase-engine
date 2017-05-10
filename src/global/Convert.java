@@ -2,8 +2,13 @@
 
 package global;
 
-import java.io.*;
-import java.lang.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 public class Convert {
 
@@ -26,8 +31,8 @@ public class Convert {
 		byte tmp[] = new byte[4];
 
 		// copy the value from data array out to a tmp byte array
+		
 		System.arraycopy(data, position, tmp, 0, 4);
-
 		/*
 		 * creates a new data input stream to read data from the specified input
 		 * stream
@@ -36,6 +41,7 @@ public class Convert {
 		instr = new DataInputStream(in);
 		value = instr.readInt();
 
+		
 		return value;
 	}
 
@@ -123,17 +129,35 @@ public class Convert {
 		String value;
 		byte tmp[] = new byte[length];
 
-		// copy the value from data array out to a tmp byte array
 		System.arraycopy(data, position, tmp, 0, length);
 
 		/*
 		 * creates a new data input stream to read data from the specified input
 		 * stream
 		 */
+		
 		in = new ByteArrayInputStream(tmp);
 		instr = new DataInputStream(in);
-		value = instr.readUTF();
+		try{
+			value = instr.readUTF();
+		}catch(Exception e){
+			value = "";
+		//	System.out.println("Value set");
+		}
+
 		return value;
+		/*short lengthToRead = (short)(((tmp[0] << 8)) | ((tmp[1] & 0xff)));
+		if(lengthToRead < 0) return "";
+		byte[] bytesToread = new byte[lengthToRead];
+		try{
+			System.arraycopy(data, position+2, bytesToread, 0, lengthToRead);
+		}catch(Exception e){
+			System.arraycopy(data, position+2, bytesToread, 0, 0);
+			String values = new String(bytesToread, "UTF-8");
+			System.out.println(">>>>>>>>>>>>>>>>>"+values);
+		}
+			
+		return new String(bytesToread, "UTF-8");*/
 	}
 
 	/**
@@ -177,6 +201,23 @@ public class Convert {
 		}
 		
 		value.set(intArr[0], intArr[1], intArr[2], intArr[3], intArr[4]);
+		return value;
+		
+		
+	}
+	
+	public static RID getIdValue(int position, byte[] data) throws IOException {
+
+		RID value = new RID();
+		
+		int intArr[] = new int[2];
+		
+		for(int ind = 0; ind  < 2; ind++, position+=4){
+			intArr[ind] = getIntValue(position, data);
+		}
+		
+		value.pageNo.pid = intArr[0];
+		value.slotNo = intArr[1];
 		return value;
 		
 		
@@ -305,17 +346,25 @@ public class Convert {
 
 		OutputStream out = new ByteArrayOutputStream();
 		DataOutputStream outstr = new DataOutputStream(out);
-
 		// write the value to the output stream
-
 		outstr.writeUTF(value);
 		// creates a byte array with this output stream size and the
 		// valid contents of the buffer have been copied into it
 		byte[] B = ((ByteArrayOutputStream) out).toByteArray();
 
 		int sz = outstr.size();
-		// copies the contents of this byte array into data[]
 		System.arraycopy(B, 0, data, position, sz);
+		
+		// copies the contents of this byte array into data[]Charset.forName("UTF-8")
+		/*byte[] b = value.getBytes("UTF-8");
+		short length = (short)b.length;
+		byte[] B = new byte[b.length+2];
+		B[0] = (byte)((length & 0xFF00) >> 8);
+		B[1] = (byte)(length & 0x00FF);
+		for(int i = 2; i < B.length; i++){
+			B[i] = b[i-2];
+		}
+		System.arraycopy(B, 0, data, position, B.length);*/
 
 	}
 
@@ -358,6 +407,13 @@ public class Convert {
 		for(int ind  = 0; ind < Descriptor.DESCRIPTOR_SIZE; ind++, position+=4){
 			setIntValue(value.get(ind), position, data);
 		}
+	}
+	
+	public static void setIDValue(RID value, int position, byte[] data) 
+			throws java.io.IOException {
+		
+		setIntValue(value.pageNo.pid, position, data);
+		setIntValue(value.slotNo, position+4, data);
 	}
 
 }

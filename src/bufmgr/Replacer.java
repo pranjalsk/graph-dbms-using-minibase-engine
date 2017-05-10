@@ -40,7 +40,6 @@ abstract class Replacer implements GlobalConst
       throw new InvalidFrameNumberException (null, "BUFMGR: BAD_BUFFRAMENO.");
     }
 
-
     (mgr.frameTable())[frameNo].pin();
     state_bit[frameNo].state = Pinned;
   }
@@ -66,9 +65,7 @@ abstract class Replacer implements GlobalConst
       throw new PageUnpinnedException (null, "BUFMGR: PAGE_NOT_PINNED.");
 
     }
-
     (mgr.frameTable())[frameNo].unpin();
-
     if ((mgr.frameTable())[frameNo].pin_count() == 0)
         state_bit[frameNo].state = Referenced;
     return true;
@@ -85,7 +82,6 @@ abstract class Replacer implements GlobalConst
   {
   
       if ( (mgr.frameTable())[frameNo].pin_count() > 1 ) {
-    
 	 throw new PagePinnedException (null, "BUFMGR: PAGE_PINNED.");
 	
       }

@@ -16,36 +16,44 @@ public class Tuple implements GlobalConst {
 	/**
 	 * a byte array to hold data
 	 */
-	private byte[] data;
+	protected byte[] data;
 
 	/**
 	 * start position of this tuple in data[]
 	 */
-	private int tuple_offset;
+	protected int tuple_offset;
 
 	/**
 	 * length of this tuple
 	 */
-	private int tuple_length;
+	protected int tuple_length;
 
 	/**
 	 * private field Number of fields in this tuple
 	 */
-	private short fldCnt;
+	protected short fldCnt;
 
 	/**
 	 * private field Array of offsets of the fields
 	 */
 
-	private short[] fldOffset;
+	protected short[] fldOffset;
+
+	public int getFldCnt() {
+		return (int)fldCnt;
+	}
+//for node insert operation we need to set fldCnt
+	public void setFldCnt(int fldCnt) {
+		this.fldCnt = (short)fldCnt;
+	}
 
 	/**
-	 * Class constructor Creat a new tuple with length = max_size,tuple offset =
+	 * Class constructor Create a new tuple with length = max_size,tuple offset =
 	 * 0.
 	 */
 
 	public Tuple() {
-		// Creat a new tuple
+		// Create a new tuple
 		data = new byte[max_size];
 		tuple_offset = 0;
 		tuple_length = max_size;
@@ -179,7 +187,9 @@ public class Tuple implements GlobalConst {
 	 */
 
 	public byte[] getTupleByteArray() {
+		//System.out.println("Tuple length-->"+ tuple_length);
 		byte[] tuplecopy = new byte[tuple_length];
+		//System.out.println(data.length);
 		System.arraycopy(data, tuple_offset, tuplecopy, 0, tuple_length);
 		return tuplecopy;
 	}
@@ -304,6 +314,15 @@ public class Tuple implements GlobalConst {
 		} else
 			throw new FieldNumberOutOfBoundException(null, "TUPLE:TUPLE_FLDNO_OUT_OF_BOUND");
 	}
+	
+	public RID getIDFld(int fldNo) throws IOException, FieldNumberOutOfBoundException {
+		RID rid;
+		if ((fldNo > 0) && (fldNo <= fldCnt)) {
+			rid = Convert.getIdValue(fldOffset[fldNo - 1], data);
+			return rid;
+		} else
+			throw new FieldNumberOutOfBoundException(null, "TUPLE:TUPLE_FLDNO_OUT_OF_BOUND");
+	}
 
 	/**
 	 * Set this field to integer value
@@ -387,6 +406,14 @@ public class Tuple implements GlobalConst {
 		} else
 			throw new FieldNumberOutOfBoundException(null, "TUPLE:TUPLE_FLDNO_OUT_OF_BOUND");
 	}
+	
+	public Tuple setIDFld(int fldNo, RID val) throws IOException, FieldNumberOutOfBoundException {
+		if ((fldNo > 0) && (fldNo <= fldCnt)) {
+			Convert.setIDValue(val, fldOffset[fldNo - 1], data);
+			return this;
+		} else
+			throw new FieldNumberOutOfBoundException(null, "TUPLE:TUPLE_FLDNO_OUT_OF_BOUND");
+	}
 
 	/**
 	 * setHdr will set the header of this tuple.
@@ -447,6 +474,10 @@ public class Tuple implements GlobalConst {
 			case AttrType.attrDesc:
 				incr = 20;
 				break;
+			
+			case AttrType.attrId:
+				incr = 8;
+				break;
 				
 			default:
 				throw new InvalidTypeException(null, "TUPLE: TUPLE_TYPE_ERROR");
@@ -473,6 +504,10 @@ public class Tuple implements GlobalConst {
 		
 		case AttrType.attrDesc:
 			incr = 20;
+			break;
+			
+		case AttrType.attrId:
+			incr = 8;
 			break;
 
 		default:
@@ -527,6 +562,7 @@ public class Tuple implements GlobalConst {
 		float fval;
 		String sval;
 		Descriptor desc;
+		RID ridVal;
 
 		System.out.print("[");
 		for (i = 0; i < fldCnt - 1; i++) {
@@ -557,6 +593,11 @@ public class Tuple implements GlobalConst {
 					System.out.print(desc.get(ind)+ " ");
 				}
 				break;
+				
+			case AttrType.attrId:
+				ridVal = Convert.getIdValue(fldOffset[i], data);
+				System.out.print(ridVal);
+				break;
 			}
 			System.out.print(", ");
 		}
@@ -586,6 +627,10 @@ public class Tuple implements GlobalConst {
 			for(int ind = 0; ind < Descriptor.DESCRIPTOR_SIZE; ind++){
 				System.out.print(desc.get(ind)+ " ");
 			}
+			break;
+		case AttrType.attrId:
+			ridVal = Convert.getIdValue(fldOffset[i], data);
+			System.out.print(ridVal);
 			break;
 		}
 		System.out.println("]");

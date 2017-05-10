@@ -4,7 +4,7 @@ import java.io.*;
 import global.*;
 
 /**
- *  This clas will hold single select condition
+ *  This class will hold single select condition
  *  It is an element of linked list which is logically
  *  connected by OR operators.
  */
@@ -32,7 +32,9 @@ public class CondExpr {
   /**
    * Pointer to the next element in linked list
    */    
-  public CondExpr    next;   
+  public CondExpr next;  
+  
+  public double distance;
   
   /**
    *constructor
@@ -44,7 +46,7 @@ public class CondExpr {
     
     operand1.integer = 0;
     operand2.integer = 0;
-    
+        
     next = null;
   }
 }

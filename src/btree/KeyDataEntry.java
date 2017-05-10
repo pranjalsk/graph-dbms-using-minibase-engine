@@ -23,7 +23,12 @@ public class KeyDataEntry {
      this.data = new IndexData(pageNo);
   }; 
 
-
+  /** Class constructor
+   */
+  public KeyDataEntry( Descriptor key, PageId pageNo) {
+     this.key = new DescriptorKey(key); 
+     this.data = new IndexData(pageNo);
+  }; 
 
   /** Class constructor.
    */
