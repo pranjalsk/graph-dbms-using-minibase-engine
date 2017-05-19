@@ -1,5 +1,5 @@
 ### GRAPH DATABASE MANAGEMENT SYSTEM IMPLEMENTATION
-
+----------------------------------------------------
 Submitted for credit towards CSE 510: Database mangement system implmentation [Spring 2017] at Arizona State University.
 Instructor: Dr. Kasim Canden
 ------------------------------------------------------------------------------------------------------------------------
